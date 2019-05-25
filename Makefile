@@ -1,7 +1,105 @@
 .PHONY: clean clean-test clean-pyc clean-build docs help
 .DEFAULT_GOAL := help
 
-define BROWSER_PYSCRIPT
+###############################################################################
+### constants
+###############################################################################
+
+# colors
+GREEN = $(shell tput -Txterm setaf 2)
+YELLOW = $(shell tput -Txterm setaf 3)
+WHITE = $(shell tput -Txterm setaf 7)
+RESET = $(shell tput -Txterm sgr0)
+GRAY = $(shell tput -Txterm setaf 6)
+
+
+TARGET_MAX_CHAR_NUM = 20
+
+###############################################################################
+### commands
+###############################################################################
+
+## Shows help
+help:
+	@eval "$$HELP_SCRIPT"
+
+## Remove build artifacts
+clean-build:
+	rm -fr build/
+	rm -fr dist/
+	rm -fr .eggs/
+	find . -name '*.egg-info' -exec rm -fr {} +
+	find . -name '*.egg' -exec rm -f {} +
+
+## Remove Python file artifacts
+clean-pyc:
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f {} +
+	find . -name '__pycache__' -exec rm -fr {} +
+
+## Remove test and coverage artifacts
+clean-test:
+	rm -fr .tox/
+	rm -f .coverage
+	rm -fr htmlcov/
+	rm -fr .pytest_cache
+
+## Check style with flake8
+lint:
+	flake8 aiohttp_admin2 tests
+
+## Run tests | tests
+test: ## run tests quickly with the default Python
+	py.test
+
+## Run tests on every Python version with tox
+test-all:
+	tox
+
+## Check code coverage quickly with the default Python
+coverage:
+	coverage run --source aiohttp_admin2 -m pytest
+	coverage report -m
+	coverage html
+	$(BROWSER) htmlcov/index.html
+
+## Generate Sphinx HTML documentation, including API docs | common
+docs:
+	rm -f docs/aiohttp_admin2.rst
+	rm -f docs/modules.rst
+	sphinx-apidoc -o docs/ aiohttp_admin2
+	$(MAKE) -C docs clean
+	$(MAKE) -C docs html
+	$(BROWSER) docs/_build/html/index.html
+
+## Clean the project
+clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+
+## Compile the docs watching for changes
+servedocs: docs
+	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+
+## Package and upload a release
+release: dist
+	twine upload dist/*
+
+## Builds source and wheel package
+dist: clean
+	python setup.py sdist
+	python setup.py bdist_wheel
+	ls -l dist
+
+## Install the package to the active Python's site-packages
+install: clean
+	python setup.py install
+
+
+###############################################################################
+### helpers functions
+###############################################################################
+
+define BROWSER_OPEN
 import os, webbrowser, sys
 
 try:
@@ -11,78 +109,33 @@ except:
 
 webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
 endef
-export BROWSER_PYSCRIPT
+export BROWSER_OPEN
 
-define PRINT_HELP_PYSCRIPT
-import re, sys
-
-for line in sys.stdin:
-	match = re.match(r'^([a-zA-Z_-]+):.*?## (.*)$$', line)
-	if match:
-		target, help = match.groups()
-		print("%-20s %s" % (target, help))
+define HELP_SCRIPT
+echo 'Usage:'
+echo ''
+echo '  ${YELLOW}make${RESET} ${GREEN}<target>${RESET}'
+echo ''
+echo 'Targets:'
+echo ''
+awk '/^[a-zA-Z\-]+:/ {
+    helpMessage = match(lastLine, /^## (.*)/);
+    if (helpMessage) {
+        if (index(lastLine, "|") != 0) {
+            stage = substr(lastLine, index(lastLine, "|") + 1);
+            printf "\n ${GRAY}%s: \n\n", stage;
+        }
+        helpCommand = substr($$1, 0, index($$1, ":")-1);
+        helpMessage = substr(lastLine, RSTART + 3, RLENGTH);
+        if (index(lastLine, "|") != 0) {
+            helpMessage = substr(helpMessage, 0, index(helpMessage, "|")-1);
+        }
+        printf "  ${YELLOW}%-$(TARGET_MAX_CHAR_NUM)s${RESET} ${GREEN}%s${RESET}\n", helpCommand, helpMessage;
+    }
+}
+{ lastLine = $$0 }' $(MAKEFILE_LIST)
+echo ''
 endef
-export PRINT_HELP_PYSCRIPT
+export HELP_SCRIPT
 
-BROWSER := python -c "$$BROWSER_PYSCRIPT"
-
-help:
-	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
-
-clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
-
-clean-build: ## remove build artifacts
-	rm -fr build/
-	rm -fr dist/
-	rm -fr .eggs/
-	find . -name '*.egg-info' -exec rm -fr {} +
-	find . -name '*.egg' -exec rm -f {} +
-
-clean-pyc: ## remove Python file artifacts
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
-	find . -name '__pycache__' -exec rm -fr {} +
-
-clean-test: ## remove test and coverage artifacts
-	rm -fr .tox/
-	rm -f .coverage
-	rm -fr htmlcov/
-	rm -fr .pytest_cache
-
-lint: ## check style with flake8
-	flake8 aiohttp_admin2 tests
-
-test: ## run tests quickly with the default Python
-	py.test
-
-test-all: ## run tests on every Python version with tox
-	tox
-
-coverage: ## check code coverage quickly with the default Python
-	coverage run --source aiohttp_admin2 -m pytest
-	coverage report -m
-	coverage html
-	$(BROWSER) htmlcov/index.html
-
-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/aiohttp_admin2.rst
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ aiohttp_admin2
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
-
-servedocs: docs ## compile the docs watching for changes
-	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
-
-release: dist ## package and upload a release
-	twine upload dist/*
-
-dist: clean ## builds source and wheel package
-	python setup.py sdist
-	python setup.py bdist_wheel
-	ls -l dist
-
-install: clean ## install the package to the active Python's site-packages
-	python setup.py install
+BROWSER := python -c "$$BROWSER_OPEN"
