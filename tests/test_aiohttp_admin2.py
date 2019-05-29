@@ -6,7 +6,7 @@
 import pytest
 
 
-from aiohttp_admin2 import aiohttp_admin2
+from aiohttp_admin2 import *
 
 
 @pytest.fixture

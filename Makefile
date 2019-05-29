@@ -51,7 +51,7 @@ lint:
 
 ## Run tests | tests
 test: ## run tests quickly with the default Python
-	py.test
+	py.test tests
 
 ## Run tests on every Python version with tox
 test-all:

@@ -102,3 +102,6 @@ ENV/
 .mypy_cache/
 
 .idea/
+
+# test project
+project_new/

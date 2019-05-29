@@ -1,8 +1,20 @@
 import sys
+import os
+import pathlib
 
 from setuptools import setup, find_packages
 
 PY_VER = sys.version_info
+
+templates = pathlib.Path(__file__).parent / 'aiohttp_admin2' / 'templates'
+
+
+def package_files(directory):
+    paths = []
+    for (path, _, filenames) in os.walk(directory):
+        for filename in filenames:
+            paths.append(os.path.join('..', path, filename))
+    return paths
 
 
 if not PY_VER >= (3, 5):
@@ -43,8 +55,10 @@ setup(
     keywords='aiohttp_admin2',
     license="Apache Software License 2.0",
     install_requires=requirements,
-    include_package_data=True,
-    packages=find_packages(include=['aiohttp_admin2']),
+    packages=find_packages(),
+    package_data={
+        '': package_files(templates),
+    },
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
