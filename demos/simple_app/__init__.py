@@ -14,6 +14,7 @@ templates_dir = pathlib.Path(__file__).resolve().parent / 'templates'
 
 @aiohttp_jinja2.template(template_name='index.html')
 async def index_handler(req: web.Request) -> Dict[str, Any]:
+    app = req.app
     return {}
 
 if __name__ == '__main__':

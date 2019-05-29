@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 PY_VER = sys.version_info
 
-templates = pathlib.Path(__file__).parent / 'aiohttp_admin2' / 'templates'
+templates = pathlib.Path(__file__).parent / 'aiohttp_admin2'
 
 
 def package_files(directory):
