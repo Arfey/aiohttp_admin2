@@ -17,38 +17,38 @@ templates_dir = parent / 'templates'
 static_dir = parent / 'static'
 
 
-@aiohttp_jinja2.template(template_name='admin/index.html')
-async def index1_handler(req: web.Request) -> Dict[str, Any]:
-    return {}
-
-
 class Admin:
     """
     docs
     """
     index_handler = None
-    name = None
+    name = 'aiohttp admin'
     prefix_url = '/admin/'
+    app: web.Application = None
 
     def __init__(self, app: web.Application) -> None:
-        self.setup_admin_application(app)
+        self.app = app
 
     @staticmethod
     @aiohttp_jinja2.template(template_name='admin/index.html')
     async def index_handler(req: web.Request) -> Dict[str, Any]:
         return {}
 
+    def init_jinja_default_env(self, env):
+        env.globals.update({
+            "project_name": self.name
+        })
+
     def setup_admin_application(
         self,
-        app: web.Application,
         jinja_app_key: str = APP_KEY,
     ) -> None:
         """
         docs
 
-        :param app:
         :return:
         """
+        app = self.app
         admin = web.Application()
         admin.add_routes([web.get('/', self.index_handler, name='index')])
         admin.router.add_static(
@@ -66,4 +66,6 @@ class Admin:
                 admin_loader,
             ])
 
-        aiohttp_jinja2.setup(admin, loader=admin_loader)
+        env = aiohttp_jinja2.setup(admin, loader=admin_loader)
+
+        self.init_jinja_default_env(env)
