@@ -50,8 +50,12 @@ lint:
 	flake8 aiohttp_admin2 tests
 
 ## Run tests | tests
-test: ## run tests quickly with the default Python
-	py.test tests
+test:
+	py.test -s -p no:warnings
+
+## Run tests with the coverage
+cover:
+	py.test --cov aiohttp_admin2 -p no:warnings
 
 ## Run tests on every Python version with tox
 test-all:
