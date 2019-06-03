@@ -2,6 +2,7 @@ import pathlib
 from typing import (
     Dict,
     Any,
+    List,
 )
 
 import aiohttp_jinja2
@@ -9,6 +10,8 @@ import jinja2
 from aiohttp import web
 from aiohttp_jinja2 import APP_KEY
 from jinja2 import ChoiceLoader
+
+from .contrib.models import ModelView
 
 __all__ = ['Admin', ]
 
@@ -25,6 +28,7 @@ class Admin:
     name = 'aiohttp admin'
     prefix_url = '/admin/'
     app: web.Application = None
+    models: List[ModelView] = None
 
     def __init__(self, app: web.Application) -> None:
         self.app = app
@@ -36,7 +40,8 @@ class Admin:
 
     def init_jinja_default_env(self, env):
         env.globals.update({
-            "project_name": self.name
+            "project_name": self.name,
+            "nav_items": [model.name for model in self.models],
         })
 
     def setup_admin_application(

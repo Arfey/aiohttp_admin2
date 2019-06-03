@@ -39,7 +39,9 @@ class AbstractResource(ABC):
         """
 
     @abstractmethod
-    def delete(self) -> Tuple[bool, CommonErrorsType]:
+    def delete_object_by_id(self, pk: int) -> Tuple[bool, CommonErrorsType]:
         """
-        docs
+        In this method you should implement logic for delete instance with
+        given `id`. This method must return tuple where first argument it's
+        optional deleted instance and second it's optional list of errors.
         """
