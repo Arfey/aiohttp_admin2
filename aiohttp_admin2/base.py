@@ -28,7 +28,7 @@ class Admin:
     name = 'aiohttp admin'
     prefix_url = '/admin/'
     app: web.Application = None
-    models: List[ModelView] = None
+    models: List[ModelView] = []
 
     def __init__(self, app: web.Application) -> None:
         self.app = app

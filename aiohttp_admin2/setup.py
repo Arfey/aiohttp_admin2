@@ -5,7 +5,7 @@ from .base import Admin
 __all__ = ['setup', ]
 
 
-def setup(app: web.Application, *, admin_class: Admin = Admin) -> None:
+def setup(app: web.Application, *, admin_class=Admin) -> None:
     """
     Docs
     """

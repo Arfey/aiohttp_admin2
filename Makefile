@@ -49,6 +49,10 @@ clean-test:
 lint:
 	flake8 aiohttp_admin2 tests
 
+## Checks types with `mypy`.
+mypy:
+	@mypy aiohttp_admin2
+
 ## Run tests | tests
 test:
 	py.test -s -p no:warnings
