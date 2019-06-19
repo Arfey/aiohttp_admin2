@@ -12,6 +12,7 @@ from aiohttp_jinja2 import APP_KEY
 from jinja2 import ChoiceLoader
 
 from .contrib.models import ModelView
+from .views.dashboard import DashboardView
 
 __all__ = ['Admin', ]
 
@@ -33,16 +34,14 @@ class Admin:
     def __init__(self, app: web.Application) -> None:
         self.app = app
 
-    @staticmethod
-    @aiohttp_jinja2.template(template_name='admin/index.html')
-    async def index_handler(req: web.Request) -> Dict[str, Any]:
-        return {}
-
     def init_jinja_default_env(self, env):
         env.globals.update({
             "project_name": self.name,
             "nav_items": [model.name for model in self.models],
         })
+
+    def set_dashboard(self, app: web.Application) -> None:
+        DashboardView().setup(app)
 
     def setup_admin_application(
         self,
@@ -55,7 +54,7 @@ class Admin:
         """
         app = self.app
         admin = web.Application()
-        admin.add_routes([web.get('/', self.index_handler, name='index')])
+        self.set_dashboard(admin)
         admin.router.add_static(
             '/static/',
             path=str(static_dir),

@@ -10,13 +10,13 @@ from typing import (
     Tuple,
 )
 
-__all__ = ['AbstractResource', ]
+__all__ = ['AbstractConnector', ]
 
 
 CommonErrorsType = Dict[str, str]
 
 
-class AbstractResource(ABC):
+class AbstractConnector(ABC):
     """
     docs
     """
