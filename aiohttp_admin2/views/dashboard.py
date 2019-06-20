@@ -7,6 +7,8 @@ class DashboardView(TemplateView):
     """
     docs
     """
-    template_name = 'admin/index.html'
-    url = '/'
+    template_name = 'admin/dashboard.html'
+    index_url = '/'
     name = 'index'
+    icon = 'dashboard'
+    title = 'dashboard'

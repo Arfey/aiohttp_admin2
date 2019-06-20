@@ -1,7 +1,6 @@
 import pathlib
+from collections import defaultdict
 from typing import (
-    Dict,
-    Any,
     List,
 )
 
@@ -11,8 +10,8 @@ from aiohttp import web
 from aiohttp_jinja2 import APP_KEY
 from jinja2 import ChoiceLoader
 
-from .contrib.models import ModelView
 from .views.dashboard import DashboardView
+from .views.base import BaseView
 
 __all__ = ['Admin', ]
 
@@ -29,19 +28,31 @@ class Admin:
     name = 'aiohttp admin'
     prefix_url = '/admin/'
     app: web.Application = None
-    models: List[ModelView] = []
+    views: List[BaseView] = []
+    dashboard_class = DashboardView
 
     def __init__(self, app: web.Application) -> None:
         self.app = app
 
     def init_jinja_default_env(self, env):
+        nav_groups = defaultdict(list)
+
+        for view in self.views:
+            if not view.is_hide_view:
+                nav_groups[view.group_name].append(view)
+
         env.globals.update({
             "project_name": self.name,
-            "nav_items": [model.name for model in self.models],
+            "nav_groups": nav_groups,
         })
 
-    def set_dashboard(self, app: web.Application) -> None:
-        DashboardView().setup(app)
+    def set_views(self, app: web.Application) -> None:
+        self.dashboard_class().setup(app)
+
+        for view in self.views:
+            view.setup(app)
+
+        self.views.insert(0, self.dashboard_class)
 
     def setup_admin_application(
         self,
@@ -54,7 +65,7 @@ class Admin:
         """
         app = self.app
         admin = web.Application()
-        self.set_dashboard(admin)
+        self.set_views(admin)
         admin.router.add_static(
             '/static/',
             path=str(static_dir),
