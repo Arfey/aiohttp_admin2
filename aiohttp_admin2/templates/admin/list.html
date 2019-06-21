@@ -1,0 +1,4 @@
+{%- for obj in list %}
+<a href="{{ url(edit_url_name, id=obj.user_id)}}">{{obj.user_id}}</a>
+<br>
+{%- endfor %}

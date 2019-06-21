@@ -1,3 +1,8 @@
+from typing import (
+    Any,
+    Dict,
+)
+
 from aiohttp import web
 
 from .base import Admin
@@ -5,7 +10,11 @@ from .base import Admin
 __all__ = ['setup', ]
 
 
-def setup(app: web.Application, *, admin_class=Admin) -> None:
+def setup(
+    app: web.Application,
+    *,
+    admin_class=Admin,
+) -> None:
     """
     Docs
     """

@@ -46,11 +46,11 @@ class Admin:
             "nav_groups": nav_groups,
         })
 
-    def set_views(self, app: web.Application) -> None:
-        self.dashboard_class().setup(app)
+    def set_views(self, admin: web.Application) -> None:
+        self.dashboard_class().setup(admin)
 
         for view in self.views:
-            view.setup(app)
+            view.setup(admin)
 
         self.views.insert(0, self.dashboard_class)
 
@@ -65,6 +65,7 @@ class Admin:
         """
         app = self.app
         admin = web.Application()
+        admin['parent'] = app
         self.set_views(admin)
         admin.router.add_static(
             '/static/',
