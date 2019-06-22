@@ -1,9 +1,9 @@
 from aiohttp import web
 
-__all__ = ['BaseView', ]
+__all__ = ['BaseAdminView', ]
 
 
-class BaseView:
+class BaseAdminView:
     """
     docs
     """

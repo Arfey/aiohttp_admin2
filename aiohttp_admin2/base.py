@@ -11,7 +11,7 @@ from aiohttp_jinja2 import APP_KEY
 from jinja2 import ChoiceLoader
 
 from .views.dashboard import DashboardView
-from .views.base import BaseView
+from .views.base import BaseAdminView
 
 __all__ = ['Admin', ]
 
@@ -28,7 +28,7 @@ class Admin:
     name = 'aiohttp admin'
     prefix_url = '/admin/'
     app: web.Application = None
-    views: List[BaseView] = []
+    views: List[BaseAdminView] = []
     dashboard_class = DashboardView
 
     def __init__(self, app: web.Application) -> None:

@@ -1,28 +1,27 @@
-from typing import (
-    Dict,
-    Any,
-)
-
 from aiohttp import web
 import aiohttp_jinja2
 
-from .base import BaseView
+from .base import BaseAdminView
+from ..types import AnyDict
 
-__all__ = ['TemplateView', ]
+__all__ = ['TemplateAdminView', ]
 
 
-class TemplateView(BaseView):
+class TemplateAdminView(BaseAdminView):
     """
-    docs
+    This class provide approach for add custom pages to the admin.
     """
-    template_name: str = None
+    template_name: str = 'admin/simple_template.html'
 
-    async def get_context(self, req: web.Request):
-        return {"request": req}
+    async def get_context(self, req: web.Request) -> AnyDict:
+        return {
+            "request": req,
+            "title": self.title,
+        }
 
     def setup(self, app: web.Application):
         @aiohttp_jinja2.template(template_name=self.template_name)
-        async def handler(req: web.Request) -> Dict[str, Any]:
+        async def handler(req: web.Request) -> AnyDict:
             return await self.get_context(req)
 
         app.add_routes([web.get(self.index_url, handler, name=self.name)])

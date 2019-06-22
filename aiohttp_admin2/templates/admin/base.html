@@ -6,6 +6,8 @@
         name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     >
+    <link rel="stylesheet" href="{{ url('admin_static', filename='css/base.css') }}" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <link rel="stylesheet" href="{{ url('admin_static', filename='css/theme.css') }}">
     <!-- extra header -->
     {% block extra_header %}{% endblock %}
@@ -18,7 +20,13 @@
     {% include 'admin/header.html' %}
     <!-- end header -->
     <!-- main block -->
-    {% block main %}{% endblock %}
+    <main class="main">
+        {% include 'admin/nav_aside.html' %}
+        <div class="content">
+            {% block main %}
+            {% endblock %}
+        </div>
+    </main>
     <!-- end main block -->
 </body>
 </html>

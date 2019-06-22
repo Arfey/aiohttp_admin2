@@ -7,10 +7,10 @@ from typing import (
 from aiohttp import web
 import aiohttp_jinja2
 
-from ..base import BaseView
+from ..base import BaseAdminView
 
 
-class PGModelView(BaseView):
+class PGModelView(BaseAdminView):
     """
     docs
     """

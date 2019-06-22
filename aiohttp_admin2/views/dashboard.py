@@ -1,13 +1,12 @@
-from .template_view import TemplateView
+from .template_view import TemplateAdminView
 
 __all__ = ['DashboardView', ]
 
 
-class DashboardView(TemplateView):
+class DashboardView(TemplateAdminView):
     """
-    docs
+    This class created for representation index page of the admin.
     """
-    template_name = 'admin/dashboard.html'
     index_url = '/'
     name = 'index'
     icon = 'dashboard'
