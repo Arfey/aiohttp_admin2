@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install aiohttp_admin2, run this command in your terminal:
+To install aiohttp_admin, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install aiohttp_admin2
+    $ pip install aiohttp_admin
 
-This is the preferred method to install aiohttp_admin2, as it will always install the most recent stable release.
+This is the preferred method to install aiohttp_admin, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,7 +26,7 @@ you through the process.
 From sources
 ------------
 
-The sources for aiohttp_admin2 can be downloaded from the `Github repo`_.
+The sources for aiohttp_admin can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 

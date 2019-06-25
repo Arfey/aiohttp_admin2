@@ -1,6 +1,5 @@
-==============
-aiohttp_admin2
-==============
+aiohttp_admin
+=============
 
 
 .. image:: https://img.shields.io/pypi/v/aiohttp_admin2.svg
@@ -19,14 +18,10 @@ aiohttp_admin2
      :alt: Updates
 
 
-Python Boilerplate contains all the boilerplate you need to create a Python package.
-
-
-* Free software: Apache Software License 2.0
-* Documentation: https://aiohttp-admin2.readthedocs.io.
-
+**aiohttp_admin** this is a library that help you to quick setup an admin
+interface on top an existing data model.
 
 Features
---------
+========
 
 * TODO
