@@ -22,7 +22,7 @@ static_dir = parent / 'static'
 
 class Admin:
     """
-    docs
+    The main class for initialization your admin interface.
     """
     index_handler = None
     name = 'aiohttp admin'

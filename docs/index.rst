@@ -1,5 +1,5 @@
-Welcome to aiohttp_admin2's documentation!
-======================================
+aiohttp_admin
+=============
 
 .. toctree::
    :maxdepth: 2

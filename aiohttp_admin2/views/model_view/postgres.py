@@ -83,8 +83,6 @@ class PGModelView(BaseAdminView):
         admin.add_routes([web.post('%s{id}/delete/' % self.index_url,
                                   delete_handler, name=f'{self.name}_delete')])
 
-
-
     class Meta:
         engine = None
         engine_name: Optional[str] = None
