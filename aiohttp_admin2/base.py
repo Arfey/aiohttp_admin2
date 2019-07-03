@@ -24,15 +24,15 @@ class Admin:
     """
     The main class for initialization your admin interface.
     """
-    index_handler = None
     name = 'aiohttp admin'
     prefix_url = '/admin/'
     app: web.Application = None
-    views: List[BaseAdminView] = []
+    views: List[BaseAdminView] = None
     dashboard_class = DashboardView
 
     def __init__(self, app: web.Application) -> None:
         self.app = app
+        self.views = self.views or []
 
     def init_jinja_default_env(self, env):
         nav_groups = defaultdict(list)
@@ -52,7 +52,7 @@ class Admin:
         for view in self.views:
             view.setup(admin)
 
-        self.views.insert(0, self.dashboard_class)
+        self.views.insert(0, self.dashboard_class())
 
     def setup_admin_application(
         self,

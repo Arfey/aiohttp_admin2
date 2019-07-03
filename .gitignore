@@ -105,3 +105,5 @@ ENV/
 
 # test project
 project_new/
+
+.vscode/

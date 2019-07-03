@@ -16,15 +16,14 @@ class FieldABC(ABC):
     Any admin's fields must inherit of this class because it show all required
     method which must provide by a field for success work in admin interface.
     """
+    name = None
+
     def __init__(
         self,
-        title: str,
         *,
-        validators: Optional[List[Any]] = None,
         widget=Widget,
         required: bool = False,
     ) -> None:
-        self.title = title
         self.widget = widget
         self.validators = validators or []
 

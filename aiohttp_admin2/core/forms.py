@@ -1,42 +1,41 @@
-from .fields.abc import FieldABC
+from aiohttp_admin2.core.fields.abc import FieldABC
 
 
 class FormMeta(type):
     """
     Metaclass for all admin forms.
     """
-    def __new__(cls, name, bases, properties):
-        # default
-        # empty fields
+    def __new__(mcs, name, bases, attrs):
+        attrs = mcs._get_not_fields_attrs(attrs)
+        new_class = super().__new__(mcs, name, bases, attrs)
 
-        properties = cls._separate_fields(properties)
+        fields = {}
 
-        return cls.__new__(name, bases, properties)
+        for class_obj in reversed(new_class.__mro__):
+            if hasattr(class_obj, '_fields'):
+                fields.update(class_obj._fields)
+
+        new_class._fields = fields
+
+        return new_class
 
     @staticmethod
-    def _separate_fields(data):
-        """
-        Separate simple property
-        """
-
-        fields = []
-        new_data = {}
-
-        for key, obj_property in data.items():
-            if isinstance(obj_property, FieldABC):
-                fields.append(obj_property)
-            else:
-                new_data.update({key: obj_property})
-
-        new_data['field'] = fields
-
-        return new_data
+    def _get_not_fields_attrs(attrs):
+        return dict(
+            filter(
+                lambda field: not isinstance(field[1], FieldABC),
+                attrs.items()
+            )
+        )
 
 
 class BaseForm(metaclass=FormMeta):
     """
     The base class for all admin forms.
     """
+    def __init__(self, *args, **kwargs):
+        pass
+
     def get_html(self, instance=None):
         """
         This method generate html code for create / edit form in admin
@@ -58,10 +57,3 @@ class BaseForm(metaclass=FormMeta):
 
     def __repr__(self):
         return f'{self.__class__.__name__}()'
-
-
-class Book(BaseForm):
-    """
-
-    """
-    name = ''
