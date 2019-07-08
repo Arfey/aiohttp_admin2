@@ -6,10 +6,10 @@ data use only for one target for render html.
 
 from aiohttp_admin2.core.forms import BaseForm
 from aiohttp_admin2.core import fields
+from aiohttp import web
 
 
-
-def test_default_fields():
+async def test_default_fields(app):
     """
     All fields have a default value, but user can possible change this
     value. In this test we check correct work for native default value
@@ -20,6 +20,8 @@ def test_default_fields():
 
         3. check a default value of TextField in a render form
         4. check a custom value of TextField in a render form
+
+        5. check a correct input name
     """
 
     class TestForm(BaseForm):
@@ -31,10 +33,10 @@ def test_default_fields():
     test_form = TestForm()
 
     # 1. check a default value of TextField in a form's object
-    assert test_form.text_field == ''
+    assert test_form['text_field'] == ''
 
     # 2. check a custom value of TextField in a form's object
-    assert test_form.text_field_with_default == 'default text'
+    assert test_form['text_field_with_default'] == 'default text'
 
     html = test_form.render_to_html()
 
@@ -43,6 +45,10 @@ def test_default_fields():
 
     # 4. check a custom value of TextField in a render form
     assert 'value="default text"' in html
+
+    # 5. check a correct input name
+    assert 'name="text_field"' in html
+    assert 'name="text_field_with_default"' in html
 
 
 def test_required_fields():
@@ -85,13 +91,15 @@ def test_required_fields():
     assert 'required="required"' in html
 
 
-def test_of_correct_render_for_form():
+def test_correct_render_form():
     """
     In this test we check a correct render for form.
 
         1. check if existing a submit button
         2. check a form method
         3. check correct name of inputs
+        4. check redefine a method
+        5. check redefine a template
     """
     class TestForm(BaseForm):
         text_field = fields.TextField()
@@ -107,8 +115,23 @@ def test_of_correct_render_for_form():
     assert 'type="submit"' in html
 
     # 2. check a form method
-    assert 'mathod="POST"' in html
+    assert 'method="POST"' in html
 
     # 3. check correct name of inputs
     assert 'name="text_field"' in html
     assert 'name="text_field_with_default"' in html
+
+    # 4. check redefine a method
+
+    class NewTestForm(BaseForm):
+        class Meta:
+            method = 'GET'
+            template = 'new template method="{method}"'
+    
+    new_test_form = NewTestForm()
+    html = new_test_form.render_to_html()
+
+    assert 'method="GET"' in html
+
+    # 5. check redefine a template
+    assert 'new template' in html
