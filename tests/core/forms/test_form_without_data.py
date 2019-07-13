@@ -122,7 +122,6 @@ def test_correct_render_form():
     assert 'name="text_field_with_default"' in html
 
     # 4. check redefine a method
-
     class NewTestForm(BaseForm):
         class Meta:
             method = 'GET'

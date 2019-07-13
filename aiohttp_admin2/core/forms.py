@@ -1,4 +1,10 @@
+from typing import (
+    List,
+    Any,
+)
+
 from aiohttp_admin2.core.fields.abc import FieldABC
+from aiohttp_admin2.core.constants import FormError
 from aiohttp import web
 
 
@@ -56,15 +62,13 @@ class BaseForm(metaclass=FormMeta):
     """
     The base class for all admin forms.
     """
-
-    def __init__(self, *args, **kwargs):
-        pass
+    form_errors: List[FormError] = []
 
     def __repr__(self):
         return f'{self.__class__.__name__}()'
 
     # TODO: test
-    def __getitem__(self, name):
+    def __getitem__(self, name: str) -> Any:
         try:
             value = self._fields[name].value
         except KeyError:
@@ -96,15 +100,35 @@ class BaseForm(metaclass=FormMeta):
         """
         This method provide validation for form and must be call before save.
         """
+        is_valid = True
+
+        for field in self._fields.values():
+            if not field.is_valid:
+                is_valid = False
+        
+        self.validation()
+
+        return is_valid and not bool(self.form_errors)
+
+    def validation(self):
+        """
+        This method is needed to get a way to add a custom validation for
+        the form.
+
+        If you want add custom error to form you need to add FormError
+        to self.form_errors in this method.
+
+        >>> def validation(self) -> bool:
+        >>>     if self.first_name or self.last_name:
+        >>>         self.form_errors.append(
+        >>>             FormError(
+        >>>                 message='One of two field is required',
+        >>>                 code=2,
+        >>>             )
+        >>>         )
+        """
         pass
 
-    def save(self) -> None:
-        """
-        If form is valid then form will create / update instance in data store.
-        """
-        # TODO: move to model (single responsibility principle)
-        pass
-    
     class Meta:
         """
         For separate common settings and settings which connected with fields,
