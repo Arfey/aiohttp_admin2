@@ -1,7 +1,10 @@
 from typing import (
     List,
     Any,
+    Dict,
+    Optional,
 )
+from copy import deepcopy
 
 from aiohttp_admin2.core.fields.abc import FieldABC
 from aiohttp_admin2.core.constants import FormError
@@ -10,11 +13,15 @@ from aiohttp import web
 
 __all__ = ['FormMeta', 'BaseForm', ]
 
+FORM_ERROR = '''
+<p class='error'>{message}</p>
+'''
 
 BASE_FORM_TEMPALTE = '''
 <form method="{method}">
     {main}
-    <input type="submit" value="submit" />
+    <input type="submit" value="submit"/>
+    {errors}
 </form>
 '''
 
@@ -34,7 +41,7 @@ class FormMeta(type):
             else:
                 new_attrs.update({key: value})
         
-        new_attrs['_fields'] = fields
+        new_attrs['_class_fields'] = fields
         if new_attrs.get('Meta'):
             new_attrs['_meta'] = attrs['Meta'].__dict__
         else:
@@ -46,13 +53,13 @@ class FormMeta(type):
         meta = {}
 
         for class_obj in reversed(new_class.__mro__):
-            if hasattr(class_obj, '_fields'):
-                fields.update(class_obj._fields)
+            if hasattr(class_obj, '_class_fields'):
+                fields.update(class_obj._class_fields)
 
             if hasattr(class_obj, '_meta'):
                 meta.update(class_obj._meta)
 
-        new_class._fields = fields
+        new_class._class_fields = fields
         new_class._meta = meta
 
         return new_class
@@ -62,12 +69,25 @@ class BaseForm(metaclass=FormMeta):
     """
     The base class for all admin forms.
     """
-    form_errors: List[FormError] = []
+    is_check = False
+
+    def __init__(self, data: Optional[Dict[str, str]] = None) -> None:
+        self._fields = deepcopy(self._class_fields)
+        self.form_errors: List[FormError] = []
+        if data:
+            for name, value in data.items():
+                try:
+                    self._fields[name]._set_value(value)
+                except KeyError:
+                    raise KeyError(
+                        f'Key {name} not found in {self.__class__.__name__}. '
+                        f'Use one of these fields: '
+                        f'{", ".join([f.name for f in self._fields])}'
+                    )
 
     def __repr__(self):
         return f'{self.__class__.__name__}()'
 
-    # TODO: test
     def __getitem__(self, name: str) -> Any:
         try:
             value = self._fields[name].value
@@ -88,11 +108,19 @@ class BaseForm(metaclass=FormMeta):
 
         ctx = {
             'method': self._meta['method'],
-            'main': ''
+            'main': '',
+            'errors': '',
         }
 
         for field in self._fields.values():
             ctx['main'] += field.render_to_html()
+        
+        if self.is_check:
+            if self.form_errors:
+                ctx['errors'] = "".join([
+                    FORM_ERROR.format(err.message)
+                    for err in self.form_errors
+                ])
 
         return self._meta['template'].format(**ctx)
 
@@ -107,6 +135,7 @@ class BaseForm(metaclass=FormMeta):
                 is_valid = False
         
         self.validation()
+        self.is_check = True
 
         return is_valid and not bool(self.form_errors)
 

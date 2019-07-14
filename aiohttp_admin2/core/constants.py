@@ -15,6 +15,9 @@ UNKNOW_ERROR = 'UNKNOW_ERROR'
 REQUIRED_MESSAGE_ERROR = 'field is required'
 REQUIRED_CODE_ERROR = 1
 
+EMAIL_MESSAGE_ERROR = 'email is not valid'
+EMAIL_CODE_ERROR = 2
+
 
 @dataclass
 class FormError:

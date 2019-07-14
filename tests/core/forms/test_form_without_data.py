@@ -7,6 +7,7 @@ data use only for one target for render html.
 from aiohttp_admin2.core.forms import BaseForm
 from aiohttp_admin2.core import fields
 from aiohttp import web
+from aiohttp_admin2.core.constants import REQUIRED_MESSAGE_ERROR
 
 
 async def test_default_fields(app):
@@ -67,13 +68,13 @@ def test_required_fields():
         required_text_field = fields.TextField(required=True)
     
     test_form = TestForm()
-    html = test_form.render_to_html()
 
     # 1. check that form with empty required field is invalid (existing
     #  errors in render)
     assert not test_form.is_valid()
-    # TODO: edit test
-    assert 'errors' in html
+    html = test_form.render_to_html()
+
+    assert REQUIRED_MESSAGE_ERROR in html
 
     # 2. check that form with required field wich has no empty default
     # value is valid
@@ -85,7 +86,7 @@ def test_required_fields():
     
     new_test_form = NewTestForm()
 
-    assert test_form.is_valid()
+    assert new_test_form.is_valid()
 
     # 3. check required attribute in render form that has required field
     assert 'required="required"' in html

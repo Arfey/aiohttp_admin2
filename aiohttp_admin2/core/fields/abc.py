@@ -22,7 +22,6 @@ class FieldABC(ABC):
     method which must provide by a field for success work in admin interface.
     """
     name = None
-    _value = None
     required_message = REQUIRED_MESSAGE_ERROR
     required_code = REQUIRED_CODE_ERROR
     errors: List[FormError] = []
@@ -34,6 +33,7 @@ class FieldABC(ABC):
         widget=Widget,
         required: bool = False,
     ) -> None:
+        self._value = None
         self.widget = widget
         self.default = default or self.default
         self.required = required
@@ -41,6 +41,9 @@ class FieldABC(ABC):
     @property
     def value(self):
         return self._value or self.default
+
+    def _set_value(self, value: str) -> None:
+        self._value = value
 
     def render_to_html(self) -> str:
         """

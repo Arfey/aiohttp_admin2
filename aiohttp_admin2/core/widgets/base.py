@@ -5,10 +5,13 @@ from typing import (
 )
 
 from aiohttp import web
-from aiohttp_admin2.core.widgets.templates import SIMPLE_INPUT_TEMPALTE
+from aiohttp_admin2.core.widgets.templates import (
+    SIMPLE_INPUT_TEMPALTE,
+    ERROR,
+)
 
 if TYPE_CHECKING:
-    from aiohttp_admin2.core.forms import BaseForm
+    from aiohttp_admin2.core.fields.abc import FieldABC
 
 
 __all__ = ['Widget', ]
@@ -24,13 +27,22 @@ class Widget:
     type_name = 'input'
 
     @classmethod
-    def render_to_html(cls, form: 'BaseForm') -> str:
-        return cls.template.format(**cls.get_context(form))
+    def render_to_html(cls, field: 'FieldABC') -> str:
+        return cls.template.format(**cls.get_context(field))
 
     @classmethod
-    def get_context(cls, form: 'BaseForm') -> Dict[str, Any]:
+    def get_context(cls, field: 'FieldABC') -> Dict[str, Any]:
+        errors = ''
+        if field.errors:
+            errors = "".join([
+                ERROR.format(err.message)
+                for err in field.errors
+            ])
+
         return {
-            'name': form.name,
+            'name': field.name,
             'type': cls.type_name,
-            'value': form.value,
+            'value': field.value,
+            'errors': errors,
+            'required': 'required="required"' if field.required else ''
         }
