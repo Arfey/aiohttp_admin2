@@ -1,9 +1,9 @@
-from .template_view import TemplateAdminView
+from .template_view import TemplateView
 
 __all__ = ['DashboardView', ]
 
 
-class DashboardView(TemplateAdminView):
+class DashboardView(TemplateView):
     """
     This class created for representation index page of the admin.
     """

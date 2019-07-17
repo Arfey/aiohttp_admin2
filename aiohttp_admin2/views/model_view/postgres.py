@@ -10,7 +10,7 @@ import aiohttp_jinja2
 from ..base import BaseAdminView
 
 
-class PGModelView(BaseAdminView):
+class PostgresView(BaseAdminView):
     """
     docs
     """

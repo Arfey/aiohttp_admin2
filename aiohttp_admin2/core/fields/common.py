@@ -9,7 +9,7 @@ from aiohttp_admin2.core.constants import (
 )
 
 
-__all__ = ['TextField', 'EmailField', ]
+__all__ = ['TextField', 'EmailField', 'IntegerField', ]
 
 
 EMAIL_REG = '\w+[.|\w]\w+@\w+[.]\w+[.|\w+]\w+'
@@ -21,6 +21,11 @@ class TextField(FieldABC):
     """
     default = ''
 
+
+class IntegerField(TextField):
+    """
+    The base field for representation a integer type.
+    """
 
 class EmailField(TextField):
     """

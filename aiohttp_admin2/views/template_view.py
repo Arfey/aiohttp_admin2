@@ -4,10 +4,10 @@ import aiohttp_jinja2
 from .base import BaseAdminView
 from ..types import AnyDict
 
-__all__ = ['TemplateAdminView', ]
+__all__ = ['TemplateView', ]
 
 
-class TemplateAdminView(BaseAdminView):
+class TemplateView(BaseAdminView):
     """
     This class provide approach for add custom pages to the admin.
     """

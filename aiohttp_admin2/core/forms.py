@@ -13,6 +13,7 @@ from aiohttp import web
 
 __all__ = ['FormMeta', 'BaseForm', ]
 
+
 FORM_ERROR = '''
 <p class='error'>{message}</p>
 '''
