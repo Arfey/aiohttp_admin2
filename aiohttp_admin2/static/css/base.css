@@ -67,6 +67,7 @@ html, body {
 .content {
     margin-top: 10px;
     display: flex;
+    max-width: calc(100% - 290px);
     width: 100%;
 }
 
@@ -76,4 +77,9 @@ html, body {
     text-transform: uppercase;
     font-weight: bold;
     color: #eee;
+}
+
+.wrapper {
+    display: block;
+    width: 100%;
 }

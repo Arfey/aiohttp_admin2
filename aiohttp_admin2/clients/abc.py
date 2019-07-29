@@ -10,13 +10,13 @@ from typing import (
     Tuple,
 )
 
-__all__ = ['AbstractConnector', ]
+__all__ = ['ABCClient', ]
 
 
 CommonErrorsType = Dict[str, str]
 
 
-class AbstractConnector(ABC):
+class ABCClient(ABC):
     """
     docs
     """
@@ -33,7 +33,7 @@ class AbstractConnector(ABC):
         """
 
     @abstractmethod
-    def create(self, data: Dict[Any, Any]) -> Tuple[bool, CommonErrorsType]:
+    def create_or_update(self, data: Dict[Any, Any]) -> Tuple[bool, CommonErrorsType]:
         """
         docs
         """

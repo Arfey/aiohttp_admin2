@@ -1,7 +1,9 @@
 {% extends 'admin/base.html' %}
 
+
 {% block main %}
-<div>
+<div class="wrapper">
+{% include 'admin/list_action_buttons.html' %}
 {%- for obj in list %}
 <a href="{{ url(edit_url_name, id=obj.user_id)}}">{{obj.user_id}}</a>
 <p>_____________________</p>

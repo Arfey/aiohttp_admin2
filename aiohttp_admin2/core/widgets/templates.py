@@ -1,6 +1,10 @@
 SIMPLE_INPUT_TEMPALTE = '''
-<input type="{type}" name="{name}" value="{value}" {required}>
+<label>
+    {name}
+    <input type="{type}" name="{name}" value="{value}" {required}>
+</label>
 {errors}
+<br/>
 '''
 
 ERROR = '''

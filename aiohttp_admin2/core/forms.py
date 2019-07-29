@@ -31,7 +31,7 @@ class FormMeta(type):
     """
     Metaclass for all admin forms.
     """
-    def __new__(mcs, name, bases, attrs):
+    def __new__(mcs, name, bases, attrs, **kwargs):
         fields = {}
         new_attrs = {}
 
@@ -48,7 +48,7 @@ class FormMeta(type):
         else:
             new_attrs['_meta'] = {}
         
-        new_class = super().__new__(mcs, name, bases, new_attrs)
+        new_class = super().__new__(mcs, name, bases, new_attrs, **kwargs)
 
         fields = {}
         meta = {}
@@ -73,6 +73,7 @@ class BaseForm(metaclass=FormMeta):
     is_check = False
 
     def __init__(self, data: Optional[Dict[str, str]] = None) -> None:
+        print('here 2 ********************')
         self._fields = deepcopy(self._class_fields)
         self.form_errors: List[FormError] = []
         if data:

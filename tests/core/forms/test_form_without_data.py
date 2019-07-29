@@ -10,7 +10,7 @@ from aiohttp import web
 from aiohttp_admin2.core.constants import REQUIRED_MESSAGE_ERROR
 
 
-async def test_default_fields(app):
+def test_default_fields(app):
     """
     All fields have a default value, but user can possible change this
     value. In this test we check correct work for native default value

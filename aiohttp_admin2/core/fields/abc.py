@@ -32,11 +32,13 @@ class FieldABC(ABC):
         default=None,
         widget=Widget,
         required: bool = False,
+        name: str = None
     ) -> None:
         self._value = None
         self.widget = widget
         self.default = default or self.default
         self.required = required
+        self.name = name or self.name
 
     @property
     def value(self):

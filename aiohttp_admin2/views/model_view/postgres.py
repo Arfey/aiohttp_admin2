@@ -7,7 +7,7 @@ from typing import (
 from aiohttp import web
 import aiohttp_jinja2
 
-from ..base import BaseAdminView
+from aiohttp_admin2.base import BaseAdminView
 
 
 class PostgresView(BaseAdminView):
@@ -16,6 +16,7 @@ class PostgresView(BaseAdminView):
     """
     template_name = 'admin/list.html'
     template_edit_name = 'admin/edit.html'
+    template_create_name = 'admin/create.html'
 
     async def get_list(self, req):
         async with self.get_engine(req.app['parent']).acquire() as conn:
@@ -48,7 +49,11 @@ class PostgresView(BaseAdminView):
             await conn.execute(query)
 
     async def get_context(self, req: web.Request):
-        return {"request": req, 'edit_url_name': f'{self.name}_edit'}
+        return {
+            "request": req,
+            'edit_url_name': f'{self.name}_edit',
+            'create_url_name': f'{self.name}_create',
+        }
 
     def get_engine(self, app):
         raise NotImplemented
@@ -74,6 +79,18 @@ class PostgresView(BaseAdminView):
             return ctx
 
         admin.add_routes([web.get('%s{id}/edit/' % self.index_url, edit_handler, name=f'{self.name}_edit')])
+
+
+        @aiohttp_jinja2.template(template_name=self.template_create_name)
+        async def create_handler(req: web.Request) -> Dict[str, Any]:
+            ctx = await self.get_context(req)
+            ctx['delete_url'] = f'{self.name}_delete'
+            ctx['form'] = self.Meta.form().render_to_html()
+            return ctx
+
+        admin.add_routes(
+            [web.get('%screate/' % self.index_url, create_handler, name=f'{self.name}_create')
+        ])
 
         async def delete_handler(req: web.Request):
             await self.delete(req)

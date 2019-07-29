@@ -4,12 +4,15 @@ from typing import (
     Any,
 )
 
-from .abc import AbstractResource
-from .commonts import Error
-from ..constants import DOES_NOT_EXIST
+from aiohttp_admin2.connectors.abc import ABCClient
+from aiohttp_admin2.clients.commonts import Error
+from aiohttp_admin2.clients import DOES_NOT_EXIST
 
 
-class DictResource(AbstractResource):
+__all__ = []
+
+
+class DictClient(ABCClient):
     """
     The simple implementation of ict resources for aiohttp admin. Usually,
     this resource use for test or create simple examples.
