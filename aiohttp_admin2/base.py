@@ -32,12 +32,17 @@ class Admin:
 
     def __init__(self, app: web.Application) -> None:
         self.app = app
-        self.views = self.views or []
+        if self.views:
+            self._views = [
+                view_class() for view_class in self.views 
+            ]
+        else:
+            self._views = []
 
     def init_jinja_default_env(self, env):
         nav_groups = defaultdict(list)
 
-        for view in self.views:
+        for view in self._views:
             if not view.is_hide_view:
                 nav_groups[view.group_name].append(view)
 
@@ -49,10 +54,10 @@ class Admin:
     def set_views(self, admin: web.Application) -> None:
         self.dashboard_class().setup(admin)
 
-        for view in self.views:
+        for view in self._views:
             view.setup(admin)
 
-        self.views.insert(0, self.dashboard_class())
+        self._views.insert(0, self.dashboard_class())
 
     def setup_admin_application(
         self,
@@ -63,22 +68,20 @@ class Admin:
 
         :return:
         """
-        app = self.app
         admin = web.Application()
-        admin['parent'] = app
         self.set_views(admin)
         admin.router.add_static(
             '/static/',
             path=str(static_dir),
             name='admin_static',
         )
-        app.add_subapp(self.prefix_url, admin)
+        self.app.add_subapp(self.prefix_url, admin)
 
         admin_loader = jinja2.FileSystemLoader(str(templates_dir.absolute()))
 
-        if app.get(jinja_app_key):
+        if self.app.get(jinja_app_key):
             admin_loader = ChoiceLoader([
-                app.get(jinja_app_key).loader,
+                self.app.get(jinja_app_key).loader,
                 admin_loader,
             ])
 

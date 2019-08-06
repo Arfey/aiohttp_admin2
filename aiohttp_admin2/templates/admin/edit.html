@@ -3,10 +3,10 @@
 {% block main %}
 <div>
     <p class="content__empty-title">{{ title }}</p>
-    {{ obj.user_id }}
+    {{ form | safe }}
     <p>_____________________</p>
     <br>
-    <form action="{{ url(delete_url, id=obj.user_id)}}" method="post">
+    <form method="DELETE">
         <button>Delete</button>
     </form>
 </div>

@@ -73,7 +73,6 @@ class BaseForm(metaclass=FormMeta):
     is_check = False
 
     def __init__(self, data: Optional[Dict[str, str]] = None) -> None:
-        print('here 2 ********************')
         self._fields = deepcopy(self._class_fields)
         self.form_errors: List[FormError] = []
         if data:

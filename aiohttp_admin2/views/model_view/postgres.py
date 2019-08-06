@@ -1,3 +1,4 @@
+import re
 from typing import (
     Dict,
     Any,
@@ -7,10 +8,15 @@ from typing import (
 from aiohttp import web
 import aiohttp_jinja2
 
-from aiohttp_admin2.base import BaseAdminView
+from aiohttp_admin2.views.base import (
+    BaseAdminResourceView,
+    BaseAdminView,
+)
+
+__all__ = ['PostgresView', ]
 
 
-class PostgresView(BaseAdminView):
+class PostgresView(BaseAdminResourceView):
     """
     docs
     """
@@ -18,9 +24,15 @@ class PostgresView(BaseAdminView):
     template_edit_name = 'admin/edit.html'
     template_create_name = 'admin/create.html'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, *kwargs)
+
+        if self.title is BaseAdminView.title:
+            self.title = re.sub(r'[_-]', ' ', self.Model.model.name)
+
     async def get_list(self, req):
-        async with self.get_engine(req.app['parent']).acquire() as conn:
-            model = self.Meta.model
+        async with self.engine(req).acquire() as conn:
+            model = self.Model.model
             query = model\
                 .select()\
                 .order_by(model.c.user_id)
@@ -30,8 +42,8 @@ class PostgresView(BaseAdminView):
             return await cursor.fetchall()
 
     async def get_detail(self, req):
-        async with self.get_engine(req.app['parent']).acquire() as conn:
-            model = self.Meta.model
+        async with self.engine(req).acquire() as conn:
+            model = self.Model.model
             query = model \
                 .select() \
                 .where(model.c.user_id == req.match_info['id'])
@@ -41,66 +53,9 @@ class PostgresView(BaseAdminView):
             return await cursor.fetchone()
 
     async def delete(self, req):
-        async with self.get_engine(req.app['parent']).acquire() as conn:
-            model = self.Meta.model
+        async with self.engine(req).acquire() as conn:
+            model = self.Model.model
             query = model.delete() \
                 .where(model.c.user_id == req.match_info['id'])
 
             await conn.execute(query)
-
-    async def get_context(self, req: web.Request):
-        return {
-            "request": req,
-            'edit_url_name': f'{self.name}_edit',
-            'create_url_name': f'{self.name}_create',
-        }
-
-    def get_engine(self, app):
-        raise NotImplemented
-
-    def setup(
-        self,
-        admin: web.Application,
-    ) -> None:
-
-        @aiohttp_jinja2.template(template_name=self.template_name)
-        async def handler(req: web.Request) -> Dict[str, Any]:
-            ctx = await self.get_context(req)
-            ctx['list'] = await self.get_list(req)
-            return ctx
-
-        admin.add_routes([web.get(self.index_url, handler, name=self.name)])
-
-        @aiohttp_jinja2.template(template_name=self.template_edit_name)
-        async def edit_handler(req: web.Request) -> Dict[str, Any]:
-            ctx = await self.get_context(req)
-            ctx['obj'] = await self.get_detail(req)
-            ctx['delete_url'] = f'{self.name}_delete'
-            return ctx
-
-        admin.add_routes([web.get('%s{id}/edit/' % self.index_url, edit_handler, name=f'{self.name}_edit')])
-
-
-        @aiohttp_jinja2.template(template_name=self.template_create_name)
-        async def create_handler(req: web.Request) -> Dict[str, Any]:
-            ctx = await self.get_context(req)
-            ctx['delete_url'] = f'{self.name}_delete'
-            ctx['form'] = self.Meta.form().render_to_html()
-            return ctx
-
-        admin.add_routes(
-            [web.get('%screate/' % self.index_url, create_handler, name=f'{self.name}_create')
-        ])
-
-        async def delete_handler(req: web.Request):
-            await self.delete(req)
-
-            raise web.HTTPFound(req.app.router[self.name].url_for())
-
-        admin.add_routes([web.post('%s{id}/delete/' % self.index_url,
-                                  delete_handler, name=f'{self.name}_delete')])
-
-    class Meta:
-        engine = None
-        engine_name: Optional[str] = None
-        model = None
