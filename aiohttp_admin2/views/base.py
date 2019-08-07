@@ -7,6 +7,7 @@ from typing import (
 
 import aiohttp_jinja2
 from aiohttp import web
+from aiohttp.web_routedef import _SimpleHandler as Handler
 from aiohttp_admin2.core.forms import BaseForm
 from  aiopg.sa.engine import Engine as SAEngine
 import sqlalchemy as sa
@@ -35,22 +36,21 @@ class BaseAdminView:
     def setup(self, app: web.Application) -> None:
         raise NotImplemented
 
+    @staticmethod
+    def as_handler(cls, method: str) -> Handler:
+        instanse = cls()
+
+        def handler(req):
+            return getattr(instanse, method)(req)
+
+        return handler
 
 class BaseAdminResourceView(BaseAdminView):
     """
     The base class for views which work with database.
     """
     read_only_fields = []
-    changeable_attributes = [
-        'read_only_fields',
-        'engine',
-        'Model',
-        'get_context',
-        'get_list',
-        'template_name',
-        'get_detail',
-        'name'
-    ]
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -83,154 +83,150 @@ class BaseAdminResourceView(BaseAdminView):
     @property
     def form(self) -> BaseForm:
         return self._form
-    
+
     async def get_context(self, req: web.Request):
         return {
             "request": req,
             'edit_url_name': f'{self.name}_edit',
             'create_url_name': f'{self.name}_create',
         }
+    
+    async def list_handler(self, req) -> web.Response:
+        ctx = await self.get_context(req)
+        ctx['list'] = await self.get_list(req)
+
+        return aiohttp_jinja2.render_template(
+            self.template_name,
+            req,
+            ctx,
+        )
+
+    async def edit_handler(self, req) -> web.Response:
+        ctx = await self.get_context(req)
+        obj = await self.get_detail(req)
+        ctx['obj'] = obj
+        ctx['form'] = self.Model.form(obj).render_to_html()
+        ctx['delete_url'] = f'{self.name}_delete'
+
+        return aiohttp_jinja2.render_template(
+            self.template_edit_name,
+            req,
+            ctx,
+        )
+
+    async def edit_post_handler(self, req) -> web.Response:
+        data = await req.post()
+        form = self.Model.form(data)
+
+        if not form.is_valid():
+            ctx = await self.get_context(req)
+            obj = await self.get_detail(req)
+            ctx['obj'] = obj
+            ctx['form'] = self.Model.form(obj).render_to_html()
+
+            ctx['form'] = form.render_to_html()
+
+            return aiohttp_jinja2.render_template(
+                self.template_create_name,
+                req,
+                ctx,
+            )
+
+        async with self.engine(req).acquire() as conn:
+            model = self.Model.model
+            query = model\
+                .update()\
+                .where(model.c.user_id == req.match_info['id'])\
+                .values(data)
+
+            cursor = await conn.execute(query)
+
+        redirect = req.app.router[self.name].url_for()
+        return web.HTTPFound(location=redirect)
+
+
+    async def create_handler(self, req) -> web.Response:
+        ctx = await self.get_context(req)
+        ctx['delete_url'] = f'{self.name}_delete'
+        ctx['form'] = self.Model.form().render_to_html()
+
+        return aiohttp_jinja2.render_template(
+            self.template_create_name,
+            req,
+            ctx,
+        )
+    
+    async def create_post_handler(self, req) -> web.Response:
+        data = await req.post()
+        form = self.Model.form(data)
+
+        if not form.is_valid():
+            ctx = await self.get_context(req)
+            ctx['delete_url'] = f'{self.name}_delete'
+            ctx['form'] = form.render_to_html()
+
+            return aiohttp_jinja2.render_template(
+                self.template_create_name,
+                req,
+                ctx,
+            )
+        
+        async with self.engine(req).acquire() as conn:
+            model = self.Model.model
+            query = model\
+                .insert()\
+                .values(data)
+
+            cursor = await conn.execute(query)
+
+        redirect = req.app.router[self.name].url_for()
+        return web.HTTPFound(location=redirect)
+
+    async def delete_handler(self, req) -> web.Response:
+        await self.delete(req)
+
+        raise web.HTTPFound(req.app.router[self.name].url_for())
 
     def setup(
         self,
         admin: web.Application,
     ) -> None:
-        # Generate simple view with params that can be change
-        BaseView = type('BaseView', (web.View, ), {
-                key: getattr(self, key)
-                for key in self.changeable_attributes
-            }
-        )
-
-        class ListView(BaseView):
-            template_name = self.template_name
-
-            async def get(self) -> web.Response:
-                ctx = await self.get_context(self.request)
-                ctx['list'] = await self.get_list(self.request)
-
-                return aiohttp_jinja2.render_template(
-                    self.template_name,
-                    self.request,
-                    ctx,
-                )
-
-        class EditView(BaseView):
-            template_name = self.template_edit_name
-
-            async def get(self) -> web.Response:
-                ctx = await self.get_context(self.request)
-                obj = await self.get_detail(self.request)
-                ctx['obj'] = obj
-                ctx['form'] = self.Model.form(obj).render_to_html()
-
-                return aiohttp_jinja2.render_template(
-                    self.template_name,
-                    self.request,
-                    ctx,
-                )
-
-            async def post(self) -> web.Response:
-                data = await self.request.post()
-                form = self.Model.form(data)
-
-                if not form.is_valid():
-                    ctx = await self.get_context(req)
-                    obj = await self.get_detail(req)
-                    ctx['obj'] = obj
-                    ctx['form'] = self.Model.form(obj).render_to_html()
-
-                    ctx['form'] = form.render_to_html()
-
-                    return aiohttp_jinja2.render_template(
-                        self.template_create_name,
-                        req,
-                        ctx,
-                    )
-
-                async with self.engine(self.request).acquire() as conn:
-                    model = self.Model.model
-                    query = model\
-                        .update()\
-                        .where(model.c.user_id == self.request.match_info['id'])\
-                        .values(data)
-
-                    cursor = await conn.execute(query)
-
-                redirect = self.request.app.router[self.name].url_for()
-                return web.HTTPFound(location=redirect)
-
-        class CreateView(BaseView):
-            template_name = self.template_create_name
-
-            async def get(self) -> web.Response:
-                ctx = await self.get_context(self.request)
-                ctx['delete_url'] = f'{self.name}_delete'
-                ctx['form'] = self.Model.form().render_to_html()
-
-                return aiohttp_jinja2.render_template(
-                    self.template_name,
-                    self.request,
-                    ctx,
-                )
-        
-            async def post(self) -> web.Response:
-                data = await self.request.post()
-                form = self.Model.form(data)
-
-                if not form.is_valid():
-                    ctx = await self.get_context(self.request)
-                    ctx['delete_url'] = f'{self.name}_delete'
-                    ctx['form'] = form.render_to_html()
-
-                    return aiohttp_jinja2.render_template(
-                        self.template_create_name,
-                        self.request,
-                        ctx,
-                    )
-                
-                async with self.engine(self.request).acquire() as conn:
-                    model = self.Model.model
-                    query = model\
-                        .insert()\
-                        .values(data)
-
-                    cursor = await conn.execute(query)
-                
-                redirect = self.request.app.router[self.name].url_for()
-                return web.HTTPFound(location=redirect)
-        
-        class DeleteView(BaseView):
-            async def delete(self) -> web.Response:
-                await self.delete(self.request)
-
-                raise web.HTTPFound(self.request.app.router[self.name].url_for())
-
+        # each request must generate a new instance of class for give
+        # possible to customize view for it
+        cls = self.__class__
 
         admin.add_routes([
-            web.view(
+            web.get(
                 self.index_url,
-                ListView,
+                lambda req: cls().list_handler(req),
                 name=self.name,
             ),
-            web.view(
+            web.get(
                 '%screate/' % self.index_url,
-                CreateView,
+                lambda req: cls().create_handler(req),
                 name=f'{self.name}_create',
             ),
-            web.view(
+            web.post(
+                '%screate/' % self.index_url,
+                lambda req: cls().create_post_handler(req),
+            ),
+            web.get(
                 '%s{id}/edit/' % self.index_url,
-                EditView,
+                lambda req: cls().edit_handler(req),
                 name=f'{self.name}_edit',
             ),
-            web.view(
+            web.post(
+                '%s{id}/edit/' % self.index_url,
+                lambda req: cls().edit_post_handler(req),
+            ),
+            web.post(
                 '%s{id}/delete/' % self.index_url,
-                DeleteView,
+                lambda req: cls().delete_handler(req),
                 name=f'{self.name}_delete',
-            )
+            ),
         ])
 
-    
+
     class Model:
         model = None
         form = None

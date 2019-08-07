@@ -6,7 +6,7 @@
     {{ form | safe }}
     <p>_____________________</p>
     <br>
-    <form method="DELETE">
+    <form action="{{ url(delete_url, id=obj.user_id)}}" method="POST">
         <button>Delete</button>
     </form>
 </div>
