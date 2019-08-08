@@ -32,7 +32,7 @@ and after open *http://localhost:8080/admin/* in your browser.
    installation
    tutorial
    views
-   models
+   forms
    templates
    authorization_permissions
    q&a

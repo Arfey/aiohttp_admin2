@@ -36,20 +36,18 @@ class BaseAdminView:
     def setup(self, app: web.Application) -> None:
         raise NotImplemented
 
-    @staticmethod
-    def as_handler(cls, method: str) -> Handler:
-        instanse = cls()
-
-        def handler(req):
-            return getattr(instanse, method)(req)
-
-        return handler
 
 class BaseAdminResourceView(BaseAdminView):
     """
     The base class for views which work with database.
     """
     read_only_fields = []
+
+    # CRUD access
+    can_create = True
+    can_update = True
+    can_delete = True
+    can_view_list = True
 
     def __init__(self) -> None:
         super().__init__()
@@ -89,8 +87,9 @@ class BaseAdminResourceView(BaseAdminView):
             "request": req,
             'edit_url_name': f'{self.name}_edit',
             'create_url_name': f'{self.name}_create',
+            "view": self
         }
-    
+
     async def list_handler(self, req) -> web.Response:
         ctx = await self.get_context(req)
         ctx['list'] = await self.get_list(req)
@@ -105,7 +104,7 @@ class BaseAdminResourceView(BaseAdminView):
         ctx = await self.get_context(req)
         obj = await self.get_detail(req)
         ctx['obj'] = obj
-        ctx['form'] = self.Model.form(obj).render_to_html()
+        ctx['form'] = self.Model.form(obj)
         ctx['delete_url'] = f'{self.name}_delete'
 
         return aiohttp_jinja2.render_template(
@@ -122,9 +121,7 @@ class BaseAdminResourceView(BaseAdminView):
             ctx = await self.get_context(req)
             obj = await self.get_detail(req)
             ctx['obj'] = obj
-            ctx['form'] = self.Model.form(obj).render_to_html()
-
-            ctx['form'] = form.render_to_html()
+            ctx['form'] = self.Model.form(obj)
 
             return aiohttp_jinja2.render_template(
                 self.template_create_name,
@@ -148,7 +145,7 @@ class BaseAdminResourceView(BaseAdminView):
     async def create_handler(self, req) -> web.Response:
         ctx = await self.get_context(req)
         ctx['delete_url'] = f'{self.name}_delete'
-        ctx['form'] = self.Model.form().render_to_html()
+        ctx['form'] = self.Model.form()
 
         return aiohttp_jinja2.render_template(
             self.template_create_name,
@@ -163,7 +160,7 @@ class BaseAdminResourceView(BaseAdminView):
         if not form.is_valid():
             ctx = await self.get_context(req)
             ctx['delete_url'] = f'{self.name}_delete'
-            ctx['form'] = form.render_to_html()
+            ctx['form'] = form
 
             return aiohttp_jinja2.render_template(
                 self.template_create_name,
@@ -187,41 +184,87 @@ class BaseAdminResourceView(BaseAdminView):
 
         raise web.HTTPFound(req.app.router[self.name].url_for())
 
+    def access_hook(self):
+        pass
+
+    def _get_list(self, req):
+        new_instance = self.__class__()
+        new_instance.access_hook(req)
+
+        if not self.can_view_list:
+            raise web.HTTPForbidden()
+
+        return new_instance.list_handler(req)
+
+
+    def _create(self, req):
+        new_instance = self.__class__()
+        new_instance.access_hook(req)
+
+        if not self.can_create:
+            raise web.HTTPForbidden()
+
+        if req.method == 'POST':
+            return new_instance.create_post_handler(req)
+        else:
+            return new_instance.create_handler(req)
+
+    def _update(self, req):
+        new_instance = self.__class__()
+        new_instance.access_hook(req)
+
+        if not self.can_update:
+            raise web.HTTPForbidden()
+    
+        if req.method == 'POST':
+            return new_instance.edit_post_handler(req)
+        else:
+            return new_instance.edit_handler(req)
+
+    def _delete(req):
+        new_instance = self.__class__()
+        new_instance.access_hook(req)
+
+        if not self.can_delete:
+            raise web.HTTPForbidden()
+
+        return new_instance.delete_handler(req)
+
     def setup(
         self,
         admin: web.Application,
     ) -> None:
         # each request must generate a new instance of class for give
         # possible to customize view for it
-        cls = self.__class__
+        
 
         admin.add_routes([
             web.get(
                 self.index_url,
-                lambda req: cls().list_handler(req),
+                self._get_list,
                 name=self.name,
             ),
             web.get(
                 '%screate/' % self.index_url,
-                lambda req: cls().create_handler(req),
+                self._create,
                 name=f'{self.name}_create',
             ),
             web.post(
                 '%screate/' % self.index_url,
-                lambda req: cls().create_post_handler(req),
+                self._create,
             ),
             web.get(
                 '%s{id}/edit/' % self.index_url,
-                lambda req: cls().edit_handler(req),
+                self._update,
                 name=f'{self.name}_edit',
             ),
             web.post(
                 '%s{id}/edit/' % self.index_url,
-                lambda req: cls().edit_post_handler(req),
+                self._update,
             ),
             web.post(
                 '%s{id}/delete/' % self.index_url,
-                lambda req: cls().delete_handler(req),
+                self._delete,
                 name=f'{self.name}_delete',
             ),
         ])

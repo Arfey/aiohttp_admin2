@@ -1,0 +1,12 @@
+<form method="POST">
+    {# common field #}
+    {% for field in form._fields.values() %}
+        {{ field.render_to_html() | safe }}
+    {% endfor %}
+
+    <input type="submit" value="submit"/>
+    {# errors without some field #}
+    {%- for err in form.form_errors %}
+        <p>{ err.message }</p>
+    {%- endfor %}
+</form>
