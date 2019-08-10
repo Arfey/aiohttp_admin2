@@ -97,6 +97,13 @@ html, body {
 }
 
 /* action bar  */
-.action-button.action-button {
+.btn-action.btn-action {
     padding: 8px 16px;
+}
+
+/* lsit */
+
+.index-checkbox {
+    margin-right: 10px;
+    transform: scale(1.2);
 }

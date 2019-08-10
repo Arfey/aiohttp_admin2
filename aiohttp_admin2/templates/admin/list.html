@@ -5,10 +5,38 @@
 {% block main %}
 <div class="wrapper">
 {% include 'admin/list_action_buttons.html' %}
-{%- for obj in list.list_result %}
-<a href="{{ url(edit_url_name, id=obj.user_id)}}">{{obj.user_id}}</a>
-<p>_____________________</p>
-{%- endfor %}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            {% for field in view.inline_fields %}
+            <th scope="col">{{ field }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {%- for obj in list.list_result %}
+        <tr>
+            <th scope="row">
+                <input class="index-checkbox" type="checkbox" />
+                <a href="{{ url(edit_url_name, id=obj.user_id)}}">
+                    {{obj.user_id}}
+                </a>
+            </th>
+            {% for field in view.inline_fields %}
+            <td>
+                {% if field in view.read_only_fields %}
+                    {{ view.get_read_only_field(field, obj)|safe }}
+                {% else %}
+                    {{ obj|attr(field) }}
+                {% endif %}
+            </th>
+            {% endfor %}
+        </tr>
+        {%- endfor %}
+    </tbody>
+</table>
 
 <!-- paggination -->
 {{ 

@@ -2,7 +2,8 @@ from typing import (
     Dict,
     Any,
     Optional,
-    Union
+    Union,
+    NamedTuple,
 )
 
 import aiohttp_jinja2
@@ -13,7 +14,17 @@ from  aiopg.sa.engine import Engine as SAEngine
 import sqlalchemy as sa
 
 
-__all__ = ['BaseAdminView', 'BaseAdminResourceView', ]
+
+__all__ = ['BaseAdminView', 'BaseAdminResourceView', 'ListResult', ]
+
+
+class ListResult(NamedTuple):
+    list_result: list
+    has_next: bool
+    has_prev: bool
+    active_page: int
+    count_items: int
+    per_page: int
 
 
 class BaseAdminView:
@@ -42,6 +53,7 @@ class BaseAdminResourceView(BaseAdminView):
     The base class for views which work with database.
     """
     read_only_fields = []
+    inline_fields = []
 
     # CRUD access
     can_create = True
@@ -88,7 +100,7 @@ class BaseAdminResourceView(BaseAdminView):
             "request": req,
             'edit_url_name': f'{self.name}_edit',
             'create_url_name': f'{self.name}_create',
-            "view": self
+            "view": self,
         }
 
     async def list_handler(self, req) -> web.Response:
@@ -237,6 +249,9 @@ class BaseAdminResourceView(BaseAdminView):
             raise web.HTTPForbidden()
 
         return new_instance.delete_handler(req)
+
+    def get_read_only_field(self, name: str, inst) -> str:
+        return getattr(self, f'{name}_field')(inst)
 
     def setup(
         self,

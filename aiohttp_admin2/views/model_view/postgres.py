@@ -7,26 +7,14 @@ from typing import (
 
 from aiohttp import web
 import aiohttp_jinja2
-from sqlalchemy import func
 
 from aiohttp_admin2.views.base import (
     BaseAdminResourceView,
     BaseAdminView,
+    ListResult,
 )
 
 __all__ = ['PostgresView', ]
-
-
-from typing import NamedTuple
-
-
-class ListResult(NamedTuple):
-    list_result: list
-    has_next: bool
-    has_prev: bool
-    active_page: int
-    count_items: int
-    per_page: int
 
 
 class PostgresView(BaseAdminResourceView):
