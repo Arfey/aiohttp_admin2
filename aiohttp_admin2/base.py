@@ -3,6 +3,7 @@ from collections import defaultdict
 from typing import (
     List,
 )
+from urllib.parse import urlencode
 
 import aiohttp_jinja2
 import jinja2
@@ -49,6 +50,7 @@ class Admin:
         env.globals.update({
             "project_name": self.name,
             "nav_groups": nav_groups,
+            "pageUrl": lambda page, params: f'?{urlencode({"page": page, **params})}'
         })
 
     def set_views(self, admin: web.Application) -> None:

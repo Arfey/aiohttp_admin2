@@ -1,8 +1,8 @@
 <div class="container">
     {%- if view.can_edit %}
     <div class="row justify-content-end">
-        <div class="col-1">
-            <a class="btn btn-success" href="{{ url(create_url_name) }}">Create</a>
+        <div>
+            <a class="btn btn-success action-button" href="{{ url(create_url_name) }}">Create</a>
         </div>
     </div>
     {%- endif %}

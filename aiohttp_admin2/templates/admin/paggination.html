@@ -1,0 +1,70 @@
+<!-- simpel link -->
+{% macro item(index, active, query_args={}) %}
+    <li class="page-item {% if index == active %}active{% endif%}">
+        <a class="page-link" href="{{ pageUrl(index, query_args) }}">
+            {{ index }}
+        </a>
+    </li>
+{% endmacro %}
+
+<!-- three dots -->
+{% macro empty_item() %}
+    <li class="page-item disabled">
+        <a class="page-link" role="button">
+            ...
+        </a>
+    </li>
+{% endmacro %}
+
+<!-- paggination block -->
+{% macro paggination(page, count, has_next, has_prev, per_page, query_args={}, size=5) -%}
+    <nav class="paggination">
+        <ul class="pagination">
+            <!-- prev -->
+            <li class="page-item {% if not has_prev %}disabled{% endif %}">
+                <a class="page-link" href="{{ pageUrl(page - 1, query_args) }}">
+                    Previous
+                </a>
+            </li>
+            <!-- items -->
+            {%- with count_of_pages=(count / per_page)|round(0, 'ceil')|int %}
+            {% if count_of_pages <= size %}
+                <!-- 1 2 3 4 5 -->
+                {% for i in range(1, count_of_pages + 1) %}
+                    {{ item(i, page) }}
+                {% endfor %}
+            {% elif page < size  %}
+                <!-- 1 2 3 ... 10 -->
+                {% for i in range(1, size + 1) %}
+                    {{ item(i, page) }}
+                {% endfor %}
+                {{ empty_item() }}
+                {{ item(count_of_pages, page) }}
+            {% elif count_of_pages - page < size - 1 %}
+                <!-- 1 ... 7 8 9 -->
+                {{ item(1, page) }}
+                {{ empty_item() }}
+                {% for i in range(count_of_pages - size + 1, count_of_pages + 1) %}
+                    {{ item(i, page) }}
+                {% endfor %}
+            {% else %}
+                <!-- 1 ... 5 6 7 ... 14 -->
+                {{ item(1, page) }}
+                {{ empty_item() }}
+                {% for i in range(page - 2, page + 3) %}
+                    {{ item(i, page) }}
+                {% endfor %}
+                {{ empty_item() }}
+                {{ item(count_of_pages, page) }}
+            {% endif %}
+            {% endwith %}
+            <!-- next -->
+            <li class="page-item {% if not has_next %}disabled{% endif %}">
+                <a class="page-link" href="{{ pageUrl(page + 1, query_args) }}">
+                    Next
+                </a>
+            </li>
+        </ul>
+        <p class="paggination__count">total count: {{ count }}</p>
+    </nav>
+{%- endmacro %}

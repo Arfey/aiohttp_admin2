@@ -67,8 +67,8 @@ html, body {
 .content {
     margin-top: 10px;
     display: flex;
-    max-width: calc(100% - 290px);
     width: 100%;
+    padding-right: 24px;
 }
 
 .content__empty-title {
@@ -82,4 +82,21 @@ html, body {
 .wrapper {
     display: block;
     width: 100%;
+}
+
+/* paggination */
+
+.paggination {
+    display: flex;
+    justify-content: space-between;
+}
+
+.paggination .paggination__count {
+    padding: .5rem .75rem;
+    color: #7c7c7c;
+}
+
+/* action bar  */
+.action-button.action-button {
+    padding: 8px 16px;
 }

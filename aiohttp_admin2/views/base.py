@@ -48,6 +48,7 @@ class BaseAdminResourceView(BaseAdminView):
     can_update = True
     can_delete = True
     can_view_list = True
+    per_page = 50
 
     def __init__(self) -> None:
         super().__init__()
@@ -92,7 +93,14 @@ class BaseAdminResourceView(BaseAdminView):
 
     async def list_handler(self, req) -> web.Response:
         ctx = await self.get_context(req)
-        ctx['list'] = await self.get_list(req)
+
+        page = int(req.rel_url.query.get('page', 1))
+
+        ctx['list'] = await self.get_list(
+            req,
+            page,
+            self.per_page,
+        )
 
         return aiohttp_jinja2.render_template(
             self.template_name,

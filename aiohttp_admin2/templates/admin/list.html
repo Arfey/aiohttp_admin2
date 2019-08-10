@@ -1,12 +1,25 @@
 {% extends 'admin/base.html' %}
+{% from "admin/paggination.html" import paggination %}
 
 
 {% block main %}
 <div class="wrapper">
 {% include 'admin/list_action_buttons.html' %}
-{%- for obj in list %}
+{%- for obj in list.list_result %}
 <a href="{{ url(edit_url_name, id=obj.user_id)}}">{{obj.user_id}}</a>
 <p>_____________________</p>
 {%- endfor %}
+
+<!-- paggination -->
+{{ 
+    paggination(
+        list.active_page,
+        list.count_items,
+        list.has_next,
+        list.has_prev,
+        list.per_page,
+    )
+}}
+
 </div>
 {% endblock %}
