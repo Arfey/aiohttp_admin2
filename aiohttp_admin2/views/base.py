@@ -95,6 +95,9 @@ class BaseAdminResourceView(BaseAdminView):
     def form(self) -> BaseForm:
         return self._form
 
+    def get_list(self, *args, **kwargs):
+        raise NotImplemented
+
     async def get_context(self, req: web.Request):
         return {
             "request": req,
@@ -107,11 +110,15 @@ class BaseAdminResourceView(BaseAdminView):
         ctx = await self.get_context(req)
 
         page = int(req.rel_url.query.get('page', 1))
+        sort = req.rel_url.query.get('sort', 'user_id')
+        sort_direction = req.rel_url.query.get('sortDir', 'asc')
 
         ctx['list'] = await self.get_list(
             req,
             page,
             self.per_page,
+            sort,
+            sort_direction
         )
 
         return aiohttp_jinja2.render_template(

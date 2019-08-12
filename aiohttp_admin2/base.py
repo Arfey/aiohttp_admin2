@@ -50,7 +50,7 @@ class Admin:
         env.globals.update({
             "project_name": self.name,
             "nav_groups": nav_groups,
-            "pageUrl": lambda page, params: f'?{urlencode({"page": page, **params})}'
+            "newParam": lambda newParam, params: f'?{urlencode({**params, **newParam})}'
         })
 
     def set_views(self, admin: web.Application) -> None:

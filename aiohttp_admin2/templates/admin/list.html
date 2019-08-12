@@ -9,10 +9,38 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th scope="col">#</th>
+            {% with isDesc=(request.rel_url.query.get('sortDir') == 'desc') %}
+            <th scope="col">
+                <a href="{{ newParam({'sort': 'user_id', 'sortDir': 'asc' if isDesc else 'desc'}, request.rel_url.query) }}">
+                    #
+                    {% if request.rel_url.query.get('sort') == 'user_id' %}
+                        {% if isDesc %}
+                        <i class="material-icons">arrow_upward</i>
+                        {% else %}
+                        <i class="material-icons">arrow_downward</i>
+                        {% endif %}
+                    {% endif %}
+                </a>
+            </th>
             {% for field in view.inline_fields %}
-            <th scope="col">{{ field }}</th>
+            <th scope="col">
+                {% if field not in view.read_only_fields %}
+                <a href="{{ newParam({'sort': field, 'sortDir': 'asc' if isDesc else 'desc'}, request.rel_url.query) }}">
+                    {{ field }}
+                    {% if request.rel_url.query.get('sort') == field %}
+                        {% if isDesc %}
+                        <i class="material-icons">arrow_upward</i>
+                        {% else %}
+                        <i class="material-icons">arrow_downward</i>
+                        {% endif %}
+                    {% endif %}
+                </a>
+                {% else %}
+                {{ field }}
+                {% endif %}
+            </th>
             {% endfor %}
+            {% endwith %}
         </tr>
     </thead>
     <tbody>
@@ -46,6 +74,7 @@
         list.has_next,
         list.has_prev,
         list.per_page,
+        request.rel_url.query,
     )
 }}
 

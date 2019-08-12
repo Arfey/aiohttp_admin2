@@ -107,3 +107,7 @@ html, body {
     margin-right: 10px;
     transform: scale(1.2);
 }
+
+.sort_active {
+    transform: rotate(180deg);
+}

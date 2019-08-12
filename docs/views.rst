@@ -32,6 +32,11 @@ create with `_field` prefix. Also, in this function you can use
 current instance. As result this function must return a string. This
 can be simple string or html.
 
+.. note::
+
+    You can sorting your list of instances using all *inline_fields* but
+    *read_only_fields* fields are not sorted.
+
 Paggination
 -----------
 

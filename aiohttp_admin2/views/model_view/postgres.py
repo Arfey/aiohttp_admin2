@@ -7,6 +7,7 @@ from typing import (
 
 from aiohttp import web
 import aiohttp_jinja2
+import sqlalchemy as sa
 
 from aiohttp_admin2.views.base import (
     BaseAdminResourceView,
@@ -36,6 +37,8 @@ class PostgresView(BaseAdminResourceView):
         req: web.Request,
         page: int = 1,
         per_page: int = 50,
+        sort: str = 'user_id',
+        sort_direction: str = 'asc'
     ):
         async with self.engine(req).acquire() as conn:
             model = self.Model.model
@@ -43,7 +46,7 @@ class PostgresView(BaseAdminResourceView):
                 .select()\
                 .limit(per_page)\
                 .offset((page - 1) * per_page)\
-                .order_by(model.c.user_id)
+                .order_by(sa.text(f'{sort} {sort_direction}'))
 
             cursor = await conn.execute(query)
 
