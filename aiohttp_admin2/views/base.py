@@ -10,21 +10,21 @@ import aiohttp_jinja2
 from aiohttp import web
 from aiohttp.web_routedef import _SimpleHandler as Handler
 from aiohttp_admin2.core.forms import BaseForm
+from aiohttp_admin2.types import (
+    ListResult,
+    ListParams,
+    SortDirectionEnum,
+)
+from aiohttp_admin2.views.utils import getListParams
 from  aiopg.sa.engine import Engine as SAEngine
 import sqlalchemy as sa
 
 
 
-__all__ = ['BaseAdminView', 'BaseAdminResourceView', 'ListResult', ]
-
-
-class ListResult(NamedTuple):
-    list_result: list
-    has_next: bool
-    has_prev: bool
-    active_page: int
-    count_items: int
-    per_page: int
+__all__ = [
+    'BaseAdminView',
+    'BaseAdminResourceView',
+]
 
 
 class BaseAdminView:
@@ -53,7 +53,7 @@ class BaseAdminResourceView(BaseAdminView):
     The base class for views which work with database.
     """
     read_only_fields = []
-    inline_fields = []
+    inline_fields = ['user_id', ]
 
     # CRUD access
     can_create = True
@@ -95,7 +95,11 @@ class BaseAdminResourceView(BaseAdminView):
     def form(self) -> BaseForm:
         return self._form
 
-    def get_list(self, *args, **kwargs):
+    def get_list(
+        self,
+        req: web.Request,
+        data: ListParams,
+    ) -> web.Response:
         raise NotImplemented
 
     async def get_context(self, req: web.Request):
@@ -107,19 +111,10 @@ class BaseAdminResourceView(BaseAdminView):
         }
 
     async def list_handler(self, req) -> web.Response:
+        params = getListParams(req, self.per_page)
+
         ctx = await self.get_context(req)
-
-        page = int(req.rel_url.query.get('page', 1))
-        sort = req.rel_url.query.get('sort', 'user_id')
-        sort_direction = req.rel_url.query.get('sortDir', 'asc')
-
-        ctx['list'] = await self.get_list(
-            req,
-            page,
-            self.per_page,
-            sort,
-            sort_direction
-        )
+        ctx['list'] = await self.get_list(req, params)
 
         return aiohttp_jinja2.render_template(
             self.template_name,

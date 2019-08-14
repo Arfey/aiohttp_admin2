@@ -12,7 +12,10 @@ import sqlalchemy as sa
 from aiohttp_admin2.views.base import (
     BaseAdminResourceView,
     BaseAdminView,
+)
+from aiohttp_admin2.types import (
     ListResult,
+    ListParams,
 )
 
 __all__ = ['PostgresView', ]
@@ -35,46 +38,38 @@ class PostgresView(BaseAdminResourceView):
     async def get_list(
         self,
         req: web.Request,
-        page: int = 1,
-        per_page: int = 50,
-        sort: str = 'user_id',
-        sort_direction: str = 'asc'
-    ):
+        params: ListParams,
+    ) -> web.Response:
         async with self.engine(req).acquire() as conn:
             model = self.Model.model
             query = model\
                 .select()\
-                .limit(per_page)\
-                .offset((page - 1) * per_page)\
-                .order_by(sa.text(f'{sort} {sort_direction}'))
+                .limit(params.per_page)\
+                .offset((params.page - 1) * params.per_page)\
+                .order_by(sa.text(f'{params.sort} {params.sort_direction}'))
 
             cursor = await conn.execute(query)
-
             list_result = await cursor.fetchall()
 
-            count_query = model.count()
+            count_items = await conn.scalar(model.count())
 
-            count_cursor = await conn.execute(count_query)
-
-            count_items = await count_cursor.fetchone()
-
-            has_next = count_items[0] / per_page - page > 0
-            has_prev = page > 1
+            has_next = count_items / params.per_page - params.page > 0
+            has_prev = params.page > 1
 
             return ListResult(
                 list_result=list_result,
-                active_page=page,
-                count_items=count_items[0],
+                active_page=params.page,
+                count_items=count_items,
                 has_next=has_next,
                 has_prev=has_prev,
-                per_page=per_page,
+                per_page=params.per_page,
             )
 
     async def get_detail(self, req):
         async with self.engine(req).acquire() as conn:
             model = self.Model.model
-            query = model \
-                .select() \
+            query = model\
+                .select()\
                 .where(model.c.user_id == req.match_info['id'])
 
             cursor = await conn.execute(query)
