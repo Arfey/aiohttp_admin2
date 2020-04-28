@@ -1,43 +1,16 @@
-.. include:: ../README.rst
-
-Installation
-============
-
-.. code-block:: bash
-
-   pip install aiohttp_admin
-
-Quick start
-===========
-
-.. code-block:: python
-
-    from aiohttp import web
-    from aiohttp_admin.setup import setup
-
-    def create_app():
-        app = web.Application()
-        setup(app)
-
-        return app
-
-and after open *http://localhost:8080/admin/* in your browser.
-
-.. image:: /image/simple_example.png
+Welcome to aiohttp admin 2's documentation!
+===========================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   readme
    installation
-   tutorial
-   views
-   forms
-   templates
-   authorization_permissions
-   q&a
+   usage
    modules
    contributing
+   authors
    history
 
 Indices and tables

@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install aiohttp_admin, run this command in your terminal:
+To install aiohttp admin 2, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install aiohttp_admin
+    $ pip install aiohttp_admin2
 
-This is the preferred method to install aiohttp_admin, as it will always install the most recent stable release.
+This is the preferred method to install aiohttp admin 2, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,19 +26,19 @@ you through the process.
 From sources
 ------------
 
-The sources for aiohttp_admin can be downloaded from the `Github repo`_.
+The sources for aiohttp admin 2 can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/Arfey/aiohttp_admin2
+    $ git clone git://github.com/arfey/aiohttp_admin2
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/Arfey/aiohttp_admin2/tarball/master
+    $ curl -OJL https://github.com/arfey/aiohttp_admin2/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/Arfey/aiohttp_admin2
-.. _tarball: https://github.com/Arfey/aiohttp_admin2/tarball/master
+.. _Github repo: https://github.com/arfey/aiohttp_admin2
+.. _tarball: https://github.com/arfey/aiohttp_admin2/tarball/master

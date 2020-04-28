@@ -1,47 +1,21 @@
 aiohttp\_admin2 package
 =======================
 
-Subpackages
------------
-
-.. toctree::
-
-    aiohttp_admin2.connectors
-    aiohttp_admin2.project_new
-    aiohttp_admin2.tests
-    aiohttp_admin2.views
-
 Submodules
 ----------
 
-aiohttp\_admin2.base module
----------------------------
+aiohttp\_admin2.aiohttp\_admin2 module
+--------------------------------------
 
-.. automodule:: aiohttp_admin2.base
+.. automodule:: aiohttp_admin2.aiohttp_admin2
     :members:
     :undoc-members:
     :show-inheritance:
 
-aiohttp\_admin2.constants module
---------------------------------
+aiohttp\_admin2.cli module
+--------------------------
 
-.. automodule:: aiohttp_admin2.constants
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-aiohttp\_admin2.setup module
-----------------------------
-
-.. automodule:: aiohttp_admin2.setup
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-aiohttp\_admin2.types module
-----------------------------
-
-.. automodule:: aiohttp_admin2.types
+.. automodule:: aiohttp_admin2.cli
     :members:
     :undoc-members:
     :show-inheritance:

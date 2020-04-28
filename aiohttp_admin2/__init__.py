@@ -1,4 +1,5 @@
-__version__ = '0.0.1'
+"""Top-level package for aiohttp admin 2."""
 
-from .base import Admin
-from .setup import setup
+__author__ = """Mykhailo Havelia"""
+__email__ = 'misha.gavela@gmail.com'
+__version__ = '0.1.0'
