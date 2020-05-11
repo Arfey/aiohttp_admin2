@@ -10,6 +10,10 @@ sphinx_rtd_theme==0.4.3
 twine==1.14.0
 Click==7.0
 
+mypy
+pytest
+pytest-asyncio
 
 # docs
-sphinxcontrib-napoleon=0.0.7
+sphinxcontrib-napoleon
+
