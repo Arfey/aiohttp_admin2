@@ -12,7 +12,10 @@ with open('HISTORY.rst') as history_file:
 
 requirements = ['Click>=7.0', ]
 
-setup_requirements = [ ]
+setup_requirements = [
+    'sqlalchemy',
+    'aiopg',
+]
 
 test_requirements = [ ]
 
