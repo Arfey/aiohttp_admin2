@@ -1,5 +1,8 @@
 import typing as t
 
+from umongo.document import MetaDocumentImplementation
+from bson.objectid import ObjectId
+
 from aiohttp_admin2.clients.client.abc import (
     AbstractClient,
     Instance,
@@ -13,8 +16,19 @@ __all__ = ['MongoClient', ]
 
 
 class MongoClient(AbstractClient):
+    table: MetaDocumentImplementation
+
+    def __init__(self, table: MetaDocumentImplementation) -> None:
+        self.table = table
+
     async def get_one(self, pk: PK) -> Instance:
-        pass
+        data = await self.table.find_one({"_id": ObjectId(pk)})
+        res = Instance()
+        res.__dict__ = {
+            key: value for key, value in data.items()
+        }
+
+        return res
 
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
         pass
@@ -23,10 +37,14 @@ class MongoClient(AbstractClient):
         pass
 
     async def delete(self, pk: PK) -> None:
-        pass
+        await self.table.collection.delete_one({"_id": ObjectId(pk)})
 
     async def create(self, instance: Instance) -> Instance:
-        pass
+        res = await self.table(**instance.__dict__).commit()
+
+        instance.id = res.inserted_id
+
+        return instance
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
         pass

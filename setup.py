@@ -15,6 +15,8 @@ requirements = ['Click>=7.0', ]
 setup_requirements = [
     'sqlalchemy',
     'aiopg',
+    'motor',
+    'umongo',
 ]
 
 test_requirements = [ ]

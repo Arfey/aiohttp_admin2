@@ -1,5 +1,4 @@
 import typing as t
-from collections import namedtuple
 
 import sqlalchemy as sa
 from aiopg.sa import Engine
