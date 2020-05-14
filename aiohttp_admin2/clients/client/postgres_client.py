@@ -50,16 +50,25 @@ class PostgresClient(AbstractClient):
         offset: t.Optional[int] = None,
         cursor: t.Optional[int] = None,
     ) -> t.Union[PaginatorCursor, PaginatorOffset]:
+        assert offset and cursor, \
+            "You can't use offset and cursor params together"
+
         async with self.engine.acquire() as conn:
             query = self.table\
                 .select().limit(limit + 1)
 
+            if offset is not None:
+                query = query.offset(offset)
+            else:
+                # todo: fix problem with sorting
+                query = query.where(self._primary_key >= cursor)
+
             cursor = await conn.execute(query)
 
             res = await cursor.fetchall()
-            count: int = await conn.scalar(self.table.count())
 
             if offset is not None:
+                count: int = await conn.scalar(self.table.count())
                 return self.create_offset_paginator(res, limit, offset, count)
             else:
                 return self.create_cursor_paginator(res, limit, cursor)

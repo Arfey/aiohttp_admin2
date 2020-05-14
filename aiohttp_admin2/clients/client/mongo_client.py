@@ -40,7 +40,26 @@ class MongoClient(AbstractClient):
         offset=None,
         cursor=None,
     ) -> t.Union[PaginatorCursor, PaginatorOffset]:
-        pass
+        if offset is not None:
+            data = await self.table\
+                .find()\
+                .skip(offset)\
+                .limit(limit + 1)\
+                .to_list(length=limit + 1)
+        else:
+            # todo: fix problem with sorting
+            data = await self.table\
+                .find({'_id': {'$gt': cursor}})\
+                .limit(limit + 1)\
+                .to_list(length=limit + 1)
+
+        if offset is not None:
+            # todo: fix problem with sorting
+            count: int = await self.table\
+                .count_documents({'_id': {'$gt': cursor}})
+            return self.create_offset_paginator(data, limit, offset, count)
+        else:
+            return self.create_cursor_paginator(data, limit, cursor)
 
     async def delete(self, pk: PK) -> None:
         await self.table.collection.delete_one({"_id": ObjectId(pk)})
