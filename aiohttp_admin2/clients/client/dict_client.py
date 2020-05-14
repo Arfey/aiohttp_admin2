@@ -3,7 +3,8 @@ from aiohttp_admin2.clients.client.abc import (
     AbstractClient,
     Instance,
     InstanceMapper,
-    Paginator,
+    PaginatorCursor,
+    PaginatorOffset,
 )
 from aiohttp_admin2.clients.exceptions import InstanceDoesNotExist
 from aiohttp_admin2.clients.types import PK
@@ -24,7 +25,7 @@ class DictClient(AbstractClient):
         >>> user = my_dict_client.get_one(1)
 
     """
-    _pk: int = None
+    _pk: int
     engine: t.Dict[PK, t.Any]
 
     def __init__(self, engine: t.Optional[t.Dict[PK, t.Any]] = None):
@@ -45,7 +46,12 @@ class DictClient(AbstractClient):
             for pk in pks
         }
 
-    async def get_list(self, count: int = 50) -> Paginator:
+    async def get_list(
+        self,
+        limit=50,
+        offset=None,
+        cursor=None,
+    ) -> t.Union[PaginatorCursor, PaginatorOffset]:
         result = []
 
         for pk, value in self.engine.items():
@@ -53,7 +59,7 @@ class DictClient(AbstractClient):
             instance.__dict__ = {'pk': pk, **value}
             result.append(instance)
 
-        return Paginator(result[:count])
+        # return Paginator(result[:limit])
 
     async def delete(self, pk: PK) -> None:
         if pk not in self.engine:

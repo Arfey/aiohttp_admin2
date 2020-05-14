@@ -7,7 +7,8 @@ from aiohttp_admin2.clients.client.abc import (
     AbstractClient,
     Instance,
     InstanceMapper,
-    Paginator,
+    PaginatorOffset,
+    PaginatorCursor,
 )
 from aiohttp_admin2.clients.types import PK
 
@@ -33,7 +34,12 @@ class MongoClient(AbstractClient):
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
         pass
 
-    async def get_list(self, count: int = 50) -> Paginator:
+    async def get_list(
+        self,
+        limit=50,
+        offset=None,
+        cursor=None,
+    ) -> t.Union[PaginatorCursor, PaginatorOffset]:
         pass
 
     async def delete(self, pk: PK) -> None:
@@ -42,7 +48,7 @@ class MongoClient(AbstractClient):
     async def create(self, instance: Instance) -> Instance:
         res = await self.table(**instance.__dict__).commit()
 
-        instance.id = res.inserted_id
+        instance.pk = res.inserted_id
 
         return instance
 

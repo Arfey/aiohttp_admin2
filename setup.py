@@ -17,6 +17,7 @@ setup_requirements = [
     'aiopg',
     'motor',
     'umongo',
+    'sqlalchemy-stubs',
 ]
 
 test_requirements = [ ]

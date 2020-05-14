@@ -30,13 +30,16 @@ async def go():
         obj.val = 'some'
 
         res = await client.create(obj)
+        res = await client.create(obj)
+        res = await client.create(obj)
         print('res', res.id)
-        print('res', await client.get_one(res.id))
-        print('res', await client.delete(res.id))
+        # print('res', await client.get_one(res.id))
+        # print('res', await client.delete(res.id))
+        print('list', await client.get_list(offset=0, limit=10))
 
 
-# loop = asyncio.get_event_loop()
-# loop.run_until_complete(go())
+loop = asyncio.get_event_loop()
+loop.run_until_complete(go())
 
 
 async def monog():
@@ -60,8 +63,8 @@ async def monog():
 
     client = MongoClient(User)
     res = await client.create(obj)
-    res = await client.get_one(res.id)
-    res = await client.delete(res.id)
+    res = await client.get_one(res.pk)
+    res = await client.delete(res.pk)
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(monog())
+# loop = asyncio.get_event_loop()
+# loop.run_until_complete(monog())

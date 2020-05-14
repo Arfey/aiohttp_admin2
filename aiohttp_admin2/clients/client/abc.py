@@ -15,9 +15,19 @@ class Instance:
     pk: PK
 
 
-class Paginator(t.NamedTuple):
+class PaginatorCursor(t.NamedTuple):
     """Object for represent list of instances."""
     instances: t.List[Instance]
+    has_next: bool
+    hex_prev: bool
+
+
+class PaginatorOffset(t.NamedTuple):
+    """Object for represent list of instances."""
+    instances: t.List[Instance]
+    has_next: bool
+    hex_prev: bool
+    count: int
 
 
 InstanceMapper = t.Dict[PK, t.Optional[Instance]]
@@ -29,7 +39,6 @@ class AbstractClient(ABC):
     All clients must be implement all method from current abstract class. These
     methods provide all action which need to do with store for work with data.
     """
-    PER_PAGE = 50
     engine: t.Any = None
 
     @abstractmethod
@@ -56,7 +65,12 @@ class AbstractClient(ABC):
         """
 
     @abstractmethod
-    async def get_list(self, count: int = PER_PAGE) -> Paginator:
+    async def get_list(
+        self,
+        limit: int,
+        offset: t.Optional[int] = None,
+        cursor: t.Optional[int] = None,
+    ) -> t.Union[PaginatorCursor, PaginatorOffset]:
         """
         Get list of instances. This method will use for show list of instances
         and must have some features:
@@ -87,3 +101,29 @@ class AbstractClient(ABC):
         Raises:
             InstanceDoesNotExist: If instance does not exists
         """
+
+    def create_offset_paginator(
+        self,
+        instances: t.List[Instance],
+        limit: int,
+        offset: t.Optional[int],
+        count: int,
+    ) -> PaginatorOffset:
+        return PaginatorOffset(
+            instances=instances[0:limit],
+            has_next=len(instances) > limit,
+            hex_prev=bool(offset),
+            count=count,
+        )
+
+    def create_cursor_paginator(
+        self,
+        instances: t.List[Instance],
+        limit: int,
+        cursor: t.Optional[int],
+    ) -> PaginatorCursor:
+        return PaginatorCursor(
+            instances=instances[0:limit],
+            has_next=len(instances) > limit,
+            hex_prev=bool(cursor),
+        )
