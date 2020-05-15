@@ -1,7 +1,15 @@
 from aiohttp_admin2.exceptions import AdminException
 
 
-__all__ = ['ClientException', 'InstanceDoesNotExist', ]
+__all__ = [
+    'ClientException',
+    'InstanceDoesNotExist',
+    'CURSOR_PAGINATION_ERROR_MESSAGE',
+]
+
+
+CURSOR_PAGINATION_ERROR_MESSAGE = \
+    "Pagination by cursor available only together with sorting by primary key"
 
 
 class ClientException(AdminException):

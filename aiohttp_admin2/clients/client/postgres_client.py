@@ -126,6 +126,7 @@ class PostgresClient(AbstractClient):
         """
         Return received order or default order if order_by was not provide.
         """
+        # todo: maybe move to string
         if order_by is not None:
             return order_by
 
