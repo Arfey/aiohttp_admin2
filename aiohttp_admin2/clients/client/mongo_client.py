@@ -10,7 +10,10 @@ from aiohttp_admin2.clients.client.abc import (
     Paginator,
 )
 from aiohttp_admin2.clients.types import PK
-from aiohttp_admin2.clients.exceptions import ClientException, CURSOR_PAGINATION_ERROR_MESSAGE
+from aiohttp_admin2.clients.exceptions import (
+    ClientException,
+    CURSOR_PAGINATION_ERROR_MESSAGE,
+)
 
 
 __all__ = ['MongoClient', ]
