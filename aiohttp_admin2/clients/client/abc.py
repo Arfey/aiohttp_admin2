@@ -15,19 +15,12 @@ class Instance:
     pk: PK
 
 
-class PaginatorCursor(t.NamedTuple):
+class Paginator(t.NamedTuple):
     """Object for represent list of instances."""
     instances: t.List[Instance]
     has_next: bool
     hex_prev: bool
-
-
-class PaginatorOffset(t.NamedTuple):
-    """Object for represent list of instances."""
-    instances: t.List[Instance]
-    has_next: bool
-    hex_prev: bool
-    count: int
+    count: t.Optional[int]
 
 
 InstanceMapper = t.Dict[PK, t.Optional[Instance]]
@@ -70,7 +63,7 @@ class AbstractClient(ABC):
         limit: int,
         offset: t.Optional[int] = None,
         cursor: t.Optional[int] = None,
-    ) -> t.Union[PaginatorCursor, PaginatorOffset]:
+    ) -> Paginator:
         """
         Get list of instances. This method will use for show list of instances
         and must have some features:
@@ -102,28 +95,18 @@ class AbstractClient(ABC):
             InstanceDoesNotExist: If instance does not exists
         """
 
-    def create_offset_paginator(
+    def create_paginator(
         self,
+        *,
         instances: t.List[Instance],
         limit: int,
-        offset: t.Optional[int],
-        count: int,
-    ) -> PaginatorOffset:
-        return PaginatorOffset(
+        offset: t.Optional[int] = None,
+        cursor: t.Optional[int] = None,
+        count: t.Optional[int] = None,
+    ) -> Paginator:
+        return Paginator(
             instances=instances[0:limit],
             has_next=len(instances) > limit,
-            hex_prev=bool(offset),
+            hex_prev=bool(offset) or bool(cursor),
             count=count,
-        )
-
-    def create_cursor_paginator(
-        self,
-        instances: t.List[Instance],
-        limit: int,
-        cursor: t.Optional[int],
-    ) -> PaginatorCursor:
-        return PaginatorCursor(
-            instances=instances[0:limit],
-            has_next=len(instances) > limit,
-            hex_prev=bool(cursor),
         )

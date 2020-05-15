@@ -3,8 +3,7 @@ from aiohttp_admin2.clients.client.abc import (
     AbstractClient,
     Instance,
     InstanceMapper,
-    PaginatorCursor,
-    PaginatorOffset,
+    Paginator,
 )
 from aiohttp_admin2.clients.exceptions import InstanceDoesNotExist
 from aiohttp_admin2.clients.types import PK
@@ -51,7 +50,7 @@ class DictClient(AbstractClient):
         limit=50,
         offset=None,
         cursor=None,
-    ) -> t.Union[PaginatorCursor, PaginatorOffset]:
+    ) -> Paginator:
         result = []
 
         for pk, value in self.engine.items():

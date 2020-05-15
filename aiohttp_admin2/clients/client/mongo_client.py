@@ -7,8 +7,7 @@ from aiohttp_admin2.clients.client.abc import (
     AbstractClient,
     Instance,
     InstanceMapper,
-    PaginatorOffset,
-    PaginatorCursor,
+    Paginator,
 )
 from aiohttp_admin2.clients.types import PK
 
@@ -39,7 +38,7 @@ class MongoClient(AbstractClient):
         limit=50,
         offset=None,
         cursor=None,
-    ) -> t.Union[PaginatorCursor, PaginatorOffset]:
+    ) -> Paginator:
         if offset is not None:
             data = await self.table\
                 .find()\
@@ -57,9 +56,18 @@ class MongoClient(AbstractClient):
             # todo: fix problem with sorting
             count: int = await self.table\
                 .count_documents({'_id': {'$gt': cursor}})
-            return self.create_offset_paginator(data, limit, offset, count)
+            return self.create_paginator(
+                instances=data,
+                limit=limit,
+                offset=offset,
+                count=count,
+            )
         else:
-            return self.create_cursor_paginator(data, limit, cursor)
+            return self.create_paginator(
+                instances=data,
+                limit=limit,
+                cursor=cursor,
+            )
 
     async def delete(self, pk: PK) -> None:
         await self.table.collection.delete_one({"_id": ObjectId(pk)})

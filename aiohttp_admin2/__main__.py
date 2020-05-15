@@ -35,11 +35,12 @@ async def go():
         # print('res', res.id)
         # print('res', await client.get_one(res.id))
         # print('res', await client.delete(res.id))
-        print('list', await client.get_list(cursor=4, limit=10))
+        print('list', await client.get_list(limit=10))
+        # print('order', await client.get_list(limit=10, order_by=sa.asc(tbl.c.id)))
 
 
-# loop = asyncio.get_event_loop()
-# loop.run_until_complete(go())
+loop = asyncio.get_event_loop()
+loop.run_until_complete(go())
 
 
 async def monog():
@@ -79,5 +80,5 @@ async def monog():
     # res = await client.delete(res.pk)
     print('list', await client.get_list(limit=5, offset=1))
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(monog())
+# loop = asyncio.get_event_loop()
+# loop.run_until_complete(monog())

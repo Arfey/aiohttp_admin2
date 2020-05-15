@@ -2,19 +2,22 @@ import typing as t
 
 import sqlalchemy as sa
 from aiopg.sa import Engine
+from sqlalchemy.sql.elements import UnaryExpression
 
 from aiohttp_admin2.clients.client.abc import (
     AbstractClient,
     Instance,
     InstanceMapper,
-    PaginatorOffset,
-    PaginatorCursor,
+    Paginator,
 )
 from aiohttp_admin2.clients.exceptions import InstanceDoesNotExist
 from aiohttp_admin2.clients.types import PK
 
 
 __all__ = ['PostgresClient', ]
+
+
+SortType = t.Union[sa.Column, UnaryExpression]
 
 
 class PostgresClient(AbstractClient):
@@ -44,35 +47,46 @@ class PostgresClient(AbstractClient):
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
         pass
 
+    # todo: move to *
     async def get_list(
         self,
         limit: int = 50,
-        offset: t.Optional[int] = None,
+        offset: int = 0,
         cursor: t.Optional[int] = None,
-    ) -> t.Union[PaginatorCursor, PaginatorOffset]:
-        assert offset and cursor, \
+        order_by: t.Optional[SortType] = None,
+    ) -> Paginator:
+        assert not offset and not cursor, \
             "You can't use offset and cursor params together"
 
         async with self.engine.acquire() as conn:
             query = self.table\
                 .select().limit(limit + 1)
 
-            if offset is not None:
-                query = query.offset(offset)
-            else:
+            if cursor is not None:
                 # todo: fix problem with sorting
                 query = query.where(self._primary_key >= cursor)
+            else:
+                query = query.offset(offset)
 
-            cursor = await conn.execute(query)
+            cursor = await conn\
+                .execute(query.order_by(self.get_order(order_by)))
 
             res = await cursor.fetchall()
 
             if offset is not None:
                 count: int = await conn.scalar(self.table.count())
-                return self.create_offset_paginator(res, limit, offset, count)
+                return self.create_paginator(
+                    instances=res,
+                    limit=limit,
+                    offset=offset,
+                    count=count,
+                )
             else:
-                return self.create_cursor_paginator(res, limit, cursor)
-
+                return self.create_paginator(
+                    instances=res,
+                    limit=limit,
+                    cursor=cursor,
+                )
 
     async def delete(self, pk: PK) -> None:
         async with self.engine.acquire() as conn:
@@ -102,5 +116,17 @@ class PostgresClient(AbstractClient):
         pass
 
     @property
-    def _primary_key(self) -> str:
+    def _primary_key(self) -> sa.Column:
+        """
+        Return primary key for current table.
+        """
         return list(self.table.primary_key.columns)[0]
+
+    def get_order(self, order_by: t.Optional[SortType]) -> SortType:
+        """
+        Return received order or default order if order_by was not provide.
+        """
+        if order_by is not None:
+            return order_by
+
+        return sa.desc(self._primary_key)
