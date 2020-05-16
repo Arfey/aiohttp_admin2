@@ -4,6 +4,7 @@ import sqlalchemy as sa
 from aiohttp_admin2.clients import PostgresClient
 from aiohttp_admin2.clients import MongoClient
 from aiohttp_admin2.clients import Instance
+from aiohttp_admin2.clients.types import FilterTuple
 
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -35,12 +36,28 @@ async def go():
         # print('res', res.id)
         # print('res', await client.get_one(res.id))
         # print('res', await client.delete(res.id))
-        print('list', await client.get_list(limit=10))
-        print('order', await client.get_list(limit=10, order_by=sa.asc(tbl.c.id)))
+        # print('list', await client.get_list(limit=10))
+        print('list', await client.get_list())
+        # print('order', await client.get_list(limit=10, order_by=sa.asc(tbl.c.id)))
+
+        # column_name = i.get('column_name')
+        # value = i.get('value')
+        # filter_type_cls = i.get('filter')
+
+        print(
+            'order',
+            await client.get_list(
+                filters=[
+                    FilterTuple('id', 5, "gte"),
+                    # FilterTuple('id', 10, "lte"),
+                    FilterTuple('val', "other", "like"),
+                ]
+            ),
+        )
 
 
-# loop = asyncio.get_event_loop()
-# loop.run_until_complete(go())
+loop = asyncio.get_event_loop()
+loop.run_until_complete(go())
 
 
 async def monog():
@@ -82,5 +99,5 @@ async def monog():
     # print('list', await client.get_list(limit=5, order_by=[('_id', 1)]))
     # print('list', await client.get_list(limit=5, cursor='5ebbad7df1716e316e2701d2', order_by=[('_id', 1)]))
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(monog())
+# loop = asyncio.get_event_loop()
+# loop.run_until_complete(monog())

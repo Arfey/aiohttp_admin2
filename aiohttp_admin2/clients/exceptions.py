@@ -4,6 +4,7 @@ from aiohttp_admin2.exceptions import AdminException
 __all__ = [
     'ClientException',
     'InstanceDoesNotExist',
+    'FilterException',
     'CURSOR_PAGINATION_ERROR_MESSAGE',
 ]
 
@@ -18,3 +19,7 @@ class ClientException(AdminException):
 
 class InstanceDoesNotExist(ClientException):
     """Client can't return instance because it does not exists."""
+
+
+class FilterException(ClientException):
+    """Client can't apply filter to query."""

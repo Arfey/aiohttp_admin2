@@ -10,14 +10,24 @@ from aiohttp_admin2.clients.client.abc import (
     InstanceMapper,
     Paginator,
 )
-from aiohttp_admin2.clients.exceptions import InstanceDoesNotExist
+from aiohttp_admin2.clients.exceptions import (
+    InstanceDoesNotExist,
+    FilterException,
+)
 from aiohttp_admin2.clients.types import PK
+from aiohttp_admin2.clients.postgres_client.utils import to_column
+from aiohttp_admin2.clients.types import FilterTuple
+from aiohttp_admin2.clients.postgres_client.filters import (
+    SQLAlchemyBaseFilter,
+    default_filter_mapper,
+)
 
 
 __all__ = ['PostgresClient', ]
 
 
 SortType = t.Union[sa.Column, UnaryExpression]
+FiltersType = t.List[FilterTuple]
 
 
 class PostgresClient(AbstractClient):
@@ -54,6 +64,7 @@ class PostgresClient(AbstractClient):
         offset: int = 0,
         cursor: t.Optional[int] = None,
         order_by: t.Optional[SortType] = None,
+        filters: t.Optional[FiltersType] = None,
     ) -> Paginator:
         assert not offset and not cursor, \
             "You can't use offset and cursor params together"
@@ -68,13 +79,21 @@ class PostgresClient(AbstractClient):
             else:
                 query = query.offset(offset)
 
+            if filters:
+                query = self.apply_filters(query, filters)
+
             cursor = await conn\
                 .execute(query.order_by(self.get_order(order_by)))
 
             res = await cursor.fetchall()
 
             if offset is not None:
-                count: int = await conn.scalar(self.table.count())
+                if filters:
+                    count: int = await conn.scalar(
+                        self.apply_filters(self.table.count(), filters)
+                    )
+                else:
+                    count: int = await conn.scalar(self.table.count())
                 return self.create_paginator(
                     instances=res,
                     limit=limit,
@@ -131,3 +150,30 @@ class PostgresClient(AbstractClient):
             return order_by
 
         return sa.desc(self._primary_key)
+
+    def apply_filters(
+        self,
+        query: sa.sql.Select,
+        filters: FiltersType,
+    ) -> sa.sql.Select:
+        """
+        This method apply received filters.
+        """
+        for i in filters:
+            filter_type_cls = i.filter
+
+            if not isinstance(filters, SQLAlchemyBaseFilter):
+                filter_type_cls = default_filter_mapper.get(filter_type_cls)
+
+                if not filter_type_cls:
+                    raise FilterException(
+                        f"unknown filter type {i.filter}")
+
+            query = filter_type_cls(
+                table=self.table,
+                column=to_column(i.column_name, self.table),
+                value=i.value,
+                query=query,
+            ).query
+
+        return query
