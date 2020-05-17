@@ -56,8 +56,8 @@ async def go():
         )
 
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(go())
+# loop = asyncio.get_event_loop()
+# loop.run_until_complete(go())
 
 
 async def monog():
@@ -96,8 +96,11 @@ async def monog():
     # res = await client.get_one(res.pk)
     # res = await client.delete(res.pk)
     # print('list', await client.get_list(limit=5, offset=1))
+    print('list', await client.get_list(filters=[
+        FilterTuple('email', 'email2@emila.com', 'eq')
+    ]))
     # print('list', await client.get_list(limit=5, order_by=[('_id', 1)]))
     # print('list', await client.get_list(limit=5, cursor='5ebbad7df1716e316e2701d2', order_by=[('_id', 1)]))
 
-# loop = asyncio.get_event_loop()
-# loop.run_until_complete(monog())
+loop = asyncio.get_event_loop()
+loop.run_until_complete(monog())

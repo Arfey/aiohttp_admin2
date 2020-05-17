@@ -10,16 +10,24 @@ from aiohttp_admin2.clients.client.abc import (
     Paginator,
 )
 from aiohttp_admin2.clients.types import PK
+from aiohttp_admin2.clients.mongo_client.filters import (
+    MongoQuery,
+    MongoBaseFilter,
+    default_filter_mapper,
+)
+from aiohttp_admin2.clients.types import FilterTuple
 from aiohttp_admin2.clients.exceptions import (
     ClientException,
     CURSOR_PAGINATION_ERROR_MESSAGE,
 )
+from aiohttp_admin2.clients.exceptions import FilterException
 
 
 __all__ = ['MongoClient', ]
 
 
 SortType = t.List[t.Tuple[str, int]]
+FiltersType = t.List[FilterTuple]
 
 
 class MongoClient(AbstractClient):
@@ -46,6 +54,7 @@ class MongoClient(AbstractClient):
         offset=0,
         cursor=None,
         order_by: t.Optional[SortType] = None,
+        filters: t.Optional[FiltersType] = None,
     ) -> Paginator:
         sort = self.get_order(order_by)
         if cursor:
@@ -53,18 +62,26 @@ class MongoClient(AbstractClient):
                 raise ClientException(CURSOR_PAGINATION_ERROR_MESSAGE)
 
             if int(sort[0][1]) == -1:
-                cursor_query = {'_id': {'$lt': ObjectId(cursor)}}
+                query = {'_id': {'$lt': ObjectId(cursor)}}
             else:
-                cursor_query = {'_id': {'$gt': ObjectId(cursor)}}
+                query = {'_id': {'$gt': ObjectId(cursor)}}
+
+            if filters:
+                query = self.apply_filters(filters, query)
 
             data = await self.table\
-                .find(cursor_query)\
+                .find(query)\
                 .limit(limit + 1)\
                 .sort(self.get_order(order_by))\
                 .to_list(length=limit + 1)
         else:
+            query = {}
+
+            if filters:
+                query = self.apply_filters(filters, query)
+
             data = await self.table \
-                .find()\
+                .find(query)\
                 .skip(offset)\
                 .limit(limit + 1)\
                 .sort(sort)\
@@ -77,7 +94,7 @@ class MongoClient(AbstractClient):
                 cursor=cursor,
             )
         else:
-            count: int = await self.table.count_documents()
+            count: int = await self.table.count_documents(query)
             return self.create_paginator(
                 instances=data,
                 limit=limit,
@@ -107,3 +124,29 @@ class MongoClient(AbstractClient):
             return order_by
 
         return [('_id', -1)]
+
+    def apply_filters(
+        self,
+        filters: FiltersType,
+        query: MongoQuery,
+    ) -> MongoQuery:
+        """
+        This method apply received filters.
+        """
+        for i in filters:
+            filter_type_cls = i.filter
+
+            if not isinstance(filters, MongoBaseFilter):
+                filter_type_cls = default_filter_mapper.get(filter_type_cls)
+
+                if not filter_type_cls:
+                    raise FilterException(
+                        f"unknown filter type {i.filter}")
+
+            query = filter_type_cls(
+                column=i.column_name,
+                value=i.value,
+                query=query,
+            ).query
+
+        return query

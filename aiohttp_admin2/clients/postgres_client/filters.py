@@ -26,7 +26,7 @@ comparator_map = {
 class SQLAlchemyBaseFilter(ABCFilter):
     filter_type: str
 
-    def __init__(self, *, table: sa.Table, column: sa.Column, value, query: sa.sql.Select) -> None:
+    def __init__(self, *, table: sa.Table, column: sa.Column, value: t.Any, query: sa.sql.Select) -> None:
         self.table = table
         self.value = value
         self.column = column
