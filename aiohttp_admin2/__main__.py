@@ -16,7 +16,8 @@ metadata = sa.MetaData()
 
 tbl = sa.Table('tbl', metadata,
    sa.Column('id', sa.Integer, primary_key=True),
-   sa.Column('val', sa.String(255))
+   sa.Column('val', sa.String(255)),
+   # sa.Column('data', sa.Date(), nullable=True),
 )
 
 
@@ -28,9 +29,16 @@ async def go():
 
         client = PostgresClient(engine, tbl)
         obj = Instance()
-        obj.val = 'some'
+        obj.val = 'some1'
 
-        # res = await client.create(obj)
+        res = await client.create(obj)
+
+        print('res', res.__dict__)
+
+        res.val = 'some2'
+        res = await client.update(res.id, res)
+        print('res', res.__dict__)
+
         # res = await client.create(obj)
         # res = await client.create(obj)
         # print('res', res.id)
@@ -55,7 +63,7 @@ async def go():
             ),
         )
 
-
+#
 # loop = asyncio.get_event_loop()
 # loop.run_until_complete(go())
 
@@ -78,9 +86,17 @@ async def monog():
     # print(res.inserted_id)
     obj = Instance()
     obj.email = 'email1@emila.com'
-
+    #
     client = MongoClient(User)
-    # res = await client.create(obj)
+    res = await client.create(obj)
+
+    print(res.__dict__)
+    #
+    obj = Instance()
+    obj.email = 'email2@emila.com'
+    #
+    res = await client.update(res.id, obj)
+    print(res.__dict__)
     # obj = Instance()
     # obj.email = 'email2@emila.com'
     # res = await client.create(obj)
@@ -93,12 +109,13 @@ async def monog():
     # obj = Instance()
     # obj.email = 'email5@emila.com'
     # res = await client.create(obj)
-    # res = await client.get_one(res.pk)
-    # res = await client.delete(res.pk)
+    # res = await client.get_one(res.id)
+    # res = await client.delete(res.id)
+    print('list', await client.get_list(limit=5))
     # print('list', await client.get_list(limit=5, offset=1))
-    print('list', await client.get_list(filters=[
-        FilterTuple('email', 'email2@emila.com', 'eq')
-    ]))
+    # print('list', await client.get_list(filters=[
+    #     FilterTuple('email', 'email2@emila.com', 'eq')
+    # ]))
     # print('list', await client.get_list(limit=5, order_by=[('_id', 1)]))
     # print('list', await client.get_list(limit=5, cursor='5ebbad7df1716e316e2701d2', order_by=[('_id', 1)]))
 

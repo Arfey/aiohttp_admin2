@@ -27,6 +27,7 @@ __all__ = ['MongoClient', ]
 
 
 SortType = t.List[t.Tuple[str, int]]
+# todo: common type
 FiltersType = t.List[FilterTuple]
 
 
@@ -39,9 +40,7 @@ class MongoClient(AbstractClient):
     async def get_one(self, pk: PK) -> Instance:
         data = await self.table.find_one({"_id": ObjectId(pk)})
         res = Instance()
-        res.__dict__ = {
-            key: value for key, value in data.items()
-        }
+        res.__dict__ = data.dump()
 
         return res
 
@@ -74,6 +73,7 @@ class MongoClient(AbstractClient):
                 .limit(limit + 1)\
                 .sort(self.get_order(order_by))\
                 .to_list(length=limit + 1)
+
         else:
             query = {}
 
@@ -86,6 +86,8 @@ class MongoClient(AbstractClient):
                 .limit(limit + 1)\
                 .sort(sort)\
                 .to_list(length=limit + 1)
+
+        data = [i.dump() for i in data]
 
         if cursor:
             return self.create_paginator(
@@ -108,12 +110,14 @@ class MongoClient(AbstractClient):
     async def create(self, instance: Instance) -> Instance:
         res = await self.table(**instance.__dict__).commit()
 
-        instance.pk = res.inserted_id
-
-        return instance
+        return await self.get_one(res.inserted_id)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
-        pass
+        await self.table\
+            .collection\
+            .update_one({"_id": ObjectId(pk)}, {"$set": instance.__dict__})
+
+        return await self.get_one(pk)
 
     def get_order(self, order_by: t.Optional[SortType]) -> SortType:
         """

@@ -132,7 +132,21 @@ class PostgresClient(AbstractClient):
             return res
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
-        pass
+        data = instance.__dict__
+        async with self.engine.acquire() as conn:
+            query = self.table\
+                .update()\
+                .where(self._primary_key == pk)\
+                .values(**data)\
+                .returning(*self.table.c)
+
+            cursor = await conn.execute(query)
+            data = await cursor.fetchone()
+
+            res = Instance()
+            res.__dict__ = dict(data)
+
+            return res
 
     @property
     def _primary_key(self) -> sa.Column:
