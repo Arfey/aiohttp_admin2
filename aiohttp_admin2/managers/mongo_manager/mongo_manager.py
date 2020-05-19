@@ -6,35 +6,33 @@ from umongo.document import (
 )
 from bson.objectid import ObjectId
 
-from aiohttp_admin2.clients.client.abc import (
-    AbstractClient,
+from aiohttp_admin2.managers.abc import (
+    AbstractManager,
     Instance,
     InstanceMapper,
     Paginator,
 )
-from aiohttp_admin2.clients.types import PK
-from aiohttp_admin2.clients.mongo_client.filters import (
+from aiohttp_admin2.managers.types import PK
+from aiohttp_admin2.managers.mongo_manager.filters import (
     MongoQuery,
     MongoBaseFilter,
     default_filter_mapper,
 )
-from aiohttp_admin2.clients.types import FilterTuple
-from aiohttp_admin2.clients.exceptions import (
+from aiohttp_admin2.managers.types import FiltersType
+from aiohttp_admin2.managers.exceptions import (
     ClientException,
     CURSOR_PAGINATION_ERROR_MESSAGE,
 )
-from aiohttp_admin2.clients.exceptions import FilterException
+from aiohttp_admin2.managers.exceptions import FilterException
 
 
-__all__ = ['MongoClient', ]
+__all__ = ['MongoManager', 'SortType', ]
 
 
 SortType = t.List[t.Tuple[str, int]]
-# todo: common type
-FiltersType = t.List[FilterTuple]
 
 
-class MongoClient(AbstractClient):
+class MongoManager(AbstractManager):
     table: MetaDocumentImplementation
 
     def __init__(self, table: MetaDocumentImplementation) -> None:
@@ -57,6 +55,7 @@ class MongoClient(AbstractClient):
 
     async def get_list(
         self,
+        *,
         limit=50,
         offset=0,
         cursor=None,
@@ -74,7 +73,7 @@ class MongoClient(AbstractClient):
                 query = {'_id': {'$gt': ObjectId(cursor)}}
 
             if filters:
-                query = self.apply_filters(filters, query)
+                query = self.apply_filters(filters=filters, query=query)
 
             data = await self.table\
                 .find(query)\
@@ -86,7 +85,7 @@ class MongoClient(AbstractClient):
             query = {}
 
             if filters:
-                query = self.apply_filters(filters, query)
+                query = self.apply_filters(filters=filters, query=query)
 
             data = await self.table \
                 .find(query)\
@@ -139,6 +138,7 @@ class MongoClient(AbstractClient):
 
     def apply_filters(
         self,
+        *,
         filters: FiltersType,
         query: MongoQuery,
     ) -> MongoQuery:

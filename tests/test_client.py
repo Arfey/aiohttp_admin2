@@ -1,22 +1,22 @@
 import pytest
 
-from aiohttp_admin2.clients import (
-    PostgresClient,
-    MongoClient,
-    MySqlClient,
+from aiohttp_admin2.managers import (
+    PostgresManager,
+    MongoManager,
+    MySqlManager,
     DictClient,
     Instance,
 )
 
 
-clients = [PostgresClient, MongoClient, MySqlClient, DictClient]
+clients = [PostgresManager, MongoManager, MySqlManager, DictClient]
 dict_client = [DictClient, ]
 
 
 @pytest.mark.parametrize('client', clients)
 def test_corrected_implement_of_client(client):
     """
-    In this test we check that all abstract methods in clients are implemented.
+    In this test we check that all abstract methods in managers are implemented.
     """
     client()
 

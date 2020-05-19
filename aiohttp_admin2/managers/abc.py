@@ -4,10 +4,22 @@ from abc import (
     abstractmethod,
 )
 
-from aiohttp_admin2.clients.types import PK
+import sqlalchemy as sa
+
+from aiohttp_admin2.managers.exceptions import FilterException
 
 
-__all__ = ['AbstractClient', 'Instance', 'InstanceMapper', 'Paginator', ]
+__all__ = [
+    'AbstractManager',
+    'Instance',
+    'InstanceMapper',
+    'Paginator',
+    'ABCFilter',
+    'PK',
+]
+
+
+PK = t.Union[str, int]
 
 
 class Instance:
@@ -29,10 +41,9 @@ class Paginator(t.NamedTuple):
 InstanceMapper = t.Dict[PK, t.Optional[Instance]]
 
 
-# todo: maybe Manager???
-class AbstractClient(ABC):
+class AbstractManager(ABC):
     """
-    All clients must be implement all method from current abstract class. These
+    All managers must be implement all method from current abstract class. These
     methods provide all action which need to do with store for work with data.
     """
     engine: t.Any = None
@@ -113,3 +124,42 @@ class AbstractClient(ABC):
             hex_prev=bool(offset) or bool(cursor),
             count=count,
         )
+
+
+class ABCFilter(ABC):
+    """
+
+    """
+    field_name: str
+    value: str
+    name: str
+
+    @abstractmethod
+    def apply(self) -> sa.sql.Select:
+        """
+
+        """
+        pass
+
+    def validate(self):
+        """
+
+        """
+        pass
+
+    @property
+    def query(self) -> sa.sql.Select:
+        """
+
+        """
+        try:
+            self.validate()
+        except Exception as e:
+            msg = ""
+
+            if e.args and isinstance(e.args[0], str):
+                msg = e.args[0]
+
+            raise FilterException(msg)
+
+        return self.apply()

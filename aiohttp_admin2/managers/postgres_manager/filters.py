@@ -1,15 +1,25 @@
 import sqlalchemy as sa
 import typing as t
 
-from aiohttp_admin2.clients.abc import ABCFilter
-from aiohttp_admin2.clients.exceptions import FilterException
+from aiohttp_admin2.managers.abc import ABCFilter
+from aiohttp_admin2.managers.exceptions import FilterException
 
 
-# todo: added imports
-__all__ = ["GT", "GTE", "SQLAlchemyBaseFilter", "default_filter_mapper", ]
+__all__ = [
+    "GT",
+    "GTE",
+    "LT",
+    "LTE",
+    "EQ",
+    "NE",
+    "IN",
+    "NIN",
+    "Like",
+    "SQLAlchemyBaseFilter",
+    "default_filter_mapper",
+]
 
 
-# todo: test operations
 comparator_map = {
     sa.String: ('eq', 'ne', 'like', 'in', 'nin',),
     sa.Integer: ('eq', 'ne', 'lt', 'lte', 'gt', 'gte', 'in', 'nin', ),
@@ -20,8 +30,6 @@ comparator_map = {
     sa.Boolean: ('eq', 'ne'),
 }
 
-
-# todo: add validation
 
 class SQLAlchemyBaseFilter(ABCFilter):
     filter_type: str

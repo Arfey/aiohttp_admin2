@@ -5,33 +5,32 @@ from sqlalchemy.engine.result import RowProxy
 from aiopg.sa import Engine
 from sqlalchemy.sql.elements import UnaryExpression
 
-from aiohttp_admin2.clients.client.abc import (
-    AbstractClient,
+from aiohttp_admin2.managers.abc import (
+    AbstractManager,
     Instance,
     InstanceMapper,
     Paginator,
 )
-from aiohttp_admin2.clients.exceptions import (
+from aiohttp_admin2.managers.exceptions import (
     InstanceDoesNotExist,
     FilterException,
 )
-from aiohttp_admin2.clients.types import PK
-from aiohttp_admin2.clients.postgres_client.utils import to_column
-from aiohttp_admin2.clients.types import FilterTuple
-from aiohttp_admin2.clients.postgres_client.filters import (
+from aiohttp_admin2.managers.types import PK
+from aiohttp_admin2.managers.postgres_manager.utils import to_column
+from aiohttp_admin2.managers.types import FiltersType
+from aiohttp_admin2.managers.postgres_manager.filters import (
     SQLAlchemyBaseFilter,
     default_filter_mapper,
 )
 
 
-__all__ = ['PostgresClient', ]
+__all__ = ['PostgresManager', 'SortType', ]
 
 
 SortType = t.Union[sa.Column, UnaryExpression]
-FiltersType = t.List[FilterTuple]
 
 
-class PostgresClient(AbstractClient):
+class PostgresManager(AbstractManager):
     engine: Engine
     table: sa.Table
     limit: int = 50
@@ -66,9 +65,9 @@ class PostgresClient(AbstractClient):
                 for r in await cursor.fetchall()
             }
 
-    # todo: move to *
     async def get_list(
         self,
+        *,
         limit: int = 50,
         offset: int = 0,
         cursor: t.Optional[int] = None,
@@ -89,7 +88,7 @@ class PostgresClient(AbstractClient):
                 query = query.offset(offset)
 
             if filters:
-                query = self.apply_filters(query, filters)
+                query = self.apply_filters(query=query, filters=filters)
 
             cursor = await conn\
                 .execute(query.order_by(self.get_order(order_by)))
@@ -102,7 +101,10 @@ class PostgresClient(AbstractClient):
             if offset is not None:
                 if filters:
                     count: int = await conn.scalar(
-                        self.apply_filters(self.table.count(), filters)
+                        self.apply_filters(
+                            query=self.table.count(),
+                            filters=filters,
+                        )
                     )
                 else:
                     count: int = await conn.scalar(self.table.count())
@@ -173,6 +175,7 @@ class PostgresClient(AbstractClient):
 
     def apply_filters(
         self,
+        *,
         query: sa.sql.Select,
         filters: FiltersType,
     ) -> sa.sql.Select:

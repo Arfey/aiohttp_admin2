@@ -1,18 +1,21 @@
 import typing as t
-from aiohttp_admin2.clients.client.abc import (
-    AbstractClient,
+
+from aiohttp_admin2.managers.abc import (
+    AbstractManager,
     Instance,
     InstanceMapper,
     Paginator,
 )
-from aiohttp_admin2.clients.exceptions import InstanceDoesNotExist
-from aiohttp_admin2.clients.types import PK
+from aiohttp_admin2.managers.exceptions import InstanceDoesNotExist
+from aiohttp_admin2.managers.types import PK
 
 
-__all__ = ['DictClient', ]
+__all__ = ['DictManager', ]
 
 
-class DictClient(AbstractClient):
+# TODO: paginator
+
+class DictManager(AbstractManager):
     """
     Dict client use dictionary as a storage. This class mainly use for test
     correct work of client abstraction.
@@ -20,7 +23,7 @@ class DictClient(AbstractClient):
     Usage:
 
         >>> storage = {1: {"name": "Bob"}, 2: {"name": "Oliver"}}
-        >>> my_dict_client = DictClient(storage)
+        >>> my_dict_client = DictManager(storage)
         >>> user = my_dict_client.get_one(1)
 
     """
