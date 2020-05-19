@@ -45,25 +45,26 @@ async def go():
         # print('res', await client.get_one(res.id))
         # print('res', await client.delete(res.id))
         # print('list', await client.get_list(limit=10))
-        print('list', await client.get_list())
+        # print('list', await client.get_list())
+        print('list', await client.get_many([25, 23, 22]))
         # print('order', await client.get_list(limit=10, order_by=sa.asc(tbl.c.id)))
 
         # column_name = i.get('column_name')
         # value = i.get('value')
         # filter_type_cls = i.get('filter')
 
-        print(
-            'order',
-            await client.get_list(
-                filters=[
-                    FilterTuple('id', 5, "gte"),
-                    # FilterTuple('id', 10, "lte"),
-                    FilterTuple('val', "other", "like"),
-                ]
-            ),
-        )
+        # print(
+        #     'order',
+        #     await client.get_list(
+        #         filters=[
+        #             FilterTuple('id', 5, "gte"),
+        #             # FilterTuple('id', 10, "lte"),
+        #             FilterTuple('val', "other", "like"),
+        #         ]
+        #     ),
+        # )
 
-#
+
 # loop = asyncio.get_event_loop()
 # loop.run_until_complete(go())
 
@@ -111,7 +112,10 @@ async def monog():
     # res = await client.create(obj)
     # res = await client.get_one(res.id)
     # res = await client.delete(res.id)
-    print('list', await client.get_list(limit=5))
+    # print('list', await client.get_list(limit=5))
+    print('list', await client.get_many(
+        ['5ec3870d8319dca59815497d', '5ec24134865a00ba7b2a8587']
+    ))
     # print('list', await client.get_list(limit=5, offset=1))
     # print('list', await client.get_list(filters=[
     #     FilterTuple('email', 'email2@emila.com', 'eq')

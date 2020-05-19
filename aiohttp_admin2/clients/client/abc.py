@@ -14,6 +14,9 @@ class Instance:
     """Object from represent all data connected with instance."""
     pk: PK
 
+    def __repr__(self) -> str:
+        return str(self.__dict__)
+
 
 class Paginator(t.NamedTuple):
     """Object for represent list of instances."""
@@ -48,7 +51,7 @@ class AbstractClient(ABC):
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
         """
         Get many instances by ids from a storage. This method will use as a
-        dataloader. TThis method mainly will use on list page in cases when
+        dataloader. This method mainly will use on list page in cases when
         need to show field with data from related model for prevent N + 1
         problem.
 

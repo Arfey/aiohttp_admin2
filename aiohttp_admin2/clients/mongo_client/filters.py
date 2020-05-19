@@ -1,6 +1,6 @@
 import typing as t
 
-from aiohttp_admin2.clients.abc.filters import ABCFilter
+from aiohttp_admin2.clients.abc import ABCFilter
 
 
 MongoQuery = t.Dict[str, t.Any]

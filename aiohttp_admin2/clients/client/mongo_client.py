@@ -1,6 +1,9 @@
 import typing as t
 
-from umongo.document import MetaDocumentImplementation
+from umongo.document import (
+    MetaDocumentImplementation,
+    Implementation,
+)
 from bson.objectid import ObjectId
 
 from aiohttp_admin2.clients.client.abc import (
@@ -39,13 +42,18 @@ class MongoClient(AbstractClient):
 
     async def get_one(self, pk: PK) -> Instance:
         data = await self.table.find_one({"_id": ObjectId(pk)})
-        res = Instance()
-        res.__dict__ = data.dump()
 
-        return res
+        return self.row_to_instance(data)
 
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
-        pass
+        data = await self.table\
+            .find({"_id": {"$in": [ObjectId(pk) for pk in pks]}})\
+            .to_list(length=len(pks))
+
+        return {
+            str(r["id"]): self.row_to_instance(r)
+            for r in data
+        }
 
     async def get_list(
         self,
@@ -87,7 +95,7 @@ class MongoClient(AbstractClient):
                 .sort(sort)\
                 .to_list(length=limit + 1)
 
-        data = [i.dump() for i in data]
+        data = [self.row_to_instance(i) for i in data]
 
         if cursor:
             return self.create_paginator(
@@ -154,3 +162,9 @@ class MongoClient(AbstractClient):
             ).query
 
         return query
+
+    def row_to_instance(self, row: Implementation) -> Instance:
+        instance = Instance()
+        instance.__dict__ = row.dump()
+
+        return instance

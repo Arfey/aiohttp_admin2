@@ -1,6 +1,7 @@
 import typing as t
 
 import sqlalchemy as sa
+from sqlalchemy.engine.result import RowProxy
 from aiopg.sa import Engine
 from sqlalchemy.sql.elements import UnaryExpression
 
@@ -52,10 +53,18 @@ class PostgresClient(AbstractClient):
             if not res:
                 raise InstanceDoesNotExist
 
-            return res
+            return self.row_to_instance(res)
 
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
-        pass
+        async with self.engine.acquire() as conn:
+            query = self.table.select().where(self._primary_key.in_(pks))
+
+            cursor = await conn.execute(query)
+
+            return {
+                r[self._primary_key.name]: self.row_to_instance(r)
+                for r in await cursor.fetchall()
+            }
 
     # todo: move to *
     async def get_list(
@@ -85,7 +94,10 @@ class PostgresClient(AbstractClient):
             cursor = await conn\
                 .execute(query.order_by(self.get_order(order_by)))
 
-            res = await cursor.fetchall()
+            res = [
+                self.row_to_instance(r)
+                for r in await cursor.fetchall()
+            ]
 
             if offset is not None:
                 if filters:
@@ -126,10 +138,7 @@ class PostgresClient(AbstractClient):
             cursor = await conn.execute(query)
             data = await cursor.fetchone()
 
-            res = Instance()
-            res.__dict__ = dict(data)
-
-            return res
+            return self.row_to_instance(data)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
         data = instance.__dict__
@@ -143,10 +152,7 @@ class PostgresClient(AbstractClient):
             cursor = await conn.execute(query)
             data = await cursor.fetchone()
 
-            res = Instance()
-            res.__dict__ = dict(data)
-
-            return res
+            return self.row_to_instance(data)
 
     @property
     def _primary_key(self) -> sa.Column:
@@ -191,3 +197,9 @@ class PostgresClient(AbstractClient):
             ).query
 
         return query
+
+    def row_to_instance(self, row: RowProxy) -> Instance:
+        instance = Instance()
+        instance.__dict__ = dict(row)
+
+        return instance
