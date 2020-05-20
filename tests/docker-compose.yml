@@ -1,8 +1,7 @@
 version: '3.1'
 
 services:
-
-  postgres:
+  postgres_test:
     image: postgres
     environment:
       POSTGRES_DB: postgres
@@ -11,7 +10,7 @@ services:
     ports:
       - 5432:5432
 
-  mongodb:
+  mongodb_test:
     image: mongo:latest
     environment:
       - MONGO_DATA_DIR=/data/db

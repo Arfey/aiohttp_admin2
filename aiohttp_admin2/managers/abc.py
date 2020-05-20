@@ -40,7 +40,8 @@ class Paginator(t.NamedTuple):
 
 InstanceMapper = t.Dict[PK, t.Optional[Instance]]
 
-
+# todo: rewrite client comments
+# todo: add docs
 class AbstractManager(ABC):
     """
     All managers must be implement all method from current abstract class. These

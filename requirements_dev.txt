@@ -13,6 +13,9 @@ Click==7.0
 mypy
 pytest
 pytest-asyncio
+pytest-docker
+pymysql
+cryptography
 
 # docs
 sphinxcontrib-napoleon

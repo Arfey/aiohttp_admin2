@@ -86,3 +86,6 @@ install: clean ## install the package to the active Python's site-packages
 
 mypy:
 	@mypy aiohttp_admin2
+
+pytest:
+	pytest tests -v -s -p no:warnings
