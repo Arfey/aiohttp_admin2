@@ -44,7 +44,7 @@ def mysql(docker_ip, docker_services):
         password='mysql',
         host=docker_ip,
         port=port,
-        database='mysql',
+        db='mysql',
     )
 
     def is_responsive(mysql_data):

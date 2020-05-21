@@ -18,6 +18,7 @@ setup_requirements = [
     'motor',
     'umongo',
     'sqlalchemy-stubs',
+    'aiomysql',
 ]
 
 test_requirements = [ ]

@@ -8,18 +8,10 @@ from aiohttp_admin2.managers import (
     Instance,
 )
 
-
-clients = [
-    pytest.param(PostgresManager, marks=pytest.mark.slow),
-    pytest.param(MongoManager, marks=pytest.mark.slow),
-    pytest.param(MySqlManager, marks=pytest.mark.slow),
-    pytest.param(DictManager),
-]
-
 dict_client = [DictManager, ]
 
 
-@pytest.mark.parametrize('client', clients)
+@pytest.mark.parametrize('client', dict_client)
 def test_corrected_implement_of_client(client):
     """
     In this test we check that all abstract methods in managers are implemented.

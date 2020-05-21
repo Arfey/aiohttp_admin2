@@ -32,7 +32,7 @@ class DictManager(AbstractManager):
 
     def __init__(self, engine: t.Optional[t.Dict[PK, t.Any]] = None):
         self.engine = engine or {}
-        self._pk = self._pk or 1
+        self._pk = 1
 
     async def get_one(self, pk: PK) -> Instance:
         instance = self.engine.get(pk)
@@ -40,11 +40,11 @@ class DictManager(AbstractManager):
         if not instance:
             raise InstanceDoesNotExist
 
-        return instance
+        return self.row_to_instance(instance)
 
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
         return {
-            pk: self.engine.get(pk)
+            id: self.row_to_instance(self.engine.get(pk))
             for pk in pks
         }
 
@@ -58,7 +58,7 @@ class DictManager(AbstractManager):
 
         for pk, value in self.engine.items():
             instance = Instance()
-            instance.__dict__ = {'pk': pk, **value}
+            instance.__dict__ = {'id': pk, **value}
             result.append(instance)
 
         # return Paginator(result[:limit])
@@ -71,8 +71,8 @@ class DictManager(AbstractManager):
 
     async def create(self, instance: Instance) -> Instance:
         pk = self._get_pk()
-        instance.pk = pk
-        self.engine[pk] = {"pk": pk, **instance.__dict__}
+        instance.id = pk
+        self.engine[pk] = {"id": pk, **instance.__dict__}
 
         return instance
 
@@ -82,7 +82,7 @@ class DictManager(AbstractManager):
 
         self.engine[pk] = instance.__dict__
 
-        return instance
+        return self.row_to_instance(instance)
 
     def _get_pk(self) -> PK:
         """Return a unique pk for new instance."""
@@ -94,3 +94,9 @@ class DictManager(AbstractManager):
         self._pk = pk
 
         return pk
+
+    def row_to_instance(self, row: t.Dict[t.Any, t.Any]) -> Instance:
+        instance = Instance()
+        instance.__dict__ = row
+
+        return instance

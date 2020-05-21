@@ -25,4 +25,4 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(skip_slow)
 
 
-pytest_plugins = ['tests.docker_fixtures', ]
+pytest_plugins = ['tests.docker_fixtures', 'tests.manager_fixtures', ]

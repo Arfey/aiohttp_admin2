@@ -22,6 +22,7 @@ from aiohttp_admin2.managers.types import FiltersType
 from aiohttp_admin2.managers.exceptions import (
     ClientException,
     CURSOR_PAGINATION_ERROR_MESSAGE,
+    InstanceDoesNotExist,
 )
 from aiohttp_admin2.managers.exceptions import FilterException
 
@@ -39,7 +40,10 @@ class MongoManager(AbstractManager):
         self.table = table
 
     async def get_one(self, pk: PK) -> Instance:
-        data = await self.table.find_one({"_id": ObjectId(pk)})
+        data = await self.table.find_one({"_id": ObjectId(str(pk))})
+
+        if not data:
+            raise InstanceDoesNotExist
 
         return self.row_to_instance(data)
 
