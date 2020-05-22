@@ -44,8 +44,9 @@ class DictManager(AbstractManager):
 
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
         return {
-            id: self.row_to_instance(self.engine.get(pk))
+            pk: self.row_to_instance(self.engine.get(pk))
             for pk in pks
+            if pk in self.engine
         }
 
     async def get_list(
@@ -82,7 +83,10 @@ class DictManager(AbstractManager):
 
         self.engine[pk] = instance.__dict__
 
-        return self.row_to_instance(instance)
+        return self.row_to_instance({
+            "id": pk,
+            **instance.__dict__
+        })
 
     def _get_pk(self) -> PK:
         """Return a unique pk for new instance."""

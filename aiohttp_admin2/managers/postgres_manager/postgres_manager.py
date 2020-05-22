@@ -125,9 +125,12 @@ class PostgresManager(AbstractManager):
         async with self.engine.acquire() as conn:
             query = self.table\
                 .delete()\
-                .where(self._primary_key == pk)
+                .where(self._primary_key == pk).returning(self._primary_key)
 
-            await conn.execute(query)
+            cursor = await conn.execute(query)
+
+            if not await cursor.fetchone():
+                raise InstanceDoesNotExist
 
     async def create(self, instance: Instance) -> Instance:
         data = instance.__dict__

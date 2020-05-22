@@ -116,7 +116,10 @@ class MongoManager(AbstractManager):
             )
 
     async def delete(self, pk: PK) -> None:
-        await self.table.collection.delete_one({"_id": ObjectId(pk)})
+        res = await self.table.collection.delete_one({"_id": ObjectId(pk)})
+
+        if not res.deleted_count:
+            raise InstanceDoesNotExist
 
     async def create(self, instance: Instance) -> Instance:
         res = await self.table(**instance.__dict__).commit()
@@ -124,6 +127,8 @@ class MongoManager(AbstractManager):
         return await self.get_one(res.inserted_id)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
+        del instance.id
+
         await self.table\
             .collection\
             .update_one({"_id": ObjectId(pk)}, {"$set": instance.__dict__})

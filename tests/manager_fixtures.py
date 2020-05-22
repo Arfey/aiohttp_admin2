@@ -26,7 +26,7 @@ managers_params = [
 
 table = sa.Table('table', sa.MetaData(),
     sa.Column('id', sa.Integer, primary_key=True),
-    sa.Column('val', sa.String(255)),
+    sa.Column('val', sa.String(255), nullable=False),
  )
 
 
@@ -48,7 +48,7 @@ async def mongo_manager(mongo):
 
     @instance.register
     class Table(Document):
-        val = fields.StrField()
+        val = fields.StrField(required=True)
 
         class Meta:
             collection_name = "table"
