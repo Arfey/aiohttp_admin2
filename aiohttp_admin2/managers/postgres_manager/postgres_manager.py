@@ -138,9 +138,10 @@ class PostgresManager(AbstractManager):
         async with self.engine.acquire() as conn:
             query = self.table\
                 .delete()\
-                .where(self._primary_key == pk).returning(self._primary_key)
+                .where(self._primary_key == pk)
 
             cursor = await conn.execute(query)
+            await conn.execute('commit;')
 
             if not cursor.rowcount:
                 raise InstanceDoesNotExist

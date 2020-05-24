@@ -22,8 +22,8 @@ from aiohttp_admin2.managers import (
 managers_params = [
     pytest.param("postgres", marks=pytest.mark.slow),
     pytest.param("mongo", marks=pytest.mark.slow),
-    # pytest.param("mysql", marks=pytest.mark.slow),
-    # pytest.param("dict_manager"),
+    pytest.param("mysql", marks=pytest.mark.slow),
+    pytest.param("dict_manager"),
 ]
 
 table = sa.Table('table', sa.MetaData(),
@@ -73,12 +73,13 @@ async def mysql_manager(mysql):
 
             yield MySqlManager(table=table, engine=engine)
 
-            await conn.execute(DropTable(table))
+            # todo: fix problem with pymysql.err.ProgrammingError 1064
+            # await conn.execute(DropTable(table))
+            # await conn.execute('commit;')
 
 
 @pytest.fixture
 async def mongo(mongo_manager):
-    print("mongo")
     yield mongo_manager
     mongo_manager.table.collection.delete_many({})
 
@@ -95,6 +96,7 @@ async def mysql(mysql_manager):
     async with mysql_manager.engine.acquire() as conn:
         yield mysql_manager
         await conn.execute(mysql_manager.table.delete())
+        await conn.execute('commit;')
 
 
 @pytest.fixture

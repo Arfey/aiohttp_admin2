@@ -1,3 +1,4 @@
 - pip-utils
 - added helpers for makefile
 - added flake plugin
+- add method to get pk from instance

@@ -6,14 +6,26 @@ from aiohttp_admin2.managers.abc import (
     InstanceMapper,
     Paginator,
 )
-from aiohttp_admin2.managers.exceptions import InstanceDoesNotExist
-from aiohttp_admin2.managers.types import PK
+from aiohttp_admin2.managers.exceptions import (
+    ClientException,
+    CURSOR_PAGINATION_ERROR_MESSAGE,
+    InstanceDoesNotExist,
+    BadParameters,
+)
+from aiohttp_admin2.managers.types import (
+    PK,
+    FiltersType,
+)
+from aiohttp_admin2.managers.dict_manager.filters import (
+    DictQuery,
+    DictBaseFilter,
+    default_filter_mapper,
+)
+from aiohttp_admin2.managers.exceptions import FilterException
 
 
 __all__ = ['DictManager', ]
 
-
-# TODO: paginator
 
 class DictManager(AbstractManager):
     """
@@ -51,19 +63,80 @@ class DictManager(AbstractManager):
 
     async def get_list(
         self,
-        limit=50,
-        offset=None,
-        cursor=None,
-        order_by=None
+        limit: int = 50,
+        page: int = 1,
+        cursor: t.Optional[int] = None,
+        order_by: t.Optional[str] = None,
+        filters: t.Optional[FiltersType] = None,
     ) -> Paginator:
-        result = []
+        self._validate_list_params(page=page, cursor=cursor, limit=limit)
 
-        for pk, value in self.engine.items():
-            instance = Instance()
-            instance.__dict__ = {'id': pk, **value}
-            result.append(instance)
+        query = self.apply_filters(filters=filters, query=self.engine.copy())
+        offset = (page - 1) * limit
 
-        # return result
+        is_desc = True
+        order = 'id'
+        if order_by is not None:
+            order = order_by
+            if order_by.startswith("-"):
+                order = order_by[1:]
+            else:
+                is_desc = False
+            if self.engine:
+                if order not in list(self.engine.values())[0].keys():
+                    raise BadParameters(f'Field {order} does not exist.')
+                if cursor and order != 'id':
+                    raise ClientException(CURSOR_PAGINATION_ERROR_MESSAGE)
+
+        if is_desc:
+            objects_list = sorted(
+                query.values(),
+                key=lambda x: x[order],
+                reverse=True,
+            )
+        else:
+            objects_list = sorted(
+                query.values(),
+                key=lambda x: x[order],
+            )
+
+        if cursor is not None:
+            if is_desc:
+                instances = [
+                    self.row_to_instance(i)
+                    for i in objects_list
+                    if i['id'] < cursor
+                ]
+
+                return self.create_paginator(
+                    instances=instances[:limit + 1],
+                    limit=limit,
+                    cursor=cursor,
+                )
+
+            instances = [
+                self.row_to_instance(i)
+                for i in objects_list
+                if i['id'] > cursor
+            ]
+
+            return self.create_paginator(
+                instances=instances[:limit + 1],
+                limit=limit,
+                cursor=cursor,
+            )
+
+        instances = [
+            self.row_to_instance(i)
+            for i in objects_list
+        ]
+
+        return self.create_paginator(
+            instances=instances[offset:offset + limit + 1],
+            limit=limit,
+            offset=offset,
+            count=len(instances),
+        )
 
     async def delete(self, pk: PK) -> None:
         if pk not in self.engine:
@@ -105,3 +178,33 @@ class DictManager(AbstractManager):
         instance.__dict__ = row
 
         return instance
+
+    def apply_filters(
+        self,
+        *,
+        filters: FiltersType,
+        query: DictQuery,
+    ) -> DictQuery:
+        """
+        This method apply received filters.
+        """
+        if not filters:
+            return query
+
+        for i in filters:
+            filter_type_cls = i.filter
+
+            if not isinstance(filters, DictBaseFilter):
+                filter_type_cls = default_filter_mapper.get(filter_type_cls)
+
+                if not filter_type_cls:
+                    raise FilterException(
+                        f"unknown filter type {i.filter}")
+
+            query = filter_type_cls(
+                column=i.column_name,
+                value=i.value,
+                query=query,
+            ).query
+
+        return query

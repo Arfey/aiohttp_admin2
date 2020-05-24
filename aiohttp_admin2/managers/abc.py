@@ -126,7 +126,7 @@ class AbstractManager(ABC):
     async def get_list(
         self,
         limit: int,
-        offset: t.Optional[int] = None,
+        page: int = 1,
         cursor: t.Optional[int] = None,
         order_by: t.Optional[str] = None,
         filters: t.Optional[FiltersType] = None,

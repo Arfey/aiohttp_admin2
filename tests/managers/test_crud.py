@@ -6,9 +6,6 @@ from aiohttp_admin2.managers import DictManager
 from .utils import generate_fake_instance
 
 
-# todo: add method to get pk from instance
-
-
 @pytest.mark.asyncio
 async def test_get_one(manager):
     """
