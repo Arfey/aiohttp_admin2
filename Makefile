@@ -50,7 +50,7 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with flake8
 	flake8 aiohttp_admin2 tests
 
-test: ## run tests quickly with the default Python
+test_: ## run tests quickly with the default Python
 	python setup.py test
 
 test-all: ## run tests on every Python version with tox
@@ -87,5 +87,6 @@ install: clean ## install the package to the active Python's site-packages
 mypy:
 	@mypy aiohttp_admin2
 
-pytest:
-	pytest tests -v -s -p no:warnings
+test:
+	@docker stop $(docker ps | grep pytest | awk '{ print $1 }') | true
+	pytest --slow -v -s -p no:warnings

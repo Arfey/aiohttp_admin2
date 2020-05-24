@@ -54,6 +54,7 @@ class DictManager(AbstractManager):
         limit=50,
         offset=None,
         cursor=None,
+        order_by=None
     ) -> Paginator:
         result = []
 
@@ -62,7 +63,7 @@ class DictManager(AbstractManager):
             instance.__dict__ = {'id': pk, **value}
             result.append(instance)
 
-        # return Paginator(result[:limit])
+        # return result
 
     async def delete(self, pk: PK) -> None:
         if pk not in self.engine:

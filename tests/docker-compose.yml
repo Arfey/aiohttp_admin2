@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - 5432:5432
+      - 1111:5432
 
   mongodb_test:
     image: mongo:latest
@@ -16,7 +16,7 @@ services:
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/dev/null
     ports:
-      - 27017:27017
+      - 2222:27017
 
   mysql_test:
     image: mysql
@@ -26,4 +26,4 @@ services:
       MYSQL_PASSWORD: mysql
       MYSQL_ROOT_PASSWORD: mysql
     ports:
-      - 3306:3306
+      - 3333:3306

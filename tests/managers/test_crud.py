@@ -1,23 +1,12 @@
 import pytest
-import typing as t
 from aiohttp_admin2.managers import Instance
 from aiohttp_admin2.managers.exceptions import InstanceDoesNotExist
 from aiohttp_admin2.managers import DictManager
 
+from .utils import generate_fake_instance
+
 
 # todo: add method to get pk from instance
-
-
-async def generate_fake_instance(manager, n: int = 1) -> t.List[Instance]:
-    instances: t.List[Instance] = []
-
-    for _ in range(n):
-        obj = Instance()
-        obj.val = 'some1'
-
-        instances.append(await manager.create(obj))
-
-    return instances
 
 
 @pytest.mark.asyncio
@@ -149,4 +138,4 @@ async def test_update(manager):
         instance.unknown_field = "unknown_field"
 
         with pytest.raises(Exception):
-            instance = await manager.update(instance.id, instance)
+            await manager.update(instance.id, instance)

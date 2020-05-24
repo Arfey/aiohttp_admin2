@@ -4,9 +4,10 @@ from abc import (
     abstractmethod,
 )
 
-import sqlalchemy as sa
-
-from aiohttp_admin2.managers.exceptions import FilterException
+from aiohttp_admin2.managers.exceptions import (
+    FilterException,
+    BadParameters,
+)
 
 
 __all__ = [
@@ -16,10 +17,60 @@ __all__ = [
     'Paginator',
     'ABCFilter',
     'PK',
+    'FilterTuple',
+    'FiltersType',
 ]
 
 
 PK = t.Union[str, int]
+
+# todo: docs
+class ABCFilter(ABC):
+    """
+
+    """
+    field_name: str
+    value: t.Any
+    name: str
+
+    @abstractmethod
+    def apply(self) -> t.Any:
+        """
+
+        """
+        pass
+
+    def validate(self):
+        """
+
+        """
+        pass
+
+    @property
+    def query(self) -> t.Any:
+        """
+
+        """
+        try:
+            self.validate()
+        except Exception as e:
+            msg = ""
+
+            if e.args and isinstance(e.args[0], str):
+                msg = e.args[0]
+
+            raise FilterException(msg)
+
+        return self.apply()
+
+
+class FilterTuple(t.NamedTuple):
+    column_name: str
+    value: t.Union[str, t.Any]
+    filter: t.Union[str, ABCFilter]
+
+
+FiltersType = t.List[FilterTuple]
 
 
 class Instance:
@@ -40,8 +91,7 @@ class Paginator(t.NamedTuple):
 
 InstanceMapper = t.Dict[PK, t.Optional[Instance]]
 
-# todo: rewrite client comments
-# todo: add docs
+
 class AbstractManager(ABC):
     """
     All managers must be implement all method from current abstract class. These
@@ -78,6 +128,8 @@ class AbstractManager(ABC):
         limit: int,
         offset: t.Optional[int] = None,
         cursor: t.Optional[int] = None,
+        order_by: t.Optional[str] = None,
+        filters: t.Optional[FiltersType] = None,
     ) -> Paginator:
         """
         Get list of instances. This method will use for show list of instances
@@ -126,41 +178,19 @@ class AbstractManager(ABC):
             count=count,
         )
 
+    def _validate_list_params(
+        self, *,
+        page: t.Optional[int] = None,
+        cursor: t.Optional[str] = None,
+        limit: t.Optional[int] = None,
+    ):
+        if page <= 0:
+            raise BadParameters("Page must be greater than zero")
 
-class ABCFilter(ABC):
-    """
+        if limit <= 0:
+            raise BadParameters("Limit must be greater than zero")
 
-    """
-    field_name: str
-    value: str
-    name: str
-
-    @abstractmethod
-    def apply(self) -> sa.sql.Select:
-        """
-
-        """
-        pass
-
-    def validate(self):
-        """
-
-        """
-        pass
-
-    @property
-    def query(self) -> sa.sql.Select:
-        """
-
-        """
-        try:
-            self.validate()
-        except Exception as e:
-            msg = ""
-
-            if e.args and isinstance(e.args[0], str):
-                msg = e.args[0]
-
-            raise FilterException(msg)
-
-        return self.apply()
+        if page != 1 and cursor is not None:
+            raise BadParameters(
+                "You can't use offset and cursor params together"
+            )

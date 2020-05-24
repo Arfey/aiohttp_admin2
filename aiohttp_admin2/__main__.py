@@ -91,15 +91,15 @@ async def monog():
     client = MongoManager(User)
     res = await client.create(obj)
 
-    print(res.__dict__)
+    # print(res.__dict__)
     #
     obj = Instance()
     obj.email = 'email2@emila.com'
     #
-    res = await client.update(res.id, obj)
-    print(res.__dict__)
+    # res = await client.update(res.id, obj)
+    # print(res.__dict__)
     # obj = Instance()
-    # obj.email = 'email2@emila.com'
+    # obj.email = 'email3@emila.com'
     # res = await client.create(obj)
     # obj = Instance()
     # obj.email = 'email3@emila.com'
@@ -113,15 +113,27 @@ async def monog():
     # res = await client.get_one(res.id)
     # res = await client.delete(res.id)
     # print('list', await client.get_list(limit=5))
-    print('list', await client.get_many(
-        ['5ec3870d8319dca59815497d', '5ec24134865a00ba7b2a8587']
-    ))
+    # print('list', await client.get_many(
+    #     ['5ec3870d8319dca59815497d', '5ec24134865a00ba7b2a8587']
+    # ))
+    print('list', await client.get_list(limit=300))
     # print('list', await client.get_list(limit=5, offset=1))
     # print('list', await client.get_list(filters=[
     #     FilterTuple('email', 'email2@emila.com', 'eq')
     # ]))
     # print('list', await client.get_list(limit=5, order_by=[('_id', 1)]))
     # print('list', await client.get_list(limit=5, cursor='5ebbad7df1716e316e2701d2', order_by=[('_id', 1)]))
+
+    print(
+        'order',
+        await client.get_list(
+            filters=[
+                # FilterTuple('id', 5, "gte"),
+                # FilterTuple('id', 10, "lte"),
+                FilterTuple('email', "email3", "like"),
+            ]
+        ),
+    )
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(monog())

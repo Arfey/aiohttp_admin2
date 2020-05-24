@@ -4,6 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy.engine.result import RowProxy
 from aiopg.sa import Engine
 from sqlalchemy.sql.elements import UnaryExpression
+from sqlalchemy import func
 
 from aiohttp_admin2.managers.abc import (
     AbstractManager,
@@ -14,6 +15,8 @@ from aiohttp_admin2.managers.abc import (
 from aiohttp_admin2.managers.exceptions import (
     InstanceDoesNotExist,
     FilterException,
+    CURSOR_PAGINATION_ERROR_MESSAGE,
+    ClientException,
 )
 from aiohttp_admin2.managers.types import PK
 from aiohttp_admin2.managers.postgres_manager.utils import to_column
@@ -69,45 +72,55 @@ class PostgresManager(AbstractManager):
         self,
         *,
         limit: int = 50,
-        offset: int = 0,
+        page: int = 1,
         cursor: t.Optional[int] = None,
-        order_by: t.Optional[SortType] = None,
+        order_by: t.Optional[str] = None,
         filters: t.Optional[FiltersType] = None,
     ) -> Paginator:
-        assert not offset and not cursor, \
-            "You can't use offset and cursor params together"
+        self._validate_list_params(page=page, cursor=cursor, limit=limit)
+
+        offset = (page - 1) * limit
+
+        id_orders = f"{self._primary_key.name}", f"-{self._primary_key.name}"
+
+        if order_by not in id_orders and cursor:
+            raise ClientException(CURSOR_PAGINATION_ERROR_MESSAGE)
 
         async with self.engine.acquire() as conn:
             query = self.table\
                 .select().limit(limit + 1)
 
             if cursor is not None:
-                # todo: fix problem with sorting
-                query = query.where(self._primary_key >= cursor)
+                if order_by == id_orders[0]:
+                    query = query.where(self._primary_key > cursor)
+                else:
+                    query = query.where(self._primary_key < cursor)
             else:
                 query = query.offset(offset)
 
             if filters:
                 query = self.apply_filters(query=query, filters=filters)
 
-            cursor = await conn\
+            cursor_query = await conn\
                 .execute(query.order_by(self.get_order(order_by)))
 
             res = [
                 self.row_to_instance(r)
-                for r in await cursor.fetchall()
+                for r in await cursor_query.fetchall()
             ]
 
-            if offset is not None:
+            if cursor is None:
                 if filters:
                     count: int = await conn.scalar(
                         self.apply_filters(
-                            query=self.table.count(),
+                            query=sa.select([func.count(self._primary_key)]),
                             filters=filters,
                         )
                     )
                 else:
-                    count: int = await conn.scalar(self.table.count())
+                    count: int = await conn.scalar(
+                        sa.select([func.count(self._primary_key)])
+                    )
                 return self.create_paginator(
                     instances=res,
                     limit=limit,
@@ -129,7 +142,7 @@ class PostgresManager(AbstractManager):
 
             cursor = await conn.execute(query)
 
-            if not await cursor.fetchone():
+            if not cursor.rowcount:
                 raise InstanceDoesNotExist
 
     async def create(self, instance: Instance) -> Instance:
@@ -166,13 +179,14 @@ class PostgresManager(AbstractManager):
         """
         return list(self.table.primary_key.columns)[0]
 
-    def get_order(self, order_by: t.Optional[SortType]) -> SortType:
+    def get_order(self, order_by: str) -> SortType:
         """
         Return received order or default order if order_by was not provide.
         """
-        # todo: maybe move to string
         if order_by is not None:
-            return order_by
+            if order_by.startswith("-"):
+                return sa.desc(to_column(order_by[1:], self.table))
+            return to_column(order_by, self.table)
 
         return sa.desc(self._primary_key)
 

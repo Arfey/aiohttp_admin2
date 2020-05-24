@@ -109,7 +109,7 @@ class NE(SQLAlchemyBaseFilter):
     filter_type: str = 'ne'
 
     def apply(self) -> sa.sql.Select:
-        return self._query.where(self.column == self.value)
+        return self._query.where(self.column != self.value)
 
 
 class IN(SQLAlchemyBaseFilter):

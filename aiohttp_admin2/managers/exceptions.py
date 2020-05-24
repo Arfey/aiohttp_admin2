@@ -5,6 +5,7 @@ __all__ = [
     'ClientException',
     'InstanceDoesNotExist',
     'FilterException',
+    'BadParameters',
     'CURSOR_PAGINATION_ERROR_MESSAGE',
 ]
 
@@ -18,8 +19,12 @@ class ClientException(AdminException):
 
 
 class InstanceDoesNotExist(ClientException):
-    """Client can't return instance because it does not exists."""
+    """Manager can't return instance because it does not exists."""
 
 
 class FilterException(ClientException):
-    """Client can't apply filter to query."""
+    """Manager can't apply filter to query."""
+
+
+class BadParameters(AdminException):
+    """Bad arguments for method."""

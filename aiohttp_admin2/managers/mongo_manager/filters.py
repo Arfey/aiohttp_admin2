@@ -1,5 +1,7 @@
 import typing as t
 
+from bson.objectid import ObjectId
+
 from aiohttp_admin2.managers.abc import ABCFilter
 
 
@@ -42,6 +44,16 @@ class MongoBaseFilter(ABCFilter):
             self._query.update({self.column: value})
 
         return self._query
+
+    @property
+    def query(self) -> MongoQuery:
+        if self.column == 'id':
+            if isinstance(self.value, str):
+                self.value = ObjectId(self.value)
+            elif isinstance(self.value, list) or isinstance(self.value, tuple):
+                self.value = [ObjectId(i) for i in self.value]
+
+        return super().query
 
 
 class GT(MongoBaseFilter):
@@ -104,7 +116,7 @@ class Like(MongoBaseFilter):
     """Like filter."""
 
     def apply(self) -> MongoQuery:
-        return self._update_query({"$regex": f"/.*{self.value}.*/"})
+        return self._update_query({"$regex": f"{self.value}"})
 
 
 default_filter_mapper = {

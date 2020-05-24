@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 import sqlalchemy as sa
 from sqlalchemy.schema import (
@@ -18,10 +20,10 @@ from aiohttp_admin2.managers import (
 
 
 managers_params = [
-    pytest.param("postgres_manage", marks=pytest.mark.slow),
-    pytest.param("mongo_manager", marks=pytest.mark.slow),
-    # pytest.param("mysql_manager", marks=pytest.mark.slow),
-    pytest.param("dict_manager"),
+    pytest.param("postgres", marks=pytest.mark.slow),
+    pytest.param("mongo", marks=pytest.mark.slow),
+    # pytest.param("mysql", marks=pytest.mark.slow),
+    # pytest.param("dict_manager"),
 ]
 
 table = sa.Table('table', sa.MetaData(),
@@ -30,7 +32,14 @@ table = sa.Table('table', sa.MetaData(),
  )
 
 
-@pytest.fixture
+@pytest.yield_fixture(scope='session')
+def event_loop():
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope='session')
 async def postgres_manage(postgres):
     async with aiopg.sa.create_engine(**postgres) as engine:
         async with engine.acquire() as conn:
@@ -41,7 +50,7 @@ async def postgres_manage(postgres):
             await conn.execute(DropTable(table))
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 async def mongo_manager(mongo):
     db = AsyncIOMotorClient(**mongo).test
     instance = MInstance(db)
@@ -56,7 +65,7 @@ async def mongo_manager(mongo):
     yield MongoManager(Table)
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 async def mysql_manager(mysql):
     async with aiomysql.sa.create_engine(**mysql) as engine:
         async with engine.acquire() as conn:
@@ -65,6 +74,27 @@ async def mysql_manager(mysql):
             yield MySqlManager(table=table, engine=engine)
 
             await conn.execute(DropTable(table))
+
+
+@pytest.fixture
+async def mongo(mongo_manager):
+    print("mongo")
+    yield mongo_manager
+    mongo_manager.table.collection.delete_many({})
+
+
+@pytest.fixture
+async def postgres(postgres_manage):
+    async with postgres_manage.engine.acquire() as conn:
+        yield postgres_manage
+        await conn.execute(postgres_manage.table.delete())
+
+
+@pytest.fixture
+async def mysql(mysql_manager):
+    async with mysql_manager.engine.acquire() as conn:
+        yield mysql_manager
+        await conn.execute(mysql_manager.table.delete())
 
 
 @pytest.fixture

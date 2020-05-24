@@ -61,14 +61,17 @@ class MongoManager(AbstractManager):
         self,
         *,
         limit=50,
-        offset=0,
+        page=1,
         cursor=None,
-        order_by: t.Optional[SortType] = None,
+        order_by: t.Optional[str] = None,
         filters: t.Optional[FiltersType] = None,
     ) -> Paginator:
+        self._validate_list_params(page=page, cursor=cursor, limit=limit)
         sort = self.get_order(order_by)
+        offset = (page - 1) * limit
+
         if cursor:
-            if sort[0][0] != '_id':
+            if sort[0][0] not in ('id', '_id'):
                 raise ClientException(CURSOR_PAGINATION_ERROR_MESSAGE)
 
             if int(sort[0][1]) == -1:
@@ -82,7 +85,7 @@ class MongoManager(AbstractManager):
             data = await self.table\
                 .find(query)\
                 .limit(limit + 1)\
-                .sort(self.get_order(order_by))\
+                .sort(sort)\
                 .to_list(length=limit + 1)
 
         else:
@@ -127,7 +130,8 @@ class MongoManager(AbstractManager):
         return await self.get_one(res.inserted_id)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
-        del instance.id
+        if hasattr(instance, 'id'):
+            del instance.id
 
         await self.table\
             .collection\
@@ -135,13 +139,23 @@ class MongoManager(AbstractManager):
 
         return await self.get_one(pk)
 
-    def get_order(self, order_by: t.Optional[SortType]) -> SortType:
+    def get_order(self, order_by: str) -> SortType:
         """
         Return received order or default order if order_by was not provide.
         """
-        # todo: maybe move to string
         if order_by is not None:
-            return order_by
+            if order_by.startswith("-"):
+                field = order_by[1:]
+
+                if field == 'id':
+                    return [('_id', -1)]
+
+                return [(field, -1)]
+
+            if order_by == 'id':
+                return [('_id', 1)]
+
+            return [(order_by, 1)]
 
         return [('_id', -1)]
 
