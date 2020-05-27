@@ -135,5 +135,23 @@ async def monog():
         ),
     )
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(monog())
+# loop = asyncio.get_event_loop()
+# loop.run_until_complete(monog())
+
+
+from aiohttp_admin2.mappers.base import Mapper
+from aiohttp_admin2.mappers.fields.common_fields import StringField, BooleanField
+
+
+class BaseMapper(Mapper):
+    updated_at = StringField(required=True)
+
+
+class BookMapper(BaseMapper, Mapper):
+    title = StringField(required=True)
+    available = BooleanField()
+
+
+print(BookMapper)
+print(BookMapper.fields)
+print(BookMapper.raw_fields)
