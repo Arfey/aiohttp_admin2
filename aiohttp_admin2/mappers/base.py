@@ -2,20 +2,11 @@ import typing as t
 from abc import ABC
 
 from aiohttp_admin2.mappers.fields.abc import AbstractField
-from aiohttp_admin2.mappers.fields.common_fields import EmptyValue
+from aiohttp_admin2.mappers.fields.abc import EmptyValue
 from aiohttp_admin2.mappers.exceptions import ValidationError
 
 
 __all__ = ['Mapper', ]
-
-
-# class AbstractMapper(ABC):
-#     def is_valid(self):
-#         return True
-#
-#
-# class Mapper(AbstractMapper):
-#     pass
 
 
 class MapperMeta(type):
@@ -47,11 +38,16 @@ class MapperMeta(type):
 
 
 class Mapper(metaclass=MapperMeta):
+
+    # todo: add itter
+    # todo: empty fields
+    # todo: empty fields error think
+
     _data: t.Dict[str, t.Any] = None
     _fields: t.Dict[str, AbstractField] = None
 
     def __init__(self, data: t.Dict[str, t.Any]) -> None:
-        self._error: t.Optional[str] = None
+        self.error: t.Optional[str] = None
         self._data = data
         self._fields = {
             field.name: field(data.get(field.name, EmptyValue()))
@@ -62,21 +58,61 @@ class Mapper(metaclass=MapperMeta):
     def fields(self) -> t.Dict[str, AbstractField]:
         return self._fields
 
+    def validation(self):
+        """
+        This method need to give simple approach for user add custom validation
+        for mapper. Error which will raise here will add as mapper error. It
+        can be helpful if we want to check validate data in few fields
+        together not in single field.
+
+        Raises:
+            ValidationError: if value is invalid
+        """
+        pass
+
     def is_valid(self) -> bool:
+        """
+        This method need to called for check if mapper data is valid. It run
+        validators for each field and main validator for mapper.
+
+        Also it run custom validators for field if these are defined:
+
+        >>> class Book(Mapper):
+        >>>    name = fields.StringField()
+        >>>
+        >>>    def validation_name(self, value):
+        >>>        if len(value) < 10:
+        >>>            raise ValidationError("name is to short")
+
+        For that you need define function which has name start with
+        `validation_` and end with name of field which you want to validate.
+        This function must receive value as parameter and raise ValidationError
+        if it is invalid.
+
+        """
         is_valid = True
 
         for f in self.fields.values():
             try:
                 f.is_valid()
-            except ValidationError as e:
-                print("name: ", f.name, "val: ", f.value, "err: ", e)
+                validator_name = f'validation_{f.name}'
+                if hasattr(self, validator_name):
+                    getattr(self, validator_name)(f.to_python())
+            except (ValidationError, TypeError) as e:
                 is_valid = False
                 if len(e.args):
                     f.error = e.args[0]
                 else:
                     f.error = 'Invalid'
 
-        # todo: mapper common validation
+        try:
+            self.validation()
+        except ValidationError as e:
+            is_valid = False
+            if len(e.args):
+                self.error = e.args[0]
+            else:
+                self.error = 'Invalid'
 
         return is_valid
 

@@ -1,13 +1,12 @@
 from dateutil import parser
 from datetime import datetime
 
-from aiohttp_admin2.mappers.fields.abc import AbstractField
+from aiohttp_admin2.mappers.fields.abc import AbstractField, EmptyValue
 
 
 # todo: default
 
-class EmptyValue:
-    pass
+
 
 
 class StringField(AbstractField):

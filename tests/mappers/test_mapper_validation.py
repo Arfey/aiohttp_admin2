@@ -2,6 +2,7 @@ from aiohttp_admin2.mappers import (
     fields,
     Mapper,
 )
+from aiohttp_admin2.mappers.exceptions import ValidationError
 
 
 def test_success_mapper():
@@ -78,3 +79,50 @@ def test_required_validation():
 
     assert not book.fields["title"].error
     assert not book.fields["description"].error
+
+
+def test_main_mapper_validation():
+    """
+    In this test we check corrected work of main validation for mapper. This
+    validation must run as additional validation together with fields
+    validation and save as mapper error.
+
+        1. test without error
+        2. test with error
+        3. test with mapper error and field error together
+    """
+    class BookMapping(Mapper):
+        title = fields.StringField(required=True)
+        description = fields.StringField(required=True)
+        pages = fields.IntField(required=True)
+
+        def validation(self):
+            if self.fields['title'].value in self.fields['description'].value:
+                raise ValidationError("title inside description")
+
+    # 1. test without error
+    book = BookMapping(dict(title="Title", description="Description", pages=1))
+
+    assert book.is_valid()
+    assert not book.fields["title"].error
+    assert not book.fields["description"].error
+    assert not book.error
+
+    # 2. test with error
+    book = BookMapping(dict(title="Title", description="Title", pages=1))
+
+    assert not book.is_valid()
+    assert not book.fields["title"].error
+    assert not book.fields["description"].error
+    assert book.error
+
+    # 3. test with mapper error and field error together
+    book = BookMapping(
+        dict(title="Title", description="Title")
+    )
+
+    assert not book.is_valid()
+    assert not book.fields["title"].error
+    assert not book.fields["description"].error
+    assert book.error
+    assert book.fields["pages"].error

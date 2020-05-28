@@ -9,7 +9,11 @@ from aiohttp_admin2.mappers.exceptions import ValidationError
 __all__ = ['AbstractField', ]
 
 
+class EmptyValue:
+    pass
+
 # todo: add validators
+
 
 class AbstractField(ABC):
     def __init__(
@@ -58,20 +62,17 @@ class AbstractField(ABC):
     def raw_value(self):
         return self.to_raw()
 
-    def _base_validation(self):
-        if self.required and not self.value:
-            raise ValidationError(F"{self.name} field is required.")
-
     def is_valid(self) -> bool:
         """
         In this method check is current field valid and have correct value.
 
         Raises:
             ValidationError: if failed validators
-            ValueError: if type of value is wrong
+            ValueError, TypeError: if type of value is wrong
 
         """
-        self._base_validation()
+        if self.required and not self.value:
+            raise ValidationError(F"{self.name} field is required.")
         self.to_python()
         self.to_raw()
 
