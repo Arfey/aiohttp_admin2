@@ -141,17 +141,23 @@ async def monog():
 
 from aiohttp_admin2.mappers.base import Mapper
 from aiohttp_admin2.mappers.fields.common_fields import StringField, BooleanField
+from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 
 
-class BaseMapper(Mapper):
+# class BaseMapper(Mapper):
+#     updated_at = StringField(required=True)
+#
+#
+# class BookMapper(BaseMapper, Mapper):
+#     title = StringField(required=True)
+#     is_exist = BooleanField()
+#
+#
+# print(list(BookMapper({}).fields))
+
+
+class BookMapper(PostgresMapperGeneric, table=tbl):
     updated_at = StringField(required=True)
 
 
-class BookMapper(BaseMapper, Mapper):
-    title = StringField(required=True)
-    available = BooleanField()
-
-
-print(BookMapper)
-print(BookMapper.fields)
-print(BookMapper.raw_fields)
+print(BookMapper({"updated_at": 1}).fields)

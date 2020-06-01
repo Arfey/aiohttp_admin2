@@ -16,7 +16,7 @@ class MapperMeta(type):
     todo: abstract?
     """
 
-    def __new__(mcs, name, bases, attrs):
+    def __new__(mcs, name, bases, attrs, **kwargs):
 
         _fields_cls: t.List[AbstractField] = []
         new_attrs: t.Dict[str, t.Any] = {}
@@ -34,7 +34,7 @@ class MapperMeta(type):
 
         new_attrs = {**new_attrs, "_fields_cls": _fields_cls}
 
-        return super().__new__(mcs, name, bases, new_attrs)
+        return super().__new__(mcs, name, bases, new_attrs, **kwargs)
 
 
 class Mapper(metaclass=MapperMeta):
@@ -49,10 +49,11 @@ class Mapper(metaclass=MapperMeta):
     def __init__(self, data: t.Dict[str, t.Any]) -> None:
         self.error: t.Optional[str] = None
         self._data = data
-        self._fields = {
-            field.name: field(data.get(field.name, EmptyValue()))
-            for field in self._fields_cls
-        }
+        self._fields = {}
+        for field in self._fields_cls:
+            new_field = field(data.get(field.name, EmptyValue()))
+            new_field.name = field.name
+            self._fields[field.name] = new_field
 
     @property
     def fields(self) -> t.Dict[str, AbstractField]:
