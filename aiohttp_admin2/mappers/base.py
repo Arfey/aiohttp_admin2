@@ -49,7 +49,7 @@ class Mapper(metaclass=MapperMeta):
     def __init__(self, data: t.Dict[str, t.Any]) -> None:
         self.error: t.Optional[str] = None
         self._data = data
-        self._fields = {}
+        self._fields = self._fields or {}
         for field in self._fields_cls:
             new_field = field(data.get(field.name, EmptyValue()))
             new_field.name = field.name

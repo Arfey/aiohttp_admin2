@@ -78,23 +78,23 @@ async def monog():
         email = fields.EmailField(required=True, unique=True)
         birthday = fields.DateTimeField(
             validate=validate.Range(min=datetime(1900, 1, 1)))
-        friends = fields.ListField(fields.ReferenceField("User"))
+        # friends = fields.ListField(fields.ReferenceField("User"))
 
         class Meta:
             collection_name = "user"
 
     # res = await User(email='email@emila.com').commit()
     # print(res.inserted_id)
-    obj = Instance()
-    obj.email = 'email1@emila.com'
+    # obj = Instance()
+    # obj.email = 'email1@emila.com'
     #
-    client = MongoManager(User)
-    res = await client.create(obj)
+    # client = MongoManager(User)
+    # res = await client.create(obj)
 
     # print(res.__dict__)
     #
-    obj = Instance()
-    obj.email = 'email2@emila.com'
+    # obj = Instance()
+    # obj.email = 'email2@emila.com'
     #
     # res = await client.update(res.id, obj)
     # print(res.__dict__)
@@ -116,7 +116,7 @@ async def monog():
     # print('list', await client.get_many(
     #     ['5ec3870d8319dca59815497d', '5ec24134865a00ba7b2a8587']
     # ))
-    print('list', await client.get_list(limit=300))
+    # print('list', await client.get_list(limit=300))
     # print('list', await client.get_list(limit=5, offset=1))
     # print('list', await client.get_list(filters=[
     #     FilterTuple('email', 'email2@emila.com', 'eq')
@@ -124,16 +124,19 @@ async def monog():
     # print('list', await client.get_list(limit=5, order_by=[('_id', 1)]))
     # print('list', await client.get_list(limit=5, cursor='5ebbad7df1716e316e2701d2', order_by=[('_id', 1)]))
 
-    print(
-        'order',
-        await client.get_list(
-            filters=[
-                # FilterTuple('id', 5, "gte"),
-                # FilterTuple('id', 10, "lte"),
-                FilterTuple('email', "email3", "like"),
-            ]
-        ),
-    )
+    # print(
+    #     'order',
+    #     await client.get_list(
+    #         filters=[
+    #             # FilterTuple('id', 5, "gte"),
+    #             # FilterTuple('id', 10, "lte"),
+    #             FilterTuple('email', "email3", "like"),
+    #         ]
+    #     ),
+    # )
+    # print("User: ", User, list(type(i) for i in User.schema.fields.values()))
+
+
 
 # loop = asyncio.get_event_loop()
 # loop.run_until_complete(monog())
@@ -142,6 +145,19 @@ async def monog():
 from aiohttp_admin2.mappers.base import Mapper
 from aiohttp_admin2.mappers.fields.common_fields import StringField, BooleanField
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
+from aiohttp_admin2.mappers.generics import MongoMapperGeneric
+
+
+class User(Document):
+    email = fields.EmailField(required=True, unique=True)
+    birthday = fields.DateTimeField(validate=validate.Range(min=datetime(1900, 1, 1)))
+
+
+class BookMapper(MongoMapperGeneric, table=User):
+    updated_at = StringField(required=True)
+
+
+print(BookMapper({"updated_at": 1}).fields)
 
 
 # class BaseMapper(Mapper):
@@ -156,8 +172,8 @@ from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 # print(list(BookMapper({}).fields))
 
 
-class BookMapper(PostgresMapperGeneric, table=tbl):
-    updated_at = StringField(required=True)
-
-
-print(BookMapper({"updated_at": 1}).fields)
+# class BookMapper(PostgresMapperGeneric, table=tbl):
+#     updated_at = StringField(required=True)
+#
+#
+# print(BookMapper({"updated_at": 1}).fields)

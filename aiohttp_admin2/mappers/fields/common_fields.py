@@ -7,8 +7,6 @@ from aiohttp_admin2.mappers.fields.abc import AbstractField, EmptyValue
 # todo: default
 
 
-
-
 class StringField(AbstractField):
 
     def to_python(self) -> str:
@@ -36,7 +34,7 @@ class FloatField(AbstractField):
         return float(self._value)
 
 
-class DateTime(AbstractField):
+class DateTimeField(AbstractField):
     # todo: make a smart
     def to_python(self) -> datetime:
         return parser(self._value)

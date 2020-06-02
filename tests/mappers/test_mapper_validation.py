@@ -18,7 +18,7 @@ def test_success_mapper():
         title = fields.StringField()
         description = fields.StringField()
         pages = fields.IntField()
-        created_at = fields.DateTime()
+        created_at = fields.DateTimeField()
 
     # 1. Simple initialize
     book = BookMapping({
