@@ -49,8 +49,6 @@ def test_generic_for_sql_alchemy_table():
     book = BookMapper({"id": 1, "title": "My test book3"})
 
     assert len(book.fields) == 2
-    print(book.fields)
-    # todo: fixed problem with nested fields
     assert isinstance(book.fields["id"], fields.StringField)
     assert isinstance(book.fields["title"], fields.StringField)
 
