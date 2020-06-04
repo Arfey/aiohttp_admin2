@@ -4,3 +4,4 @@
 - add method to get pk from instance
 - add integrate test for manager
 - move methods for async
+- think about move instance to dict

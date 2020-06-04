@@ -125,6 +125,7 @@ class AbstractManager(ABC):
     @abstractmethod
     async def get_list(
         self,
+        *,
         limit: int,
         page: int = 1,
         cursor: t.Optional[int] = None,

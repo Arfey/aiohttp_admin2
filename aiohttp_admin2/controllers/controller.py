@@ -3,6 +3,7 @@ import typing as t
 from aiohttp_admin2.managers.types import (
     PK,
     Instance,
+    FiltersType,
 )
 from aiohttp_admin2.managers.abc import AbstractManager
 from aiohttp_admin2.controllers.exceptions import PermissionDenied
@@ -27,6 +28,10 @@ class Controller:
     can_update = True
     can_delete = True
     can_view = True
+
+    # settings
+    order_by = 'id'
+    per_page = 50
 
     # CRUD hooks
     async def pre_create(self, data: t.Dict[str, t.Any]) -> None:
@@ -134,3 +139,31 @@ class Controller:
             raise PermissionDenied
 
         await self.resource.get_one(pk)
+
+    async def get_list(
+        self,
+        page: int = 1,
+        cursor: t.Optional[int] = None,
+        order_by: t.Optional[str] = None,
+        filters: t.Optional[FiltersType] = None,
+    ):
+        await self.access_hook()
+
+        if not self.can_view:
+            raise PermissionDenied
+
+        return self.resource.get_list(
+            page=page,
+            cursor=cursor,
+            limit=self.per_page,
+            order_by=order_by or self.order_by,
+            filters=filters,
+        )
+
+    async def get_many(self, pks: t.List[PK]):
+        await self.access_hook()
+
+        if not self.can_view:
+            raise PermissionDenied
+
+        return self.resource.get_many(pks)
