@@ -140,24 +140,24 @@ async def monog():
 
 # loop = asyncio.get_event_loop()
 # loop.run_until_complete(monog())
-
-
-from aiohttp_admin2.mappers.base import Mapper
-from aiohttp_admin2.mappers.fields.common_fields import StringField, BooleanField
-from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
-from aiohttp_admin2.mappers.generics import MongoMapperGeneric
-
-
-class User(Document):
-    email = fields.EmailField(required=True, unique=True)
-    birthday = fields.DateTimeField(validate=validate.Range(min=datetime(1900, 1, 1)))
-
-
-class BookMapper(MongoMapperGeneric, table=User):
-    updated_at = StringField(required=True)
-
-
-print(BookMapper({"updated_at": 1}).fields)
+#
+#
+# from aiohttp_admin2.mappers.base import Mapper
+# from aiohttp_admin2.mappers.fields.common_fields import StringField, BooleanField
+# from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
+# from aiohttp_admin2.mappers.generics import MongoMapperGeneric
+#
+#
+# class User(Document):
+#     email = fields.EmailField(required=True, unique=True)
+#     birthday = fields.DateTimeField(validate=validate.Range(min=datetime(1900, 1, 1)))
+#
+#
+# class BookMapper(MongoMapperGeneric, table=User):
+#     updated_at = StringField(required=True)
+#
+#
+# print(BookMapper({"updated_at": 1}).fields)
 
 
 # class BaseMapper(Mapper):
@@ -177,3 +177,14 @@ print(BookMapper({"updated_at": 1}).fields)
 #
 #
 # print(BookMapper({"updated_at": 1}).fields)
+
+
+from aiohttp import web
+
+from aiohttp_admin2.view.aiohttp.setup import setup
+
+
+app = web.Application()
+setup(app)
+
+web.run_app(app)

@@ -19,6 +19,8 @@ setup_requirements = [
     'umongo',
     'sqlalchemy-stubs',
     'aiomysql',
+    'aiohttp_jinja2',
+    'aiohttp',
 ]
 
 test_requirements = [ ]
