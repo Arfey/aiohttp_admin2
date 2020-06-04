@@ -1,4 +1,4 @@
-from aiohttp_admin2.managers.abc import (
+from aiohttp_admin2.resources.abc import (
     PK,
     FilterTuple,
     FiltersType,

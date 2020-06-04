@@ -1,10 +1,10 @@
 import asyncio
 from aiopg.sa import create_engine
 import sqlalchemy as sa
-from aiohttp_admin2.managers import PostgresManager
-from aiohttp_admin2.managers import MongoManager
-from aiohttp_admin2.managers import Instance
-from aiohttp_admin2.managers.types import FilterTuple
+from aiohttp_admin2.resources import PostgresResource
+from aiohttp_admin2.resources import MongoResource
+from aiohttp_admin2.resources import Instance
+from aiohttp_admin2.resources.types import FilterTuple
 
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -27,7 +27,7 @@ async def go():
                              host='127.0.0.1',
                              password='postgres') as engine:
 
-        client = PostgresManager(engine, tbl)
+        client = PostgresResource(engine, tbl)
         obj = Instance()
         obj.val = 'some1'
 
@@ -88,7 +88,7 @@ async def monog():
     # obj = Instance()
     # obj.email = 'email1@emila.com'
     #
-    # client = MongoManager(User)
+    # client = MongoResource(User)
     # res = await client.create(obj)
 
     # print(res.__dict__)

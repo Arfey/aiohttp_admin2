@@ -1,6 +1,6 @@
 import typing as t
 
-from aiohttp_admin2.managers.abc import ABCFilter
+from aiohttp_admin2.resources.abc import ABCFilter
 
 
 __all__ = [

@@ -1,11 +1,11 @@
 import typing as t
 
-from aiohttp_admin2.managers.types import (
+from aiohttp_admin2.resources.types import (
     PK,
     Instance,
     FiltersType,
 )
-from aiohttp_admin2.managers.abc import AbstractManager
+from aiohttp_admin2.resources.abc import AbstractResource
 from aiohttp_admin2.controllers.exceptions import PermissionDenied
 
 # todo: test
@@ -18,7 +18,7 @@ class Controller:
         - access
         - hooks
     """
-    resource: AbstractManager
+    resource: AbstractResource
 
     read_only_fields = []
     inline_fields = ['id', ]

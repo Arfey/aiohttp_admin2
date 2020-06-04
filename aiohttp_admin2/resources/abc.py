@@ -4,14 +4,14 @@ from abc import (
     abstractmethod,
 )
 
-from aiohttp_admin2.managers.exceptions import (
+from aiohttp_admin2.resources.exceptions import (
     FilterException,
     BadParameters,
 )
 
 
 __all__ = [
-    'AbstractManager',
+    'AbstractResource',
     'Instance',
     'InstanceMapper',
     'Paginator',
@@ -92,9 +92,9 @@ class Paginator(t.NamedTuple):
 InstanceMapper = t.Dict[PK, t.Optional[Instance]]
 
 
-class AbstractManager(ABC):
+class AbstractResource(ABC):
     """
-    All managers must be implement all method from current abstract class. These
+    All resources must be implement all method from current abstract class. These
     methods provide all action which need to do with store for work with data.
     """
     engine: t.Any = None

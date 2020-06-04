@@ -48,7 +48,7 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 
 
 
-manager (resource) need for get and set data
+resource (resource) need for get and set data
 mapper for represent/validate data/type for field
 mapper for trafaret??
 separate mapper for view and validate?

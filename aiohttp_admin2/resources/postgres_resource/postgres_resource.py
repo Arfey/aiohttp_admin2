@@ -6,34 +6,34 @@ from aiopg.sa import Engine
 from sqlalchemy.sql.elements import UnaryExpression
 from sqlalchemy import func
 
-from aiohttp_admin2.managers.abc import (
-    AbstractManager,
+from aiohttp_admin2.resources.abc import (
+    AbstractResource,
     Instance,
     InstanceMapper,
     Paginator,
 )
-from aiohttp_admin2.managers.exceptions import (
+from aiohttp_admin2.resources.exceptions import (
     InstanceDoesNotExist,
     FilterException,
     CURSOR_PAGINATION_ERROR_MESSAGE,
     ClientException,
 )
-from aiohttp_admin2.managers.types import PK
-from aiohttp_admin2.managers.postgres_manager.utils import to_column
-from aiohttp_admin2.managers.types import FiltersType
-from aiohttp_admin2.managers.postgres_manager.filters import (
+from aiohttp_admin2.resources.types import PK
+from aiohttp_admin2.resources.postgres_resource.utils import to_column
+from aiohttp_admin2.resources.types import FiltersType
+from aiohttp_admin2.resources.postgres_resource.filters import (
     SQLAlchemyBaseFilter,
     default_filter_mapper,
 )
 
 
-__all__ = ['PostgresManager', 'SortType', ]
+__all__ = ['PostgresResource', 'SortType', ]
 
 
 SortType = t.Union[sa.Column, UnaryExpression]
 
 
-class PostgresManager(AbstractManager):
+class PostgresResource(AbstractResource):
     engine: Engine
     table: sa.Table
     limit: int = 50

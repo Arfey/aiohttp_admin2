@@ -2,6 +2,6 @@
 - added helpers for makefile
 - added flake plugin
 - add method to get pk from instance
-- add integrate test for manager
+- add integrate test for resource
 - move methods for async
 - think about move instance to dict

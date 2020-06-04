@@ -1,33 +1,33 @@
 import typing as t
 
-from aiohttp_admin2.managers.abc import (
-    AbstractManager,
+from aiohttp_admin2.resources.abc import (
+    AbstractResource,
     Instance,
     InstanceMapper,
     Paginator,
 )
-from aiohttp_admin2.managers.exceptions import (
+from aiohttp_admin2.resources.exceptions import (
     ClientException,
     CURSOR_PAGINATION_ERROR_MESSAGE,
     InstanceDoesNotExist,
     BadParameters,
 )
-from aiohttp_admin2.managers.types import (
+from aiohttp_admin2.resources.types import (
     PK,
     FiltersType,
 )
-from aiohttp_admin2.managers.dict_manager.filters import (
+from aiohttp_admin2.resources.dict_resource.filters import (
     DictQuery,
     DictBaseFilter,
     default_filter_mapper,
 )
-from aiohttp_admin2.managers.exceptions import FilterException
+from aiohttp_admin2.resources.exceptions import FilterException
 
 
-__all__ = ['DictManager', ]
+__all__ = ['DictResource', ]
 
 
-class DictManager(AbstractManager):
+class DictResource(AbstractResource):
     """
     Dict client use dictionary as a storage. This class mainly use for test
     correct work of client abstraction.
@@ -35,7 +35,7 @@ class DictManager(AbstractManager):
     Usage:
 
         >>> storage = {1: {"name": "Bob"}, 2: {"name": "Oliver"}}
-        >>> my_dict_client = DictManager(storage)
+        >>> my_dict_client = DictResource(storage)
         >>> user = my_dict_client.get_one(1)
 
     """

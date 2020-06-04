@@ -1,32 +1,32 @@
 import pytest
 
-from aiohttp_admin2.managers.exceptions import (
+from aiohttp_admin2.resources.exceptions import (
     ClientException,
     BadParameters,
 )
-from aiohttp_admin2.managers.types import FilterTuple
+from aiohttp_admin2.resources.types import FilterTuple
 
 from .utils import generate_fake_instance
 
 
 @pytest.mark.asyncio
-async def test_list_order(manager):
+async def test_list_order(resource):
     """
-    In this test check corrected work sort in get_list method of manager.
+    In this test check corrected work sort in get_list method of resource.
 
         1. Check default order
         2. Check asc order
         3. Error of ordering for cursor pagination
     """
-    await generate_fake_instance(manager, 10)
+    await generate_fake_instance(resource, 10)
 
     # 1. Check default order
-    list_objects = await manager.get_list()
+    list_objects = await resource.get_list()
 
     assert len(list_objects.instances) == 10
 
     # 2. Check desc order
-    list_objects_second = await manager.get_list(order_by='id')
+    list_objects_second = await resource.get_list(order_by='id')
 
     compare_list = zip(
         list_objects.instances,
@@ -38,15 +38,15 @@ async def test_list_order(manager):
 
     # 3. Error of ordering for cursor pagination
     with pytest.raises(ClientException):
-        await manager.get_list(order_by='val', cursor=1)
+        await resource.get_list(order_by='val', cursor=1)
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("ordering", ("id", "-id"))
-async def test_list_page_pagination(manager, ordering):
+async def test_list_page_pagination(resource, ordering):
     """
     In this test check corrected work page pagination in get_list method of
-    manager. + ordering
+    resource. + ordering
 
         1. Check of correct work page pagination
 
@@ -56,17 +56,17 @@ async def test_list_page_pagination(manager, ordering):
         2. Check of correct work page pagination with remainder
     """
     instance_count = 9
-    await generate_fake_instance(manager, instance_count)
+    await generate_fake_instance(resource, instance_count)
 
     # 1. Check of correct work page pagination
     full_list_objects = \
-        await manager.get_list(limit=instance_count, order_by=ordering)
+        await resource.get_list(limit=instance_count, order_by=ordering)
     full_list_objects_ids = [i.id for i in full_list_objects.instances]
 
     assert len(full_list_objects_ids) == instance_count
 
     # page 1
-    list_objects = await manager.get_list(limit=3, order_by=ordering)
+    list_objects = await resource.get_list(limit=3, order_by=ordering)
     list_objects_ids = [i.id for i in list_objects.instances]
 
     assert len(list_objects_ids) == 3
@@ -78,7 +78,7 @@ async def test_list_page_pagination(manager, ordering):
     assert list_objects.count == instance_count
 
     # page 2
-    list_objects = await manager.get_list(limit=3, page=2, order_by=ordering)
+    list_objects = await resource.get_list(limit=3, page=2, order_by=ordering)
     list_objects_ids = [i.id for i in list_objects.instances]
 
     assert len(list_objects_ids) == 3
@@ -90,7 +90,7 @@ async def test_list_page_pagination(manager, ordering):
     assert list_objects.count == instance_count
 
     # page 3
-    list_objects = await manager.get_list(limit=3, page=3, order_by=ordering)
+    list_objects = await resource.get_list(limit=3, page=3, order_by=ordering)
     list_objects_ids = [i.id for i in list_objects.instances]
 
     assert len(list_objects_ids) == 3
@@ -102,10 +102,10 @@ async def test_list_page_pagination(manager, ordering):
     assert list_objects.count == instance_count
 
     # 2. Check of correct work page pagination with remainder
-    await generate_fake_instance(manager, 1)
+    await generate_fake_instance(resource, 1)
 
     # page 4
-    list_objects = await manager.get_list(limit=3, page=4, order_by=ordering)
+    list_objects = await resource.get_list(limit=3, page=4, order_by=ordering)
     list_objects_ids = [i.id for i in list_objects.instances]
 
     assert len(list_objects_ids) == 1
@@ -116,7 +116,7 @@ async def test_list_page_pagination(manager, ordering):
 
 
 @pytest.mark.asyncio
-async def test_list_page_pagination_parameters_error(manager):
+async def test_list_page_pagination_parameters_error(resource):
     """
     In this test check errors which can been raised if pass bad arguments.
 
@@ -127,25 +127,25 @@ async def test_list_page_pagination_parameters_error(manager):
 
     # 1. limit must be greater than zero
     with pytest.raises(BadParameters):
-        await manager.get_list(limit=0)
+        await resource.get_list(limit=0)
 
     # 2. cursor can't be use together with page
-    instances = await generate_fake_instance(manager, 1)
+    instances = await generate_fake_instance(resource, 1)
 
     with pytest.raises(BadParameters):
-        await manager.get_list(page=2, cursor=instances[0].id)
+        await resource.get_list(page=2, cursor=instances[0].id)
 
     # 3. page must be greater than zero
     with pytest.raises(BadParameters):
-        await manager.get_list(page=0)
+        await resource.get_list(page=0)
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("ordering", ("id", "-id"))
-async def test_list_cursor_pagination(manager, ordering):
+async def test_list_cursor_pagination(resource, ordering):
     """
     In this test check corrected work cursor pagination in get_list method of
-    manager. + ordering
+    resource. + ordering
 
         1. Check of correct work cursor pagination
 
@@ -154,17 +154,17 @@ async def test_list_cursor_pagination(manager, ordering):
 
     """
     instance_count = 5
-    await generate_fake_instance(manager, instance_count)
+    await generate_fake_instance(resource, instance_count)
 
     # 1. Check of correct work cursor pagination
     full_list_objects = \
-        await manager.get_list(limit=instance_count, order_by=ordering)
+        await resource.get_list(limit=instance_count, order_by=ordering)
     full_list_objects_ids = [i.id for i in full_list_objects.instances]
 
     assert len(full_list_objects_ids) == instance_count
 
     # page 1
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         cursor=full_list_objects_ids[0],
         limit=3,
         order_by=ordering,
@@ -179,7 +179,7 @@ async def test_list_cursor_pagination(manager, ordering):
     assert list_objects.count is None
 
     # page 2
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         cursor=full_list_objects_ids[3],
         limit=3,
         order_by=ordering,
@@ -195,9 +195,9 @@ async def test_list_cursor_pagination(manager, ordering):
 
 
 @pytest.mark.asyncio
-async def test_filter_api_for_get_list(manager):
+async def test_filter_api_for_get_list(resource):
     """
-    In this test check corrected work filter api in get_list method of manager.
+    In this test check corrected work filter api in get_list method of resource.
     + ordering
 
         1. Check corrected work of one filter + ordering
@@ -205,11 +205,11 @@ async def test_filter_api_for_get_list(manager):
 
     """
     # 1. Check corrected work of one filter + ordering
-    instances = await generate_fake_instance(manager, 10)
+    instances = await generate_fake_instance(resource, 10)
     full_list_objects_ids = [i.id for i in instances]
 
     # desc
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         filters=[
             FilterTuple('id', full_list_objects_ids[0], "gt"),
         ],
@@ -220,7 +220,7 @@ async def test_filter_api_for_get_list(manager):
     assert set(list_objects_ids) == set(full_list_objects_ids[1:])
 
     # asc
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         filters=[
             FilterTuple('id', full_list_objects_ids[-1], "lt"),
         ],
@@ -233,7 +233,7 @@ async def test_filter_api_for_get_list(manager):
         assert x == y
 
     # 2. Check corrected work of two filter + ordering
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         filters=[
             FilterTuple('id', full_list_objects_ids[0], "gt"),
             FilterTuple('id', full_list_objects_ids[2], "lt"),
@@ -247,19 +247,19 @@ async def test_filter_api_for_get_list(manager):
 
 
 @pytest.mark.asyncio
-async def test_common_filters_for_get_list(manager):
+async def test_common_filters_for_get_list(resource):
     """
     In this test we check corrected work of common filters in get_list method
-    of manager.
+    of resource.
 
     Check corrected work of filters:
         eq, ne, lt, lte, gt, gte, in, nin, like
     """
-    instances = await generate_fake_instance(manager, 10)
+    instances = await generate_fake_instance(resource, 10)
     full_list_objects_ids = [i.id for i in instances]
 
     # eq
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         filters=[
             FilterTuple('id', full_list_objects_ids[0], "eq"),
         ],
@@ -271,7 +271,7 @@ async def test_common_filters_for_get_list(manager):
     assert list_objects_ids[0] == full_list_objects_ids[0]
 
     # ne
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         filters=[
             FilterTuple('id', full_list_objects_ids[0], "ne"),
         ],
@@ -283,7 +283,7 @@ async def test_common_filters_for_get_list(manager):
     assert full_list_objects_ids[0] not in list_objects_ids
 
     # gt
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         filters=[
             FilterTuple('id', full_list_objects_ids[-2], "gt"),
         ],
@@ -295,7 +295,7 @@ async def test_common_filters_for_get_list(manager):
     assert list_objects_ids[0] == full_list_objects_ids[-1]
 
     # gte
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         filters=[
             FilterTuple('id', full_list_objects_ids[-2], "gte"),
         ],
@@ -307,7 +307,7 @@ async def test_common_filters_for_get_list(manager):
     assert set(list_objects_ids) == set(full_list_objects_ids[-2:])
 
     # lt
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         filters=[
             FilterTuple('id', full_list_objects_ids[1], "lt"),
         ],
@@ -319,7 +319,7 @@ async def test_common_filters_for_get_list(manager):
     assert list_objects_ids[0] == full_list_objects_ids[0]
 
     # lte
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         filters=[
             FilterTuple('id', full_list_objects_ids[1], "lte"),
         ],
@@ -332,7 +332,7 @@ async def test_common_filters_for_get_list(manager):
 
     # in
     ids = full_list_objects_ids[1], full_list_objects_ids[0]
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         filters=[
             FilterTuple('id', ids, "in"),
         ],
@@ -344,7 +344,7 @@ async def test_common_filters_for_get_list(manager):
     assert set(list_objects_ids) == set(ids)
 
     # nin
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         filters=[
             FilterTuple('id', ids, "nin"),
         ],
@@ -356,7 +356,7 @@ async def test_common_filters_for_get_list(manager):
     assert not (set(list_objects_ids) & set(ids))
 
     # like
-    list_objects = await manager.get_list(
+    list_objects = await resource.get_list(
         filters=[
             FilterTuple('val', instances[0].val, "like"),
         ],

@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 
-from aiohttp_admin2.managers.exceptions import ClientException
+from aiohttp_admin2.resources.exceptions import ClientException
 
 
 __all__ = ["to_column", ]

@@ -6,34 +6,34 @@ from umongo.document import (
 )
 from bson.objectid import ObjectId
 
-from aiohttp_admin2.managers.abc import (
-    AbstractManager,
+from aiohttp_admin2.resources.abc import (
+    AbstractResource,
     Instance,
     InstanceMapper,
     Paginator,
 )
-from aiohttp_admin2.managers.types import PK
-from aiohttp_admin2.managers.mongo_manager.filters import (
+from aiohttp_admin2.resources.types import PK
+from aiohttp_admin2.resources.mongo_resource.filters import (
     MongoQuery,
     MongoBaseFilter,
     default_filter_mapper,
 )
-from aiohttp_admin2.managers.types import FiltersType
-from aiohttp_admin2.managers.exceptions import (
+from aiohttp_admin2.resources.types import FiltersType
+from aiohttp_admin2.resources.exceptions import (
     ClientException,
     CURSOR_PAGINATION_ERROR_MESSAGE,
     InstanceDoesNotExist,
 )
-from aiohttp_admin2.managers.exceptions import FilterException
+from aiohttp_admin2.resources.exceptions import FilterException
 
 
-__all__ = ['MongoManager', 'SortType', ]
+__all__ = ['MongoResource', 'SortType', ]
 
 
 SortType = t.List[t.Tuple[str, int]]
 
 
-class MongoManager(AbstractManager):
+class MongoResource(AbstractResource):
     table: MetaDocumentImplementation
 
     def __init__(self, table: MetaDocumentImplementation) -> None:

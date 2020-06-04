@@ -1,13 +1,13 @@
-from aiohttp_admin2.managers.postgres_manager.postgres_manager import \
-    PostgresManager
-from aiohttp_admin2.managers.abc import Instance
-from aiohttp_admin2.managers.types import PK
+from aiohttp_admin2.resources.postgres_resource.postgres_resource import \
+    PostgresResource
+from aiohttp_admin2.resources.abc import Instance
+from aiohttp_admin2.resources.types import PK
 
 
 __all__ = ['MySqlManager', ]
 
 
-class MySqlManager(PostgresManager):
+class MySqlManager(PostgresResource):
 
     async def create(self, instance: Instance) -> Instance:
         data = instance.__dict__

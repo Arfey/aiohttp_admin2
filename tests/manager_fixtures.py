@@ -11,19 +11,19 @@ import aiomysql.sa
 from motor.motor_asyncio import AsyncIOMotorClient
 from umongo import Instance as MInstance, Document, fields
 
-from aiohttp_admin2.managers import (
-    PostgresManager,
+from aiohttp_admin2.resources import (
+    PostgresResource,
     MySqlManager,
-    MongoManager,
-    DictManager,
+    MongoResource,
+    DictResource,
 )
 
 
-managers_params = [
+resource_params = [
     pytest.param("postgres", marks=pytest.mark.slow),
     pytest.param("mongo", marks=pytest.mark.slow),
     pytest.param("mysql", marks=pytest.mark.slow),
-    pytest.param("dict_manager"),
+    pytest.param("dict_resource"),
 ]
 
 table = sa.Table('table', sa.MetaData(),
@@ -40,18 +40,18 @@ def event_loop():
 
 
 @pytest.fixture(scope='session')
-async def postgres_manage(postgres):
+async def postgres_resource(postgres):
     async with aiopg.sa.create_engine(**postgres) as engine:
         async with engine.acquire() as conn:
             await conn.execute(CreateTable(table))
 
-            yield PostgresManager(table=table, engine=engine)
+            yield PostgresResource(table=table, engine=engine)
 
             await conn.execute(DropTable(table))
 
 
 @pytest.fixture(scope="session")
-async def mongo_manager(mongo):
+async def mongo_resource(mongo):
     db = AsyncIOMotorClient(**mongo).test
     instance = MInstance(db)
 
@@ -62,11 +62,11 @@ async def mongo_manager(mongo):
         class Meta:
             collection_name = "table"
 
-    yield MongoManager(Table)
+    yield MongoResource(Table)
 
 
 @pytest.fixture(scope='session')
-async def mysql_manager(mysql):
+async def mysql_resource(mysql):
     async with aiomysql.sa.create_engine(**mysql) as engine:
         async with engine.acquire() as conn:
             await conn.execute(CreateTable(table))
@@ -79,31 +79,31 @@ async def mysql_manager(mysql):
 
 
 @pytest.fixture
-async def mongo(mongo_manager):
-    yield mongo_manager
-    mongo_manager.table.collection.delete_many({})
+async def mongo(mongo_resource):
+    yield mongo_resource
+    mongo_resource.table.collection.delete_many({})
 
 
 @pytest.fixture
-async def postgres(postgres_manage):
-    async with postgres_manage.engine.acquire() as conn:
-        yield postgres_manage
-        await conn.execute(postgres_manage.table.delete())
+async def postgres(postgres_resource):
+    async with postgres_resource.engine.acquire() as conn:
+        yield postgres_resource
+        await conn.execute(postgres_resource.table.delete())
 
 
 @pytest.fixture
-async def mysql(mysql_manager):
-    async with mysql_manager.engine.acquire() as conn:
-        yield mysql_manager
-        await conn.execute(mysql_manager.table.delete())
+async def mysql(mysql_resource):
+    async with mysql_resource.engine.acquire() as conn:
+        yield mysql_resource
+        await conn.execute(mysql_resource.table.delete())
         await conn.execute('commit;')
 
 
 @pytest.fixture
-async def dict_manager():
-    yield DictManager()
+async def dict_resource():
+    yield DictResource()
 
 
-@pytest.fixture(params=managers_params)
-def manager(request):
+@pytest.fixture(params=resource_params)
+def resource(request):
     yield request.getfixturevalue(request.param)
