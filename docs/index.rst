@@ -45,6 +45,7 @@ see home page of our awesome admin interface.
    installation
    usage
    modules
+   templates
    contributing
    authors
    history

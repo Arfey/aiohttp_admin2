@@ -33,7 +33,7 @@ class Admin:
     @staticmethod
     def _get_index(request: web.Request) -> web.Response:
         return aiohttp_jinja2.render_template(
-            'admin/index.html',
+            'aiohttp_admin/index.html',
             request,
             {},
         )
