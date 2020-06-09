@@ -4,10 +4,10 @@ from aiohttp_jinja2 import APP_KEY
 from aiohttp_admin2.view.aiohttp.admin import Admin
 
 
-__all__ = ['setup', ]
+__all__ = ['setup_admin', ]
 
 
-def setup(
+def setup_admin(
     app: web.Application,
     *,
     admin_class=Admin,
@@ -15,6 +15,6 @@ def setup(
 ) -> None:
     """
     This is a main function for initialize an admin interface for the given
-    application.
+    aiohttp application.
     """
     admin_class(app).setup_admin_application(jinja_app_key=jinja_app_key)

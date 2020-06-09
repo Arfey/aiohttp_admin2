@@ -19,15 +19,15 @@ class Admin:
     The main class for initialization your admin interface.
     """
 
-    name = 'aiohttp admin'
-    prefix_url = '/admin/'
+    admin_name = 'aiohttp admin'
+    admin_url = '/admin/'
 
     def __init__(self, app: web.Application) -> None:
         self.app = app
 
     def init_jinja_default_env(self, env):
         env.globals.update({
-            "project_name": self.name,
+            "project_name": self.admin_name,
         })
 
     @staticmethod
@@ -52,18 +52,16 @@ class Admin:
         jinja_app_key: str = APP_KEY,
     ) -> None:
         """
-        docs
-        :return:
+        This method will setup admin interface to received aiohttp application.
         """
         admin = web.Application()
-        self.set_views(admin)
-        admin.router.add_static(
-            '/static/',
-            path=str(static_dir),
-            name='admin_static',
-        )
-        self.app.add_subapp(self.prefix_url, admin)
+        admin.router\
+            .add_static('/static/', path=str(static_dir), name='admin_static')
 
+        self.set_views(admin)
+        self.app.add_subapp(self.admin_url, admin)
+
+        # setup jinja
         admin_loader = jinja2.FileSystemLoader(str(templates_dir.absolute()))
 
         if self.app.get(jinja_app_key):

@@ -180,11 +180,10 @@ async def monog():
 
 
 from aiohttp import web
-
-from aiohttp_admin2.view.aiohttp.setup import setup
+from aiohttp_admin2 import setup_admin
 
 
 app = web.Application()
-setup(app)
+setup_admin(app)
 
 web.run_app(app)

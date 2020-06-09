@@ -12,6 +12,7 @@ Click==7.0
 
 mypy
 pytest
+pytest-aiohttp
 pytest-asyncio
 pytest-docker
 pymysql
