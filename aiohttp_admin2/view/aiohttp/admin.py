@@ -5,6 +5,8 @@ from aiohttp_jinja2 import APP_KEY
 import jinja2
 import aiohttp_jinja2
 
+from aiohttp_admin2.view import DashboardView
+
 
 __all__ = ['Admin', ]
 
@@ -13,7 +15,7 @@ parent = pathlib.Path(__file__).resolve().parent
 templates_dir = parent / 'templates'
 static_dir = parent / 'static'
 
-
+# todo: add test add docs
 class Admin:
     """
     The main class for initialization your admin interface.
@@ -21,6 +23,7 @@ class Admin:
 
     admin_name = 'aiohttp admin'
     admin_url = '/admin/'
+    dashboard_class = DashboardView
 
     def __init__(self, app: web.Application) -> None:
         self.app = app
@@ -28,24 +31,11 @@ class Admin:
     def init_jinja_default_env(self, env):
         env.globals.update({
             "project_name": self.admin_name,
+            "index_url": self.dashboard_class.name
         })
 
-    @staticmethod
-    def _get_index(request: web.Request) -> web.Response:
-        return aiohttp_jinja2.render_template(
-            'aiohttp_admin/index.html',
-            request,
-            {},
-        )
-
     def set_views(self, app: web.Application) -> None:
-        app.add_routes([
-            web.get(
-                '/',
-                self._get_index,
-                name='index',
-            )
-        ])
+        self.dashboard_class().setup(app)
 
     def setup_admin_application(
         self,
@@ -60,6 +50,7 @@ class Admin:
 
         self.set_views(admin)
         self.app.add_subapp(self.admin_url, admin)
+        self.app['aiohttp_admin'] = admin
 
         # setup jinja
         admin_loader = jinja2.FileSystemLoader(str(templates_dir.absolute()))
