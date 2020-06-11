@@ -1,11 +1,16 @@
 import pathlib
+import typing as t
+from collections import defaultdict
 
 from aiohttp import web
 from aiohttp_jinja2 import APP_KEY
 import jinja2
 import aiohttp_jinja2
 
-from aiohttp_admin2.view import DashboardView
+from aiohttp_admin2.view import (
+    DashboardView,
+    BaseAdminView,
+)
 
 
 __all__ = ['Admin', ]
@@ -24,18 +29,37 @@ class Admin:
     admin_name = 'aiohttp admin'
     admin_url = '/admin/'
     dashboard_class = DashboardView
+    nav_groups: t.Dict[str, BaseAdminView] = None
 
-    def __init__(self, app: web.Application) -> None:
+    def __init__(
+        self,
+        app: web.Application,
+        views: t.Optional[t.List[BaseAdminView]] = None,
+    ) -> None:
         self.app = app
+        self._views = [
+            self.dashboard_class(),
+            *[view() for view in views or []]
+        ]
+        self.generate_nav_groups()
+
+    def generate_nav_groups(self):
+        self.nav_groups = defaultdict(list)
+
+        for view in self._views:
+            if not view.is_hide_view:
+                self.nav_groups[view.group_name].append(view)
 
     def init_jinja_default_env(self, env):
         env.globals.update({
             "project_name": self.admin_name,
+            "nav_groups": self.nav_groups,
             "index_url": self.dashboard_class.name
         })
 
     def set_views(self, app: web.Application) -> None:
-        self.dashboard_class().setup(app)
+        for view in self._views:
+            view.setup(app)
 
     def setup_admin_application(
         self,

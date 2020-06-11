@@ -181,9 +181,15 @@ async def monog():
 
 from aiohttp import web
 from aiohttp_admin2 import setup_admin
+from aiohttp_admin2.view import TemplateView
+
+
+class NewPage(TemplateView):
+    title = 'new page'
 
 
 app = web.Application()
-setup_admin(app)
+# todo: test
+setup_admin(app, views=[NewPage,])
 
 web.run_app(app)
