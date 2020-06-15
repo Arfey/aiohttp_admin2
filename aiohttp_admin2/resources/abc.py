@@ -87,6 +87,8 @@ class Paginator(t.NamedTuple):
     has_next: bool
     hex_prev: bool
     count: t.Optional[int]
+    active_page: t.Optional[int]
+    per_page: int
 
 
 InstanceMapper = t.Dict[PK, t.Optional[Instance]]
@@ -177,6 +179,8 @@ class AbstractResource(ABC):
             instances=instances[0:limit],
             has_next=len(instances) > limit,
             hex_prev=bool(offset) or bool(cursor),
+            active_page=int(offset/limit + 1) if offset is not None else None,
+            per_page=limit,
             count=count,
         )
 

@@ -185,13 +185,25 @@ from aiohttp_admin2.view import TemplateView
 from aiohttp_admin2.view import ControllerView
 from aiohttp_admin2.controllers.controller import Controller
 from aiohttp_admin2.resources.dict_resource.dict_resource import DictResource
+from aiohttp_admin2.resources.postgres_resource.postgres_resource import PostgresResource
 
 
-storage = {1: {"name": "Bob"}, 2: {"name": "Oliver"}}
+storage = {
+    1: {"id": 1, "name": "Bob"},
+    2: {"id": 2, "name": "Aliver"},
+    3: {"id": 3, "name": "Aliver"},
+    4: {"id": 4, "name": "Aliver"},
+    5: {"id": 5, "name": "Aliver"},
+    6: {"id": 6, "name": "Aliver"},
+    7: {"id": 7, "name": "Aliver"},
+    8: {"id": 8, "name": "Aliver"},
+}
 
 
 class BookController(Controller):
     resource = DictResource(storage)
+    inline_fields = ['id', 'name']
+    per_page = 3
 
 
 class BookView(ControllerView):
@@ -201,6 +213,9 @@ class BookView(ControllerView):
 
 class NewPage(TemplateView):
     title = 'new page'
+#
+# class UserController(Controller):
+#     resource = PostgresResource
 
 
 app = web.Application()

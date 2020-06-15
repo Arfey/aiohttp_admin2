@@ -1,6 +1,7 @@
 import pathlib
 import typing as t
 from collections import defaultdict
+from urllib.parse import urlencode
 
 from aiohttp import web
 from aiohttp_jinja2 import APP_KEY
@@ -54,7 +55,10 @@ class Admin:
         env.globals.update({
             "project_name": self.admin_name,
             "nav_groups": self.nav_groups,
-            "index_url": self.dashboard_class.name
+            "index_url": self.dashboard_class.name,
+            "newParam":
+                lambda new_params, params:
+                    f'?{urlencode({**params, **new_params})}'
         })
 
     def set_views(self, app: web.Application) -> None:

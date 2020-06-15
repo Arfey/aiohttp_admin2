@@ -1,8 +1,13 @@
 from aiohttp import web
 import aiohttp_jinja2
+import typing as t
 
 from aiohttp_admin2.view.aiohttp.views.base import BaseAdminView
 from aiohttp_admin2.controllers.controller import Controller
+from aiohttp_admin2.view.aiohttp.utils import (
+    get_params_from_request,
+    QueryParams,
+)
 
 
 class ControllerView(BaseAdminView):
@@ -20,11 +25,21 @@ class ControllerView(BaseAdminView):
 
         self.title = self.title if not self.title == 'None' else default
 
+    def get_params_from_request(self, req: web.Request) -> QueryParams:
+        return get_params_from_request(req)
+
     async def get_list(self, req: web.Request) -> web.Response:
+        params = self.get_params_from_request(req)
+        controller = self.controller()
+        data = await controller.get_list(**params._asdict())
         return aiohttp_jinja2.render_template(
             self.template_list_name,
             req,
-            await self.get_context(req),
+            {
+                **await self.get_context(req),
+                "list": data,
+                "controller": controller,
+            }
         )
 
     def setup(self, app: web.Application) -> None:

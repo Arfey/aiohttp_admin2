@@ -1,9 +1,74 @@
 {% extends 'aiohttp_admin/base.html' %}
+{% from "aiohttp_admin/paggination.html" import paggination %}
 
 {% block main %}
-{%- if content  %}
-{{ content }}
-{%- else %}
- <p class="content__empty-title">{{ title }}</p>
-{%- endif %}
+<div class="wrapper">
+{% include 'aiohttp_admin/list_action_buttons.html' %}
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            {% with isDesc=(request.rel_url.query.get('sortDir') == 'desc') %}
+            {% for field in controller.inline_fields %}
+            <th scope="col">
+                {% if field not in controller.read_only_fields %}
+                <!-- todo: delete pagination after sort  -->
+                <a href="{{ newParam({'sort': field, 'sortDir': 'asc' if isDesc else 'desc'}, request.rel_url.query) }}">
+                    {{ field }}
+                    {% if request.rel_url.query.get('sort') == field %}
+                        {% if isDesc %}
+                        <i class="material-icons">arrow_upward</i>
+                        {% else %}
+                        <i class="material-icons">arrow_downward</i>
+                        {% endif %}
+                    {% endif %}
+                </a>
+                {% else %}
+                {{ field }}
+                {% endif %}
+            </th>
+            {% endfor %}
+            {% endwith %}
+        </tr>
+    </thead>
+    <tbody>
+        {%- for obj in list.instances %}
+        <tr>
+            {% for field in controller.inline_fields %}
+            <td>
+                {% if loop.first %}
+                <input class="index-checkbox" type="checkbox" />
+                <a href="">
+                {% endif %}
+                {% if field in controller.read_only_fields %}
+                    <!-- todo: read only -->
+                    {{ controller.get_read_only_field(field, obj)|safe }}
+                {% else %}
+                    {{ obj|attr(field) }}
+                {% endif %}
+                {% if loop.first %}
+                </a>
+                {% endif %}
+            </th>
+            {% endfor %}
+        </tr>
+        {%- endfor %}
+    </tbody>
+</table>
+
+<!-- paggination -->
+<!-- todo: order -->
+{{
+    paggination(
+        list.active_page,
+        list.count,
+        list.has_next,
+        list.hex_prev,
+        list.per_page,
+        request.rel_url.query,
+    )
+}}
+</div>
+
 {% endblock %}

@@ -152,7 +152,7 @@ class Controller:
         if not self.can_view:
             raise PermissionDenied
 
-        return self.resource.get_list(
+        return await self.resource.get_list(
             page=page,
             cursor=cursor,
             limit=self.per_page,
