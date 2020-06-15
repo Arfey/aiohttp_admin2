@@ -4,10 +4,10 @@ from aiohttp_admin2.resources.abc import Instance
 from aiohttp_admin2.resources.types import PK
 
 
-__all__ = ['MySqlManager', ]
+__all__ = ['MySqlResource', ]
 
 
-class MySqlManager(PostgresResource):
+class MySqlResource(PostgresResource):
 
     async def create(self, instance: Instance) -> Instance:
         data = instance.__dict__

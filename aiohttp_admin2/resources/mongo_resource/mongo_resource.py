@@ -38,6 +38,7 @@ class MongoResource(AbstractResource):
 
     def __init__(self, table: MetaDocumentImplementation) -> None:
         self.table = table
+        self.name = table.__name__.lower()
 
     async def get_one(self, pk: PK) -> Instance:
         data = await self.table.find_one({"_id": ObjectId(str(pk))})

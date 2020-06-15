@@ -37,10 +37,12 @@ class PostgresResource(AbstractResource):
     engine: Engine
     table: sa.Table
     limit: int = 50
+    name: str
 
     def __init__(self, engine: Engine, table: sa.Table) -> None:
         self.engine = engine
         self.table = table
+        self.name = table.name.lower()
 
     async def get_one(self, pk: PK) -> Instance:
         async with self.engine.acquire() as conn:

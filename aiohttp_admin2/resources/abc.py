@@ -98,6 +98,7 @@ class AbstractResource(ABC):
     methods provide all action which need to do with store for work with data.
     """
     engine: t.Any = None
+    name: str
 
     @abstractmethod
     async def get_one(self, pk: PK) -> Instance:

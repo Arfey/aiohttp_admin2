@@ -1,5 +1,3 @@
-import typing as t
-
 import aiohttp_jinja2
 from aiohttp import web
 
@@ -15,16 +13,6 @@ class TemplateView(BaseAdminView):
     that.
     """
     template_name: str = 'aiohttp_admin/template_view.html'
-
-    async def get_context(self, req: web.Request) -> t.Dict[str, t.Any]:
-        """
-        In this place you can redefine whole context which will use for
-        generate custom page.
-        """
-        return {
-            "request": req,
-            "title": self.title,
-        }
 
     async def get(self, req: web.Request) -> web.Response:
         return aiohttp_jinja2.render_template(

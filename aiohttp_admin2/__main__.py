@@ -182,6 +182,21 @@ async def monog():
 from aiohttp import web
 from aiohttp_admin2 import setup_admin
 from aiohttp_admin2.view import TemplateView
+from aiohttp_admin2.view import ControllerView
+from aiohttp_admin2.controllers.controller import Controller
+from aiohttp_admin2.resources.dict_resource.dict_resource import DictResource
+
+
+storage = {1: {"name": "Bob"}, 2: {"name": "Oliver"}}
+
+
+class BookController(Controller):
+    resource = DictResource(storage)
+
+
+class BookView(ControllerView):
+    group_name: str = 'Controllers'
+    controller = BookController
 
 
 class NewPage(TemplateView):
@@ -190,6 +205,9 @@ class NewPage(TemplateView):
 
 app = web.Application()
 # todo: test
-setup_admin(app, views=[NewPage,])
+setup_admin(
+    app,
+    views=[NewPage, BookView],
+)
 
 web.run_app(app)

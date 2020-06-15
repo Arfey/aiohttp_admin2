@@ -13,7 +13,7 @@ from umongo import Instance as MInstance, Document, fields
 
 from aiohttp_admin2.resources import (
     PostgresResource,
-    MySqlManager,
+    MySqlResource,
     MongoResource,
     DictResource,
 )
@@ -71,7 +71,7 @@ async def mysql_resource(mysql):
         async with engine.acquire() as conn:
             await conn.execute(CreateTable(table))
 
-            yield MySqlManager(table=table, engine=engine)
+            yield MySqlResource(table=table, engine=engine)
 
             # todo: fix problem with pymysql.err.ProgrammingError 1064
             # await conn.execute(DropTable(table))

@@ -45,6 +45,7 @@ class DictResource(AbstractResource):
     def __init__(self, engine: t.Optional[t.Dict[PK, t.Any]] = None):
         self.engine = engine or {}
         self._pk = 1
+        self.name = engine.__class__.__name__.lower()
 
     async def get_one(self, pk: PK) -> Instance:
         instance = self.engine.get(pk)
