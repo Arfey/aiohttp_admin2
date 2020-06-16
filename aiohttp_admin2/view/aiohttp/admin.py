@@ -35,12 +35,14 @@ class Admin:
     def __init__(
         self,
         app: web.Application,
+        engines: t.Optional[t.Dict[str, t.Any]],
         views: t.Optional[t.List[BaseAdminView]] = None,
     ) -> None:
         self.app = app
+        self._engines = engines
         self._views = [
             self.dashboard_class(),
-            *[view() for view in views or []]
+            *[view(params={"engines": engines}) for view in views or []]
         ]
         self.generate_nav_groups()
 

@@ -184,8 +184,8 @@ from aiohttp_admin2 import setup_admin
 from aiohttp_admin2.view import TemplateView
 from aiohttp_admin2.view import ControllerView
 from aiohttp_admin2.controllers.controller import Controller
+from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.resources.dict_resource.dict_resource import DictResource
-from aiohttp_admin2.resources.postgres_resource.postgres_resource import PostgresResource
 
 
 storage = {
@@ -204,6 +204,7 @@ class BookController(Controller):
     resource = DictResource(storage)
     inline_fields = ['id', 'name']
     per_page = 3
+    name = 'postgres1'
 
 
 class BookView(ControllerView):
@@ -213,16 +214,36 @@ class BookView(ControllerView):
 
 class NewPage(TemplateView):
     title = 'new page'
-#
-# class UserController(Controller):
-#     resource = PostgresResource
 
 
-app = web.Application()
-# todo: test
-setup_admin(
-    app,
-    views=[NewPage, BookView],
-)
+class UserController(PostgresController):
+    table = tbl
+    engine_name = 'db'
+    name = 'postgres'
+    inline_fields = ['id', 'val']
+    per_page = 5
 
-web.run_app(app)
+
+class UserPage(ControllerView):
+    controller = UserController
+
+
+async def app(argv):
+    app = web.Application()
+    engine = await create_engine(user='postgres',
+                                 database='postgres',
+                                 host='0.0.0.0',
+                                 password='postgres').__aenter__()
+    setup_admin(
+        app,
+        engines={
+            "db": engine
+        },
+        views=[
+            NewPage,
+            BookView,
+            UserPage,
+        ],
+    )
+
+    return app

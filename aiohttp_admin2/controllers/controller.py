@@ -33,6 +33,9 @@ class Controller:
     order_by = 'id'
     per_page = 50
 
+    def get_resource(self):
+        return self.resource
+
     # CRUD hooks
     async def pre_create(self, data: t.Dict[str, t.Any]) -> None:
         """
@@ -104,7 +107,7 @@ class Controller:
             raise PermissionDenied
 
         await self.pre_delete(pk)
-        await self.resource.delete(pk)
+        await self.get_resource().delete(pk)
         await self.post_delete(pk)
 
     async def update(self, pk: PK, data: t.Dict[str, t.Any]):
@@ -116,7 +119,7 @@ class Controller:
         await self.pre_update(data)
         instance = Instance()
         instance.__dict__ = data
-        res = await self.resource.update(pk, instance)
+        res = await self.get_resource().update(pk, instance)
         await self.post_update(res)
 
     async def create(self, data: t.Dict[str, t.Any]):
@@ -129,7 +132,7 @@ class Controller:
         await self.pre_create(data)
         instance = Instance()
         instance.__dict__ = data
-        res = await self.resource.create(instance)
+        res = await self.get_resource().create(instance)
         await self.post_create(res)
 
     async def get_detail(self, pk: PK):
@@ -138,7 +141,7 @@ class Controller:
         if not self.can_view:
             raise PermissionDenied
 
-        await self.resource.get_one(pk)
+        await self.get_resource().get_one(pk)
 
     async def get_list(
         self,
@@ -152,7 +155,7 @@ class Controller:
         if not self.can_view:
             raise PermissionDenied
 
-        return await self.resource.get_list(
+        return await self.get_resource().get_list(
             page=page,
             cursor=cursor,
             limit=self.per_page,
@@ -166,4 +169,8 @@ class Controller:
         if not self.can_view:
             raise PermissionDenied
 
-        return self.resource.get_many(pks)
+        return self.get_resource().get_many(pks)
+
+    @classmethod
+    def builder_form_params(cls, params: t.Dict[str, t.Any]):
+        return cls()

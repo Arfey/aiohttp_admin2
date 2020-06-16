@@ -14,7 +14,11 @@
             <th scope="col">
                 {% if field not in controller.read_only_fields %}
                 <!-- todo: delete pagination after sort  -->
-                <a href="{{ newParam({'sort': field, 'sortDir': 'asc' if isDesc else 'desc'}, request.rel_url.query) }}">
+                <a href="{{ newParam({
+                    'sort': field,
+                    'sortDir': 'asc' if isDesc else 'desc',
+                    'page': 1,
+                }, request.rel_url.query) }}">
                     {{ field }}
                     {% if request.rel_url.query.get('sort') == field %}
                         {% if isDesc %}

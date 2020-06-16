@@ -39,6 +39,7 @@ class PostgresResource(AbstractResource):
     limit: int = 50
     name: str
 
+    # todo: *
     def __init__(self, engine: Engine, table: sa.Table) -> None:
         self.engine = engine
         self.table = table
