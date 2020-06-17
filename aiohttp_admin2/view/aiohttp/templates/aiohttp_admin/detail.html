@@ -1,0 +1,14 @@
+{% extends 'aiohttp_admin/base.html' %}
+
+{% block main %}
+<div>
+    <p class="content__empty-title">{{ title }}</p>
+    {% for name, value in object.__dict__.items() %}
+    <p><b>{{ name }}</b>  {{ value }}</p>
+    {% endfor %}
+    <br>
+    <form action="#" method="POST">
+        <button class="btn btn-danger" type="submit">Delete</button>
+    </form>
+</div>
+{% endblock %}

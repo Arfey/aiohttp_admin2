@@ -141,7 +141,7 @@ class Controller:
         if not self.can_view:
             raise PermissionDenied
 
-        await self.get_resource().get_one(pk)
+        return await self.get_resource().get_one(pk)
 
     async def get_list(
         self,

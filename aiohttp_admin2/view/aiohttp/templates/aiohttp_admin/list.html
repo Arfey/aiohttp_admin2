@@ -43,7 +43,9 @@
             <td>
                 {% if loop.first %}
                 <input class="index-checkbox" type="checkbox" />
-                <a href="">
+                {% if controller.can_update %}
+                <a href="{{ url(detail_url, pk=obj.id) }}">
+                {% endif %}
                 {% endif %}
                 {% if field in controller.read_only_fields %}
                     <!-- todo: read only -->
@@ -52,7 +54,9 @@
                     {{ obj|attr(field) }}
                 {% endif %}
                 {% if loop.first %}
+                {% if controller.can_update %}
                 </a>
+                {% endif %}
                 {% endif %}
             </th>
             {% endfor %}
