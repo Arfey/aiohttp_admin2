@@ -1,0 +1,10 @@
+{% extends 'aiohttp_admin/base.html' %}
+
+{% block main %}
+<div>
+    <p class="content__empty-title">{{ title }}</p>
+    <form action="{{ url(delete_url, pk=pk) }}" method="POST">
+        <button class="btn btn-danger" type="submit">Delete</button>
+    </form>
+</div>
+{% endblock %}

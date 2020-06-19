@@ -3,14 +3,14 @@
 {% block main %}
 <div>
     <p class="content__empty-title">{{ title }}</p>
-    {% for name, value in object.__dict__.items() %}
+    <form action="{{ url(create_url) }}" method="POST">
+    {% for name, field in controller.detail_fields.items() %}
     <b>{{ name }}</b>
     <input name="{{ name }}" value="{{ value }}" />
     <br>
     {% endfor %}
     <br>
-    <form action="{{ url(delete_url, pk=object.id) }}" method="GET">
-        <button class="btn btn-danger" type="submit">Delete</button>
+        <button class="btn" type="submit">Create</button>
     </form>
 </div>
 {% endblock %}

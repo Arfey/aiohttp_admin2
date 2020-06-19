@@ -186,6 +186,7 @@ from aiohttp_admin2.view import ControllerView
 from aiohttp_admin2.controllers.controller import Controller
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.resources.dict_resource.dict_resource import DictResource
+from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 
 
 storage = {
@@ -215,12 +216,20 @@ class BookView(ControllerView):
 class NewPage(TemplateView):
     title = 'new page'
 
+# todo: add auto generated mapper if no specify
+class UserMapper(PostgresMapperGeneric, table=tbl):
+    pass
+
+print(UserMapper({}).fields)
 
 class UserController(PostgresController):
+    # todo: move to Meta?
     table = tbl
+    mapper = UserMapper
     engine_name = 'db'
     name = 'postgres'
     inline_fields = ['id', 'val']
+    fields = '__all__'
     per_page = 5
 
 

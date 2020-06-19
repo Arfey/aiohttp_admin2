@@ -7,8 +7,12 @@ from aiohttp_admin2.resources.types import (
 )
 from aiohttp_admin2.resources.abc import AbstractResource
 from aiohttp_admin2.controllers.exceptions import PermissionDenied
+from aiohttp_admin2.mappers import Mapper
+
+from aiohttp_admin2.mappers.fields.abc import AbstractField
 
 # todo: test
+
 
 class Controller:
     """
@@ -19,9 +23,12 @@ class Controller:
         - hooks
     """
     resource: AbstractResource
+    mapper: Mapper = None
 
     read_only_fields = []
     inline_fields = ['id', ]
+    # todo: handle list of fields
+    fields: t.Union[str, t.Tuple[t.Any]] = '__all__'
 
     # CRUD access
     can_create = True
@@ -133,7 +140,10 @@ class Controller:
         instance = Instance()
         instance.__dict__ = data
         res = await self.get_resource().create(instance)
+
         await self.post_create(res)
+
+        return res
 
     async def get_detail(self, pk: PK):
         await self.access_hook()
@@ -173,4 +183,18 @@ class Controller:
 
     @classmethod
     def builder_form_params(cls, params: t.Dict[str, t.Any]):
+        # todo: add params
         return cls()
+
+    @property
+    def detail_fields(self) -> t.Dict[str, AbstractField]:
+        # todo: add for dict
+        fields = self.mapper({}).fields
+        if self.fields == "__all__":
+            return fields
+
+        return {
+            name: value
+            for name, value in fields
+            if name in self.fields
+        }

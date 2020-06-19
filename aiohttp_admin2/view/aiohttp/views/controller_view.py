@@ -18,6 +18,8 @@ class ControllerView(BaseAdminView):
     template_list_name = 'aiohttp_admin/list.html'
     template_detail_name = 'aiohttp_admin/detail.html'
     template_detail_edit_name = 'aiohttp_admin/detail_edit.html'
+    template_detail_create_name = 'aiohttp_admin/create.html'
+    template_delete_name = 'aiohttp_admin/delete.html'
     controller: Controller
 
     def __init__(self, *, params: t.Dict[str, t.Any] = None) -> None:
@@ -31,6 +33,23 @@ class ControllerView(BaseAdminView):
     @property
     def detail_url_name(self):
         return f'{self.name}_detail'
+
+    @property
+    def create_url_name(self):
+        return f'{self.name}_create'
+
+    @property
+    def create_post_url_name(self):
+        print(f'{self.name}_create_post')
+        return f'{self.name}_create_post'
+
+    @property
+    def delete_url_name(self):
+        return f'{self.name}_delete'
+
+    @property
+    def delete_post_url_name(self):
+        return f'{self.name}_delete_post'
 
     @property
     def index_url_name(self):
@@ -54,6 +73,7 @@ class ControllerView(BaseAdminView):
                 "list": data,
                 "controller": controller,
                 "detail_url": self.detail_url_name,
+                "create_url": self.create_url_name,
             }
         )
 
@@ -75,8 +95,51 @@ class ControllerView(BaseAdminView):
                 "object": data,
                 "controller": controller,
                 "title": f"{self.name}#{data.id}",
+                "delete_url": self.delete_url_name,
             }
         )
+
+    async def get_create(self, req: web.Request) -> web.Response:
+        controller = self.get_controller()
+
+        return aiohttp_jinja2.render_template(
+            self.template_detail_create_name,
+            req,
+            {
+                **await self.get_context(req),
+                "controller": controller,
+                "title": f"Create a new {self.name}",
+                "create_url": self.create_post_url_name,
+            }
+        )
+
+    async def post_create(self, req: web.Request) -> None:
+        controller = self.get_controller()
+        data = await req.post()
+
+        obj = await controller.create(dict(data))
+
+        raise web.HTTPFound(
+            req.app.router[self.detail_url_name].url_for(pk=str(obj.id))
+        )
+
+    async def get_delete(self, req: web.Request) -> web.Response:
+        return aiohttp_jinja2.render_template(
+            self.template_delete_name,
+            req,
+            {
+                **await self.get_context(req),
+                "title": f"Confirm delete {self.name}#{req.match_info['pk']}",
+                "delete_url": self.delete_post_url_name,
+                "pk": req.match_info['pk'],
+            }
+        )
+
+    async def post_delete(self, req: web.Request) -> None:
+        controller = self.get_controller()
+        await controller.delete(int(req.match_info['pk']))
+        location = req.app.router[self.index_url_name].url_for()
+        raise web.HTTPFound(location=location)
 
     def setup(self, app: web.Application) -> None:
         app.add_routes([
@@ -86,8 +149,28 @@ class ControllerView(BaseAdminView):
                 name=self.index_url_name,
             ),
             web.get(
-                f'{self.index_url}' + '{pk}',
+                f'{self.index_url}' + r'{pk:\d+}',
                 self.get_detail,
                 name=self.detail_url_name,
-            )
+            ),
+            web.get(
+                f'{self.index_url}' + 'create',
+                self.get_create,
+                name=self.create_url_name,
+            ),
+            web.get(
+                f'{self.index_url}' + r'{pk:\d+}/delete',
+                self.get_delete,
+                name=self.delete_url_name,
+            ),
+            web.post(
+                f'{self.index_url}' + r'{pk:\d+}/delete',
+                self.post_delete,
+                name=self.delete_post_url_name,
+            ),
+            web.post(
+                f'{self.index_url}' + r'create_post',
+                self.post_create,
+                name=self.create_post_url_name,
+            ),
         ])

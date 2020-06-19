@@ -2,7 +2,7 @@
     {%- if controller.can_create %}
     <div class="row justify-content-end">
         <div>
-            <a class="btn btn-success btn-action" href="#">Create</a>
+            <a class="btn btn-success btn-action" href="{{ url(create_url) }}">Create</a>
         </div>
     </div>
     {%- endif %}
