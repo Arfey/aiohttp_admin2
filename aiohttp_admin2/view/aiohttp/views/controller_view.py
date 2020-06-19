@@ -40,8 +40,11 @@ class ControllerView(BaseAdminView):
 
     @property
     def create_post_url_name(self):
-        print(f'{self.name}_create_post')
         return f'{self.name}_create_post'
+
+    @property
+    def update_post_url_name(self):
+        return f'{self.name}_update_post'
 
     @property
     def delete_url_name(self):
@@ -96,6 +99,7 @@ class ControllerView(BaseAdminView):
                 "controller": controller,
                 "title": f"{self.name}#{data.id}",
                 "delete_url": self.delete_url_name,
+                "save_url": self.update_post_url_name,
             }
         )
 
@@ -121,6 +125,17 @@ class ControllerView(BaseAdminView):
 
         raise web.HTTPFound(
             req.app.router[self.detail_url_name].url_for(pk=str(obj.id))
+        )
+
+    async def post_update(self, req: web.Request) -> None:
+        controller = self.get_controller()
+        data = await req.post()
+        pk = req.match_info['pk']
+
+        await controller.update(pk, dict(data))
+
+        raise web.HTTPFound(
+            req.app.router[self.detail_url_name].url_for(pk=pk)
         )
 
     async def get_delete(self, req: web.Request) -> web.Response:
@@ -172,5 +187,10 @@ class ControllerView(BaseAdminView):
                 f'{self.index_url}' + r'create_post',
                 self.post_create,
                 name=self.create_post_url_name,
+            ),
+            web.post(
+                f'{self.index_url}' + r'{pk:\d+}/update_post',
+                self.post_update,
+                name=self.update_post_url_name,
             ),
         ])

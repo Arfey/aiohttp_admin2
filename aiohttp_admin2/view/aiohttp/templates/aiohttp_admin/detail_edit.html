@@ -2,6 +2,7 @@
 
 {% block main %}
 <div>
+    <form action="{{ url(save_url, pk=object.id) }}" method="POST">
     <p class="content__empty-title">{{ title }}</p>
     {% for name, value in object.__dict__.items() %}
     <b>{{ name }}</b>
@@ -9,6 +10,8 @@
     <br>
     {% endfor %}
     <br>
+        <button class="btn" type="submit">Update</button>
+    </form>
     <form action="{{ url(delete_url, pk=object.id) }}" method="GET">
         <button class="btn btn-danger" type="submit">Delete</button>
     </form>
