@@ -1,16 +1,20 @@
 {% extends 'aiohttp_admin/base.html' %}
+{% from 'aiohttp_admin/form.html' import form %}
 
 {% block main %}
-<div>
+<div style="width: 100%">
+    {% if message %}
+    <p class="alert alert-dark">{{ message }}</p>
+    {% endif %}
     <p class="content__empty-title">{{ title }}</p>
-    <form action="{{ url(create_url) }}" method="POST">
-    {% for name, field in controller.detail_fields.items() %}
-    <b>{{ name }}</b>
-    <input name="{{ name }}" value="{{ value }}" />
-    <br>
-    {% endfor %}
-    <br>
-        <button class="btn" type="submit">Create</button>
-    </form>
+    <!--  create form  -->
+    {{
+        form(
+            url(create_url),
+            submit_text='Create',
+            mapper=mapper,
+            exclude=exclude_fields,
+        )
+    }}
 </div>
 {% endblock %}

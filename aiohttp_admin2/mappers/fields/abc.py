@@ -10,7 +10,8 @@ __all__ = ['AbstractField', ]
 
 
 class EmptyValue:
-    pass
+    def __repr__(self):
+        return ''
 
 # todo: add validators
 

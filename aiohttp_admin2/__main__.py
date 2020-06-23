@@ -187,6 +187,7 @@ from aiohttp_admin2.controllers.controller import Controller
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.resources.dict_resource.dict_resource import DictResource
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
+from aiohttp_admin2.mappers.fields import StringField
 
 
 storage = {
@@ -216,11 +217,15 @@ class BookView(ControllerView):
 class NewPage(TemplateView):
     title = 'new page'
 
+
 # todo: add auto generated mapper if no specify
 class UserMapper(PostgresMapperGeneric, table=tbl):
-    pass
+    val = StringField(required=True)
+
 
 print(UserMapper({}).fields)
+print(UserMapper({}).fields['val'].required)
+
 
 class UserController(PostgresController):
     # todo: move to Meta?

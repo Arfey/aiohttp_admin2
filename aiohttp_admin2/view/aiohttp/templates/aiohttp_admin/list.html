@@ -5,6 +5,9 @@
 <div class="wrapper">
 {% include 'aiohttp_admin/list_action_buttons.html' %}
 
+{% if message %}
+<p class="alert alert-dark">{{ message }}</p>
+{% endif %}
 
 <table class="table table-striped">
     <thead>

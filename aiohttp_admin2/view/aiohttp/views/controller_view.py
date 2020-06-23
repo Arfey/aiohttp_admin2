@@ -15,12 +15,16 @@ class ControllerView(BaseAdminView):
     This class need for represent a pages based on controller for admin
     interface.
     """
+    # Templates
     template_list_name = 'aiohttp_admin/list.html'
     template_detail_name = 'aiohttp_admin/detail.html'
     template_detail_edit_name = 'aiohttp_admin/detail_edit.html'
     template_detail_create_name = 'aiohttp_admin/create.html'
     template_delete_name = 'aiohttp_admin/delete.html'
     controller: Controller
+
+    # Fields
+    exclude_fields = ['id', ]
 
     def __init__(self, *, params: t.Dict[str, t.Any] = None) -> None:
         default = self.controller.name.lower()
@@ -30,6 +34,7 @@ class ControllerView(BaseAdminView):
         self.title = self.title if not self.title == 'None' else default
         self.params = params or {}
 
+    # Urls
     @property
     def detail_url_name(self):
         return f'{self.name}_detail'
@@ -77,10 +82,15 @@ class ControllerView(BaseAdminView):
                 "controller": controller,
                 "detail_url": self.detail_url_name,
                 "create_url": self.create_url_name,
+                "message": req.rel_url.query.get('message')
             }
         )
 
-    async def get_detail(self, req: web.Request) -> web.Response:
+    async def get_detail(
+        self,
+        req: web.Request,
+        mapper: t.Dict[str, t.Any] = None,
+    ) -> web.Response:
         controller = self.get_controller()
         # todo: handle str key for dict
         data = await controller.get_detail(int(req.match_info['pk']))
@@ -100,10 +110,18 @@ class ControllerView(BaseAdminView):
                 "title": f"{self.name}#{data.id}",
                 "delete_url": self.delete_url_name,
                 "save_url": self.update_post_url_name,
+                "mapper": mapper or controller.mapper(data.__dict__),
+                "fields": controller.fields,
+                "message": req.rel_url.query.get('message'),
+                "exclude_fields": self.exclude_fields,
             }
         )
 
-    async def get_create(self, req: web.Request) -> web.Response:
+    async def get_create(
+        self,
+        req: web.Request,
+        mapper: t.Dict[str, t.Any] = None,
+    ) -> web.Response:
         controller = self.get_controller()
 
         return aiohttp_jinja2.render_template(
@@ -114,29 +132,53 @@ class ControllerView(BaseAdminView):
                 "controller": controller,
                 "title": f"Create a new {self.name}",
                 "create_url": self.create_post_url_name,
+                "mapper": mapper or controller.mapper({}),
+                "fields": controller.fields,
+                "exclude_fields": self.exclude_fields,
             }
         )
 
-    async def post_create(self, req: web.Request) -> None:
+    async def post_create(self, req: web.Request) -> web.Response:
         controller = self.get_controller()
-        data = await req.post()
+        data = dict(await req.post())
+        data['id'] = 0
 
-        obj = await controller.create(dict(data))
+        mapper = controller.mapper(data)
 
-        raise web.HTTPFound(
-            req.app.router[self.detail_url_name].url_for(pk=str(obj.id))
-        )
+        if mapper.is_valid():
+            del data['id']
+            obj = await controller.create(data)
 
-    async def post_update(self, req: web.Request) -> None:
+            raise web.HTTPFound(
+                req.app.router[self.detail_url_name]
+                    .url_for(pk=str(obj.id))
+                    .with_query(
+                        f'message=The {self.name}#{obj.id} has been created'
+                    )
+            )
+        else:
+            return await self.get_create(req, mapper)
+
+    # todo: concat post and get update
+    async def post_update(self, req: web.Request) -> web.Response:
         controller = self.get_controller()
         data = await req.post()
         pk = req.match_info['pk']
 
-        await controller.update(pk, dict(data))
+        mapper = controller.mapper(dict(data))
 
-        raise web.HTTPFound(
-            req.app.router[self.detail_url_name].url_for(pk=pk)
-        )
+        if mapper.is_valid():
+            await controller.update(pk, dict(data))
+
+            raise web.HTTPFound(
+                req.app.router[self.detail_url_name]
+                    .url_for(pk=pk)
+                    .with_query(
+                        f'message=The {self.name}#{pk} has been updated'
+                    )
+            )
+        else:
+            return await self.get_detail(req, mapper)
 
     async def get_delete(self, req: web.Request) -> web.Response:
         return aiohttp_jinja2.render_template(
@@ -152,8 +194,11 @@ class ControllerView(BaseAdminView):
 
     async def post_delete(self, req: web.Request) -> None:
         controller = self.get_controller()
-        await controller.delete(int(req.match_info['pk']))
-        location = req.app.router[self.index_url_name].url_for()
+        pk = req.match_info['pk']
+        await controller.delete(int(pk))
+        location = req.app.router[self.index_url_name]\
+            .url_for()\
+            .with_query(f'message=The {self.name}#{pk} has been deleted')
         raise web.HTTPFound(location=location)
 
     def setup(self, app: web.Application) -> None:

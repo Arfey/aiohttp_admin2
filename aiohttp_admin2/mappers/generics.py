@@ -32,6 +32,16 @@ class PostgresMapperGeneric(Mapper):
             field.name = name
             cls._fields[name] = field
 
+        # todo: add tests
+        if not cls._fields_cls:
+            cls._fields_cls = cls._fields.values()
+        else:
+            existing_fields = [field.name for field in cls._fields_cls]
+
+            for name, field in cls._fields.items():
+                if name not in existing_fields:
+                    cls._fields_cls.append(field)
+
 
 class MongoMapperGeneric(Mapper):
     """
