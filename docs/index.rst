@@ -1,6 +1,20 @@
 Aiohttp admin documentation
 ===========================
 
+.. image:: https://img.shields.io/pypi/v/aiohttp_admin2.svg
+        :target: https://pypi.python.org/pypi/aiohttp_admin2
+
+.. image:: https://img.shields.io/travis/arfey/aiohttp_admin2.svg
+        :target: https://travis-ci.com/arfey/aiohttp_admin2
+
+.. image:: https://readthedocs.org/projects/aiohttp-admin2/badge/?version=latest
+        :target: https://aiohttp-admin2.readthedocs.io/en/latest/?badge=latest
+        :alt: Documentation Status
+
+.. image:: https://pyup.io/repos/github/arfey/aiohttp_admin2/shield.svg
+     :target: https://pyup.io/repos/github/arfey/aiohttp_admin2/
+     :alt: Updates
+
 The aiohttp admin is library for generate admin interface for your data based
 on aiohttp. This interface support multiple data storages and can combine them
 together.
@@ -37,15 +51,75 @@ see home page of our awesome admin interface.
 
 .. image:: /images/simple_example.png
 
+If you use sqlalchemy then simple example with integration can be looks like this.
+
+.. code-block:: python
+
+    from aiohttp import web
+    from aiohttp_admin2 import setup_admin
+    from aiohttp_admin2.view import ControllerView
+    from aiohttp_admin2.controllers.postgres_controller import PostgresController
+    from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
+    import sqlalchemy as sa
+
+
+    # describe a table
+    metadata = sa.MetaData()
+
+    tbl = sa.Table('tbl', metadata,
+       sa.Column('id', sa.Integer, primary_key=True),
+       sa.Column('val', sa.String(255)),
+    )
+
+    # create a mapper for table
+    class UserMapper(PostgresMapperGeneric, table=tbl):
+        pass
+
+    # create controller for table with UserMapper
+    class UserController(PostgresController):
+        table = tbl
+        mapper = UserMapper
+        engine_name = 'db'
+        name = 'user'
+
+    # create view for table
+    class UserPage(ControllerView):
+        controller = UserController
+
+
+    app = web.Application()
+
+    engine = await create_engine(user='postgres',
+                                 database='postgres',
+                                 host='0.0.0.0',
+                                 password='postgres').__aenter__()
+    setup_admin(
+        app,
+        # put our engines
+        engines={
+            "db": engine
+        },
+        # put our views
+        views=[UserPage, ],
+    )
+
+    web.run_app(app)
+
+
+.. image:: /images/simple_list_example.png
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   readme
    installation
    usage
-   modules
+   controllers
+   mappers
+   views
+   resources
    templates
+   modules
    contributing
    authors
    history

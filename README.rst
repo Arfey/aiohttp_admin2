@@ -1,13 +1,10 @@
 ===============
-aiohttp admin 2
+Aiohttp admin 2
 ===============
 
-todo:
-
-- readme to md
-- autogenerator for history
-
-
+The aiohttp admin is library for generate admin interface for your data based
+on aiohttp. This interface support multiple data storages and can combine them
+together.
 
 .. image:: https://img.shields.io/pypi/v/aiohttp_admin2.svg
         :target: https://pypi.python.org/pypi/aiohttp_admin2
@@ -24,31 +21,5 @@ todo:
      :target: https://pyup.io/repos/github/arfey/aiohttp_admin2/
      :alt: Updates
 
-
-
-Generator of admin interface based on aiohttp.
-
-
 * Free software: MIT license
 * Documentation: https://aiohttp-admin2.readthedocs.io.
-
-
-Features
---------
-
-* TODO
-
-Credits
--------
-
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
-
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
-
-
-
-resource (resource) need for get and set data
-mapper for represent/validate data/type for field
-mapper for trafaret??
-separate mapper for view and validate?

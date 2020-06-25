@@ -179,52 +179,97 @@ async def monog():
 # print(BookMapper({"updated_at": 1}).fields)
 
 
+# from aiohttp import web
+# from aiohttp_admin2 import setup_admin
+# from aiohttp_admin2.view import TemplateView
+# from aiohttp_admin2.view import ControllerView
+# from aiohttp_admin2.controllers.controller import Controller
+# from aiohttp_admin2.controllers.postgres_controller import PostgresController
+# from aiohttp_admin2.resources.dict_resource.dict_resource import DictResource
+# from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
+# from aiohttp_admin2.mappers.fields import StringField
+#
+#
+# storage = {
+#     1: {"id": 1, "name": "Bob"},
+#     2: {"id": 2, "name": "Aliver"},
+#     3: {"id": 3, "name": "Aliver"},
+#     4: {"id": 4, "name": "Aliver"},
+#     5: {"id": 5, "name": "Aliver"},
+#     6: {"id": 6, "name": "Aliver"},
+#     7: {"id": 7, "name": "Aliver"},
+#     8: {"id": 8, "name": "Aliver"},
+# }
+#
+#
+# class BookController(Controller):
+#     resource = DictResource(storage)
+#     inline_fields = ['id', 'name']
+#     per_page = 3
+#     name = 'postgres1'
+#
+#
+# class BookView(ControllerView):
+#     group_name: str = 'Controllers'
+#     controller = BookController
+#
+#
+# class NewPage(TemplateView):
+#     title = 'new page'
+#
+#
+# # todo: add auto generated mapper if no specify
+# class UserMapper(PostgresMapperGeneric, table=tbl):
+#     val = StringField(required=True)
+#
+#
+# class UserController(PostgresController):
+#     # todo: move to Meta?
+#     table = tbl
+#     mapper = UserMapper
+#     engine_name = 'db'
+#     name = 'postgres'
+#     inline_fields = ['id', 'val']
+#     fields = '__all__'
+#     per_page = 5
+#
+#
+# class UserPage(ControllerView):
+#     controller = UserController
+#
+#
+# async def app(argv):
+#     app = web.Application()
+#
+#     engine = await create_engine(user='postgres',
+#                                  database='postgres',
+#                                  host='0.0.0.0',
+#                                  password='postgres').__aenter__()
+#     setup_admin(
+#         app,
+#         engines={
+#             "db": engine
+#         },
+#         views=[
+#             NewPage,
+#             BookView,
+#             UserPage,
+#         ],
+#     )
+#
+#     return app
+
+
 from aiohttp import web
 from aiohttp_admin2 import setup_admin
-from aiohttp_admin2.view import TemplateView
 from aiohttp_admin2.view import ControllerView
-from aiohttp_admin2.controllers.controller import Controller
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
-from aiohttp_admin2.resources.dict_resource.dict_resource import DictResource
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 from aiohttp_admin2.mappers.fields import StringField
 
 
-storage = {
-    1: {"id": 1, "name": "Bob"},
-    2: {"id": 2, "name": "Aliver"},
-    3: {"id": 3, "name": "Aliver"},
-    4: {"id": 4, "name": "Aliver"},
-    5: {"id": 5, "name": "Aliver"},
-    6: {"id": 6, "name": "Aliver"},
-    7: {"id": 7, "name": "Aliver"},
-    8: {"id": 8, "name": "Aliver"},
-}
-
-
-class BookController(Controller):
-    resource = DictResource(storage)
-    inline_fields = ['id', 'name']
-    per_page = 3
-    name = 'postgres1'
-
-
-class BookView(ControllerView):
-    group_name: str = 'Controllers'
-    controller = BookController
-
-
-class NewPage(TemplateView):
-    title = 'new page'
-
-
-# todo: add auto generated mapper if no specify
 class UserMapper(PostgresMapperGeneric, table=tbl):
-    val = StringField(required=True)
-
-
-print(UserMapper({}).fields)
-print(UserMapper({}).fields['val'].required)
+    pass
 
 
 class UserController(PostgresController):
@@ -232,10 +277,8 @@ class UserController(PostgresController):
     table = tbl
     mapper = UserMapper
     engine_name = 'db'
-    name = 'postgres'
-    inline_fields = ['id', 'val']
-    fields = '__all__'
-    per_page = 5
+    name = 'user'
+    per_page = 10
 
 
 class UserPage(ControllerView):
@@ -244,6 +287,7 @@ class UserPage(ControllerView):
 
 async def app(argv):
     app = web.Application()
+
     engine = await create_engine(user='postgres',
                                  database='postgres',
                                  host='0.0.0.0',
@@ -254,8 +298,6 @@ async def app(argv):
             "db": engine
         },
         views=[
-            NewPage,
-            BookView,
             UserPage,
         ],
     )
