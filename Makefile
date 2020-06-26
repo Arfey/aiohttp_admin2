@@ -1,79 +1,68 @@
 .PHONY: clean clean-test clean-pyc clean-build docs help
 .DEFAULT_GOAL := help
 
-###############################################################################
-### constants
-###############################################################################
+define BROWSER_PYSCRIPT
+import os, webbrowser, sys
 
-# colors
-GREEN = $(shell tput -Txterm setaf 2)
-YELLOW = $(shell tput -Txterm setaf 3)
-WHITE = $(shell tput -Txterm setaf 7)
-RESET = $(shell tput -Txterm sgr0)
-GRAY = $(shell tput -Txterm setaf 6)
+from urllib.request import pathname2url
 
+webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
+endef
+export BROWSER_PYSCRIPT
 
-TARGET_MAX_CHAR_NUM = 20
+define PRINT_HELP_PYSCRIPT
+import re, sys
 
-###############################################################################
-### commands
-###############################################################################
+for line in sys.stdin:
+	match = re.match(r'^([a-zA-Z_-]+):.*?## (.*)$$', line)
+	if match:
+		target, help = match.groups()
+		print("%-20s %s" % (target, help))
+endef
+export PRINT_HELP_PYSCRIPT
 
-## Shows help
+BROWSER := python -c "$$BROWSER_PYSCRIPT"
+
 help:
-	@eval "$$HELP_SCRIPT"
+	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-## Remove build artifacts
-clean-build:
+clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+
+clean-build: ## remove build artifacts
 	rm -fr build/
 	rm -fr dist/
 	rm -fr .eggs/
 	find . -name '*.egg-info' -exec rm -fr {} +
 	find . -name '*.egg' -exec rm -f {} +
 
-## Remove Python file artifacts
-clean-pyc:
+clean-pyc: ## remove Python file artifacts
 	find . -name '*.pyc' -exec rm -f {} +
 	find . -name '*.pyo' -exec rm -f {} +
 	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 
-## Remove test and coverage artifacts
-clean-test:
+clean-test: ## remove test and coverage artifacts
 	rm -fr .tox/
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 
-## Check style with flake8
-lint:
+lint: ## check style with flake8
 	flake8 aiohttp_admin2 tests
 
-## Checks types with `mypy`.
-mypy:
-	@mypy aiohttp_admin2
+test_: ## run tests quickly with the default Python
+	python setup.py test
 
-## Run tests | tests
-test:
-	py.test -s -p no:warnings
-
-## Run tests with the coverage
-cover:
-	py.test --cov aiohttp_admin2 -p no:warnings
-
-## Run tests on every Python version with tox
-test-all:
+test-all: ## run tests on every Python version with tox
 	tox
 
-## Check code coverage quickly with the default Python
-coverage:
-	coverage run --source aiohttp_admin2 -m pytest
+coverage: ## check code coverage quickly with the default Python
+	coverage run --source aiohttp_admin2 setup.py test
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-## Generate Sphinx HTML documentation, including API docs | common
-docs:
+docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/aiohttp_admin2.rst
 	rm -f docs/modules.rst
 	sphinx-apidoc -o docs/ aiohttp_admin2
@@ -81,69 +70,23 @@ docs:
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
-## Clean the project
-clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
-
-## Compile the docs watching for changes
-servedocs: docs
+servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
-## Package and upload a release
-release: dist
+release: dist ## package and upload a release
 	twine upload dist/*
 
-## Builds source and wheel package
-dist: clean
+dist: clean ## builds source and wheel package
 	python setup.py sdist
 	python setup.py bdist_wheel
 	ls -l dist
 
-## Install the package to the active Python's site-packages
-install: clean
+install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
+mypy:
+	@mypy aiohttp_admin2
 
-###############################################################################
-### helpers functions
-###############################################################################
-
-define BROWSER_OPEN
-import os, webbrowser, sys
-
-try:
-	from urllib import pathname2url
-except:
-	from urllib.request import pathname2url
-
-webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
-endef
-export BROWSER_OPEN
-
-define HELP_SCRIPT
-echo 'Usage:'
-echo ''
-echo '  ${YELLOW}make${RESET} ${GREEN}<target>${RESET}'
-echo ''
-echo 'Targets:'
-echo ''
-awk '/^[a-zA-Z\-]+:/ {
-    helpMessage = match(lastLine, /^## (.*)/);
-    if (helpMessage) {
-        if (index(lastLine, "|") != 0) {
-            stage = substr(lastLine, index(lastLine, "|") + 1);
-            printf "\n ${GRAY}%s: \n\n", stage;
-        }
-        helpCommand = substr($$1, 0, index($$1, ":")-1);
-        helpMessage = substr(lastLine, RSTART + 3, RLENGTH);
-        if (index(lastLine, "|") != 0) {
-            helpMessage = substr(helpMessage, 0, index(helpMessage, "|")-1);
-        }
-        printf "  ${YELLOW}%-$(TARGET_MAX_CHAR_NUM)s${RESET} ${GREEN}%s${RESET}\n", helpCommand, helpMessage;
-    }
-}
-{ lastLine = $$0 }' $(MAKEFILE_LIST)
-echo ''
-endef
-export HELP_SCRIPT
-
-BROWSER := python -c "$$BROWSER_OPEN"
+test:
+	@docker stop $(docker ps | grep pytest | awk '{ print $1 }') | true
+	pytest --slow -v -s -p no:warnings

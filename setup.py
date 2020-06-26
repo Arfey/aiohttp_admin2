@@ -1,24 +1,8 @@
-import sys
-import os
-import pathlib
+#!/usr/bin/env python
+
+"""The setup script."""
 
 from setuptools import setup, find_packages
-
-PY_VER = sys.version_info
-
-templates = pathlib.Path(__file__).parent / 'aiohttp_admin2'
-
-
-def package_files(directory):
-    paths = []
-    for (path, _, filenames) in os.walk(directory):
-        for filename in filenames:
-            paths.append(os.path.join('..', path, filename))
-    return paths
-
-
-if not PY_VER >= (3, 5):
-    raise RuntimeError("aiohttp_admin doesn't support Python earlier than 3.5")
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -26,44 +10,53 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = []
+requirements = ['Click>=7.0', ]
 
-setup_requirements = ['pytest-runner', ]
+setup_requirements = [
+    'sqlalchemy',
+    'aiopg',
+    'motor',
+    'umongo',
+    'sqlalchemy-stubs',
+    'aiomysql',
+    'aiohttp_jinja2',
+    'aiohttp',
+]
 
-test_requirements = ['pytest', ]
+test_requirements = [ ]
 
 setup(
-    name='aiohttp_admin2',
-    description="Admin interface for aiohttp application.",
-    long_description=readme + '\n\n' + history,
     author="Mykhailo Havelia",
     author_email='misha.gavela@gmail.com',
+    python_requires='>=3.5',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
+        'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
-        'Framework :: AsyncIO',
-        'Operating System :: POSIX',
-        'Environment :: Web Environment',
+        'Programming Language :: Python :: 3.8',
     ],
-    keywords='aiohttp_admin2',
-    license="Apache Software License 2.0",
-    install_requires=requirements,
-    packages=find_packages(),
-    package_data={
-        '': package_files(templates),
+    description="Generator of admin interface based on aiohttp.",
+    entry_points={
+        'console_scripts': [
+            'aiohttp_admin2=aiohttp_admin2.cli:main',
+        ],
     },
+    install_requires=requirements,
+    license="MIT license",
+    long_description=readme + '\n\n' + history,
+    include_package_data=True,
+    keywords='aiohttp_admin2',
+    name='aiohttp_admin2',
+    packages=find_packages(include=['aiohttp_admin2', 'aiohttp_admin2.*']),
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/Arfey/aiohttp_admin2',
+    url='https://github.com/arfey/aiohttp_admin2',
     version='0.1.0',
-    platforms=['POSIX'],
     zip_safe=False,
 )

@@ -1,0 +1,50 @@
+{% macro form(
+    action,
+    mapper=None,
+    fields=None,
+    method='POST',
+    submit_text='submit',
+    submit_cls='',
+    exclude=[])
+%}
+<div>
+    <form method="{{ method }}" action="{{ action }}">
+        {% if mapper %}
+        {% if fields == '__all__' %}
+
+        {% for name, field in mapper.fields.items() %}
+            {% if name not in exclude %}
+            <p>
+                <b style="width: 80px; display: inline-block">{{ name }}:</b>
+                <!-- todo: move from _value -->
+                <input name="{{ name }}" value="{{ field._value if field._value }}" />
+                {% if field.error %}
+                <br>
+                <span style="color: red">{{ field.error }}</span>
+                {% endif %}
+            </p>
+            {% endif %}
+        {% endfor %}
+
+        {% else%}
+
+        {% for name, field in mapper.fields.items() %}
+            {% if name not in exclude %}
+            <p>
+                <b style="width: 80px; display: inline-block">{{ name }}:</b>
+                <!-- todo: move from _value -->
+                <input name="{{ name }}" value="{{ field._value if field._value }}" />
+            </p>
+            {% endif %}
+            {% if field.error %}
+            <br>
+            <span style="color: red">{{ field.error }}</span>
+            {% endif %}
+        {% endfor %}
+
+        {% endif %}
+        {% endif %}
+        <button class="btn {{ submit_cls }}" type="submit">{{ submit_text }}</button>
+    </form>
+</div>
+{% endmacro %}
