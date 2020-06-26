@@ -183,7 +183,7 @@ async def monog():
 # from aiohttp_admin2 import setup_admin
 # from aiohttp_admin2.view import TemplateView
 # from aiohttp_admin2.view import ControllerView
-# from aiohttp_admin2.controllers.controller import Controller
+from aiohttp_admin2.controllers.controller import Controller
 # from aiohttp_admin2.controllers.postgres_controller import PostgresController
 # from aiohttp_admin2.resources.dict_resource.dict_resource import DictResource
 # from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
