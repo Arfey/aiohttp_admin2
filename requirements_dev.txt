@@ -17,6 +17,7 @@ pytest-asyncio
 pytest-docker
 pymysql
 cryptography
+aiohttp-devtools
 
 # docs
 sphinxcontrib-napoleon

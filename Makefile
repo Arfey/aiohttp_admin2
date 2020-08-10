@@ -90,3 +90,6 @@ mypy:
 test:
 	@docker stop $(docker ps | grep pytest | awk '{ print $1 }') | true
 	pytest --slow -v -s -p no:warnings
+
+demo:
+	adev runserver aiohttp_admin2/demo/__init__.py
