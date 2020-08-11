@@ -1,9 +1,9 @@
 import sqlalchemy as sa
 
+from ..db import metadata
 
-metadata = sa.MetaData()
 
-actors = sa.Table('actors', metadata,
+users = sa.Table('users', metadata,
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('name', sa.String(255)),
 )

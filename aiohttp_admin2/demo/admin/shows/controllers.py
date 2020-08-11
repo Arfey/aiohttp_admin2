@@ -2,7 +2,7 @@ from aiohttp_admin2.view import ControllerView
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 
-from .table import shows
+from ...catalog.tables import shows
 
 
 # todo: remove table from controller?
