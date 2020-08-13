@@ -1,9 +1,48 @@
-<form method="POST" action="{{ url('login_post') }}">
-    <label for="username">username</label>
-    <input type="text" name="username">
-    <br>
-    <label for="password">password</label>
-    <input type="password" name="password">
-    <br>
-    <input type="submit">
-</form>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    >
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login page | aiohttp admin</title>
+    <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+        crossorigin="anonymous"
+    >
+</head>
+<body>
+    <div class="container" style="display: flex; height: 100vh">
+
+        <!--    from with url to handler    -->
+        <form
+            style="margin: auto; min-width: 320px"
+            method="POST"
+            action="{{ url('login_post') }}"
+        >
+
+            <!--    username field      -->
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" name="username" id="username" aria-describedby="usernameHelp" value="admin">
+                <small id="usernameHelp" class="form-text text-muted">
+                    For login use <b>admin</b> for username and password.</small>
+            </div>
+
+            <!--    password field      -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" name="password" id="password" value="admin">
+            </div>
+
+            <!--    submit button      -->
+            <button type="submit" class="btn btn-primary">Submit</button>
+
+        </form>
+
+    </div>
+</body>
+</html>

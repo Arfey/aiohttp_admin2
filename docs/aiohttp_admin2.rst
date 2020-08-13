@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
 
     aiohttp_admin2.controllers
+    aiohttp_admin2.demo
     aiohttp_admin2.mappers
     aiohttp_admin2.resources
     aiohttp_admin2.view

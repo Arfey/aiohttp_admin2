@@ -18,6 +18,9 @@ pytest-docker
 pymysql
 cryptography
 aiohttp-devtools
+aiohttp_security
+aiohttp_session
+cryptography
 
 # docs
 sphinxcontrib-napoleon
