@@ -22,6 +22,7 @@ from .admin.users.controllers import UsersPage
 from .routes import routes
 from .auth.views import login_page
 from .auth.authorization import AuthorizationPolicy
+from .auth.middlewares import admin_access_middleware
 
 
 THIS_DIR = Path(__file__).parent
@@ -36,12 +37,16 @@ async def jinja(application: web.Application) -> None:
 
 
 async def security(application: web.Application) -> None:
-    policy = SessionIdentityPolicy()
-    setup_security(application, policy, AuthorizationPolicy())
-
     fernet_key = fernet.Fernet.generate_key()
     secret_key = base64.urlsafe_b64decode(fernet_key)
-    session_setup(application, EncryptedCookieStorage(secret_key))
+
+    session_setup(
+        application,
+        EncryptedCookieStorage(secret_key, cookie_name='API_SESSION'),
+    )
+
+    policy = SessionIdentityPolicy()
+    setup_security(application, policy, AuthorizationPolicy())
 
     yield
 
@@ -74,19 +79,20 @@ async def admin(application: web.Application) -> None:
         password='postgres',
     ).__aenter__()
 
+    views = [
+        # todo: add custom page
+        ActorPage,
+        GenresPage,
+        MoviesPage,
+        ShowsPage,
+        UsersPage,
+    ]
     setup_admin(
         application,
-        engines={
-            "db": engine
-        },
-        views=[
-            # todo: add custom page
-            ActorPage,
-            GenresPage,
-            MoviesPage,
-            ShowsPage,
-            UsersPage,
-        ],
+        engines={"db": engine},
+        views=views,
+        middleware_list=[admin_access_middleware, ],
+        logout_path='/logout',
     )
 
 
