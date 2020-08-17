@@ -1,7 +1,10 @@
 import typing as t
 
 from aiohttp import web
-from aiohttp_security import is_anonymous
+from aiohttp_security import (
+    is_anonymous,
+    permits,
+)
 
 
 @web.middleware
@@ -14,6 +17,9 @@ async def admin_access_middleware(
     don't have right permissions.
     """
     if await is_anonymous(request):
+        raise web.HTTPFound('/')
+
+    if not await permits(request, 'admin'):
         raise web.HTTPFound('/')
 
     return await handler(request)

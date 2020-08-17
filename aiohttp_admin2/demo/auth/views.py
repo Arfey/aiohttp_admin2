@@ -7,6 +7,7 @@ from aiohttp_security import (
 )
 
 from ..routes import routes
+from .users import user_map
 
 
 __all___ = ['login_page', 'login_handler', ]
@@ -43,10 +44,11 @@ async def login_post(request: web.Request) -> None:
     in another case we'll redirect him to login page.
     """
     data = await request.post()
+    user = user_map.get(data['username'])
 
-    if data['username'] == 'admin' and data['password'] == 'admin':
+    if user and user.password == data['password']:
         admin_page = web.HTTPFound('/admin/')
-        await remember(request, admin_page, 'admin')
+        await remember(request, admin_page, user.username)
         raise admin_page
 
     raise web.HTTPFound('/login')

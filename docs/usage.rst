@@ -95,10 +95,55 @@ Controller generate access to your data based on some engine.
 Access
 ......
 
+Admin interface have two approaches for restrict access:
+
+- global middleware
+- `access_hook` for each controller
+
+Global middleware use for restrict access to whole admin interface. It might
+look something like this:
+
+.. code-block:: python
+
+    from aiohttp import web
+
+
+    @web.middleware
+    async def admin_access_middleware(request, handler):
+        """
+        This middleware need for forbidden access to admin interface for users
+        who don't have right permissions.
+        """
+        if await is_anonymous(request):
+            raise web.HTTPFound('/')
+
+        if not await permits(request, 'admin'):
+            raise web.HTTPFound('/')
+
+        return await handler(request)
+
+This middleware you can apply for admin interface using `middleware_list`
+parameter.
+
+.. code-block:: python
+
+    setup_admin(
+        application,
+        # ...
+        middleware_list=[admin_access_middleware, ],
+        logout_path='/logout',
+    )
+
+also you can specify `logout_path` parameter to add logout button inside admin
+header navigation bar.
+
+
+
+
 If you need to make access to some instances you cat do it using: can_create,
 can_update, can_view, can_delete.
-If access must be specefy by some user you also cat use `access_hook`.
-`access_hook` - access hook use befor for each access to data.
+If access must be specify by some user you also cat use `access_hook`.
+`access_hook` - access hook use before for each access to data.
 
 .. code-block:: python
 

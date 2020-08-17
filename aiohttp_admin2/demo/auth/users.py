@@ -1,10 +1,14 @@
 from collections import namedtuple
 
 
-User = namedtuple('User', ['username', 'password'])
+User = namedtuple('User', ['username', 'id', 'password', 'permission'])
 
 
-# todo: move to database
 users = [
-    User('admin', 'admin')
+    User('admin', 1, 'admin', ['admin']),
+    User('simple', 2, 'simple', []),
 ]
+
+user_map = {
+    user.username: user for user in users
+}
