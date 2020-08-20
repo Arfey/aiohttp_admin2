@@ -11,6 +11,7 @@ actors = sa.Table('actors', metadata,
 genres = sa.Table('genres', metadata,
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('name', sa.String(255)),
+    sa.Column('type', sa.String(255)),
 )
 
 movies = sa.Table('movies', metadata,

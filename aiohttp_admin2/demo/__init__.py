@@ -23,6 +23,7 @@ from .routes import routes
 from .auth.views import login_page
 from .auth.authorization import AuthorizationPolicy
 from .auth.middlewares import admin_access_middleware
+from .load_data import load_data
 
 
 THIS_DIR = Path(__file__).parent
@@ -107,5 +108,7 @@ async def app():
     application.add_routes(routes)
 
     await admin(application)
+
+    await load_data()
 
     return application
