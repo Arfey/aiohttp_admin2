@@ -1,6 +1,10 @@
 Aiohttp admin documentation
 ===========================
 
+`Demo site
+<https://shrouded-stream-28595.herokuapp.com/>`_ | `Demo source code
+<https://github.com/Arfey/aiohttp_admin2/tree/master/aiohttp_admin2/demo/>`_.
+
 .. image:: https://img.shields.io/pypi/v/aiohttp_admin2.svg
         :target: https://pypi.python.org/pypi/aiohttp_admin2
 

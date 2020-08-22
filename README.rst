@@ -2,6 +2,9 @@
 Aiohttp admin 2
 ===============
 
+Link to the - `DEME
+<https://shrouded-stream-28595.herokuapp.com/>`_.
+
 The aiohttp admin is library for generate admin interface for your data based
 on aiohttp. This interface support multiple data storages and can combine them
 together.
