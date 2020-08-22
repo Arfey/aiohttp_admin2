@@ -92,4 +92,8 @@ test:
 	pytest --slow -v -s -p no:warnings
 
 demo:
-	adev runserver aiohttp_admin2/demo/__init__.py
+	WITHOUT_UPDATE_DB=1 DATABASE_URL=postgres://postgres:postgres@0.0.0.0:5432/postgres adev runserver aiohttp_admin2/demo/__init__.py
+
+deploy_demo:
+	heroku container:push web
+	heroku container:release web

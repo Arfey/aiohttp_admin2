@@ -1,5 +1,7 @@
 from pathlib import Path
 import base64
+import asyncio
+import os
 
 from cryptography import fernet
 from aiohttp import web
@@ -23,10 +25,25 @@ from .routes import routes
 from .auth.views import login_page
 from .auth.authorization import AuthorizationPolicy
 from .auth.middlewares import admin_access_middleware
-from .load_data import load_data
+from .load_data import (
+    load_data,
+    get_config_from_db_url,
+)
 
 
 THIS_DIR = Path(__file__).parent
+
+
+async def load_data_cron(db_url_text: str) -> None:
+    """
+    Runner for sync data form tmdb database.
+    """
+    while True:
+        if not os.getenv("WITHOUT_UPDATE_DB"):
+            await load_data(db_url_text)
+
+        # we need to sync data each 24 hours
+        await asyncio.sleep(60 * 60 * 24)
 
 
 async def jinja(application: web.Application) -> None:
@@ -57,12 +74,9 @@ async def database(application: web.Application) -> None:
     A function that, when the server is started, connects to postgres,
     and after stopping it breaks the connection (after yield)
     """
-    engine = await aiopg.sa.create_engine(
-        user='postgres',
-        database='postgres',
-        host='0.0.0.0',
-        password='postgres',
-    )
+    engine = await aiopg.sa\
+        .create_engine(**get_config_from_db_url(application['db_url']))
+
     application['db'] = engine
 
     yield
@@ -73,12 +87,9 @@ async def database(application: web.Application) -> None:
 
 async def admin(application: web.Application) -> None:
     # todo: setup engine without it
-    engine = await aiopg.sa.create_engine(
-        user='postgres',
-        database='postgres',
-        host='0.0.0.0',
-        password='postgres',
-    ).__aenter__()
+    engine = await aiopg.sa\
+        .create_engine(**get_config_from_db_url(application['db_url']))\
+        .__aenter__()
 
     views = [
         # todo: add custom page
@@ -99,6 +110,7 @@ async def admin(application: web.Application) -> None:
 
 async def app():
     application = web.Application()
+    application['db_url'] = os.getenv('DATABASE_URL')
     application.cleanup_ctx.extend([
         database,
         jinja,
@@ -109,6 +121,6 @@ async def app():
 
     await admin(application)
 
-    await load_data()
+    asyncio.create_task(load_data_cron(application['db_url']))
 
     return application

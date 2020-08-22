@@ -1,3 +1,5 @@
+import re
+
 import aiohttp
 import aiopg.sa
 from sqlalchemy import create_engine
@@ -20,6 +22,23 @@ table_list = [
 
 # todo: move to secret
 API_KEY = '702889df5a654ac187d0de04d5b85f97'
+
+
+def get_config_from_db_url(text_url):
+    result = re.match(
+        r'postgres:\/\/(\w*):(\w*)@([-\w.]*):(\d*)\/([\w]*)',
+        text_url,
+    )
+
+    user, password, host, port, database = result.groups()
+
+    return {
+        "user": user,
+        "database": database,
+        "host": host,
+        "password": password,
+        "port": port,
+    }
 
 
 class TMDBClient:
@@ -105,9 +124,9 @@ async def execute(config, command):
             await conn.execute(command)
 
 
-def recreate_tables(config):
+def recreate_tables(db_url):
     sync_engine = create_engine(
-        get_db_url(**config),
+        db_url,
         isolation_level='AUTOCOMMIT',
     )
 
@@ -116,32 +135,10 @@ def recreate_tables(config):
     metadata.create_all(sync_engine)
 
 
-def get_db_url(*, user, password, host, port, database) -> str:
-    """
-    Generate a url for db connection.
-    """
+async def load_data(db_url_text):
+    config = get_config_from_db_url(db_url_text)
 
-    return (
-        f"postgresql://"
-        f"{user}"
-        f":{password}"
-        f"@{host}"
-        f":{port}"
-        f"/{database}"
-    )
-
-
-async def load_data():
-    # todo: move to config
-    config = {
-        "user": "postgres",
-        "database": "postgres",
-        "host": "0.0.0.0",
-        "password": "postgres",
-        "port": "5432",
-    }
-
-    recreate_tables(config)
+    recreate_tables(db_url_text)
 
     tmdb_client = TMDBClient(API_KEY)
 
