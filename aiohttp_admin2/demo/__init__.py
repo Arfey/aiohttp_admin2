@@ -25,6 +25,7 @@ from .routes import routes
 from .auth.views import login_page
 from .auth.authorization import AuthorizationPolicy
 from .auth.middlewares import admin_access_middleware
+from .injectors import postgres_injector
 from .load_data import (
     load_data,
     get_config_from_db_url,
@@ -79,6 +80,8 @@ async def database(application: web.Application) -> None:
 
     application['db'] = engine
 
+    postgres_injector.init(engine)
+
     yield
 
     application['db'].close()
@@ -86,11 +89,6 @@ async def database(application: web.Application) -> None:
 
 
 async def admin(application: web.Application) -> None:
-    # todo: setup engine without it
-    engine = await aiopg.sa\
-        .create_engine(**get_config_from_db_url(application['db_url']))\
-        .__aenter__()
-
     views = [
         # todo: add custom page
         ActorPage,
@@ -101,7 +99,6 @@ async def admin(application: web.Application) -> None:
     ]
     setup_admin(
         application,
-        engines={"db": engine},
         views=views,
         middleware_list=[admin_access_middleware, ],
         logout_path='/logout',

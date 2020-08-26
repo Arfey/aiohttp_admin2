@@ -276,7 +276,6 @@ class UserController(PostgresController):
     # todo: move to Meta?
     table = tbl
     mapper = UserMapper
-    engine_name = 'db'
     name = 'user'
     per_page = 10
 

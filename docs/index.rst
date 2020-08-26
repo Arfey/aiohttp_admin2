@@ -64,11 +64,13 @@ If you use sqlalchemy then simple example with integration can be looks like thi
     from aiohttp_admin2.view import ControllerView
     from aiohttp_admin2.controllers.postgres_controller import PostgresController
     from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
+    from aiohttp_admin2.connection_injectors import ConnectionInjector
     import sqlalchemy as sa
 
 
     # describe a table
     metadata = sa.MetaData()
+    postgres_injector = ConnectionInjector()
 
     tbl = sa.Table('tbl', metadata,
        sa.Column('id', sa.Integer, primary_key=True),
@@ -80,10 +82,10 @@ If you use sqlalchemy then simple example with integration can be looks like thi
         pass
 
     # create controller for table with UserMapper
+    @postgres_injector.inject
     class UserController(PostgresController):
         table = tbl
         mapper = UserMapper
-        engine_name = 'db'
         name = 'user'
 
     # create view for table
@@ -97,12 +99,10 @@ If you use sqlalchemy then simple example with integration can be looks like thi
                                  database='postgres',
                                  host='0.0.0.0',
                                  password='postgres').__aenter__()
+    postgres_injector.init(engine)
+
     setup_admin(
         app,
-        # put our engines
-        engines={
-            "db": engine
-        },
         # put our views
         views=[UserPage, ],
     )

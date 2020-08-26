@@ -75,10 +75,10 @@ Controller generate access to your data based on some engine.
     from aiohttp_admin2.controllers.postgres_controller import PostgresController
 
 
+    @postgres_injector.inject
     class UserController(PostgresController):
         table = user
         mapper = UserMapper
-        engine_name = 'db'
         name = 'user'
         per_page = 10
 

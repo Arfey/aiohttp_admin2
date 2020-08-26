@@ -15,7 +15,6 @@ __all__ = ['setup_admin', ]
 def setup_admin(
     app: web.Application,
     *,
-    engines: t.Optional[t.Dict[str, t.Any]] = None,
     admin_class=Admin,
     jinja_app_key: str = APP_KEY,
     views: t.Optional[t.List[BaseAdminView]] = None,
@@ -28,7 +27,6 @@ def setup_admin(
     """
     admin_class(
         app,
-        engines,
         views,
         middleware_list,
         logout_path,

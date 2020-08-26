@@ -1,6 +1,7 @@
 version: '3.1'
 
 services:
+
   postgres:
     image: postgres
     environment:
@@ -9,3 +10,11 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - 5432:5432
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    ports:
+      - 27017:27017
