@@ -15,6 +15,3 @@ class MongoTestController(MongoController):
 
 class MongoControllerView(ControllerView):
     controller = MongoTestController
-
-
-# todo: added some like MotorAsyncIOInstance for db https://github.com/sneawo/asyncio-rest-example/blob/master/app/db.py

@@ -92,6 +92,33 @@ Controller generate access to your data based on some engine.
 - per_page - number of item per page
 
 
+The Controller need to have connection for engine. For this goal we need to
+inject connection by `ConnectionInjector`.
+
+.. code-block:: python
+
+    from aiohttp_admin2.connection_injectors import ConnectionInjector
+
+
+    postgres_injector = ConnectionInjector()
+
+
+    async def init_db(app):
+        # Context function for initialize connection to db
+        engine = await aiopg.sa.create_engine(
+            user='postgres',
+            database='postgres',
+            host='0.0.0.0',
+            password='postgres',
+        )
+        app['db'] = engine
+
+        # here we add connection for our injector
+        postgres_injector.init(engine)
+
+After that you can user `postgres_injector` to decorate your controllers.
+
+
 Access
 ......
 

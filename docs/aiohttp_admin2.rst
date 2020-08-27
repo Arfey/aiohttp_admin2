@@ -23,6 +23,14 @@ aiohttp\_admin2.cli module
     :undoc-members:
     :show-inheritance:
 
+aiohttp\_admin2.connection\_injectors module
+--------------------------------------------
+
+.. automodule:: aiohttp_admin2.connection_injectors
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 aiohttp\_admin2.exceptions module
 ---------------------------------
 
