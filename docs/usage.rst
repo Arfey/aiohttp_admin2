@@ -116,8 +116,9 @@ inject connection by `ConnectionInjector`.
         # here we add connection for our injector
         postgres_injector.init(engine)
 
-After that you can user `postgres_injector` to decorate your controllers.
-
+After that you can user `postgres_injector` to decorate your controllers. For
+`MongoController` you don't need to use `ConnectionInjector` because connection
+to db exist in table instance.
 
 Access
 ......

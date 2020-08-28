@@ -1,17 +1,29 @@
 from aiohttp_admin2.mappers.generics import MongoMapperGeneric
 from aiohttp_admin2.controllers.mongo_controller import MongoController
 from aiohttp_admin2.view import ControllerView
+from umongo import Document, fields
 
-from ..catalog.mongo_table import TestTable
+from .injectors import instance
 
 
-class MongoTestMapper(MongoMapperGeneric, table=TestTable):
+@instance.register
+class User(Document):
+    email = fields.EmailField(required=True, unique=True)
+
+    class Meta:
+        collection_name = "user"
+
+
+class MongoTestMapper(MongoMapperGeneric, table=User):
     pass
 
 
 class MongoTestController(MongoController):
-    pass
+    mapper = MongoTestMapper
+    table = User
+    name = 'user_mongo'
+    per_page = 10
 
 
-class MongoControllerView(ControllerView):
+class MongoPage(ControllerView):
     controller = MongoTestController

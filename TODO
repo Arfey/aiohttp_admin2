@@ -7,3 +7,5 @@
 - think about move instance to dict
 - get name of user in nav bar
 - add access inside admin interface
+- controller name with whitespace
+- datetime field mongodb

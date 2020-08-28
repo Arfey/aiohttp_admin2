@@ -93,7 +93,7 @@ class ControllerView(BaseAdminView):
     ) -> web.Response:
         controller = self.get_controller()
         # todo: handle str key for dict
-        data = await controller.get_detail(int(req.match_info['pk']))
+        data = await controller.get_detail(req.match_info['pk'])
 
         template = self.template_detail_edit_name
 
@@ -209,7 +209,7 @@ class ControllerView(BaseAdminView):
                 name=self.index_url_name,
             ),
             web.get(
-                f'{self.index_url}' + r'{pk:\d+}',
+                f'{self.index_url}' + r'{pk:\w+}',
                 self.get_detail,
                 name=self.detail_url_name,
             ),
@@ -219,12 +219,12 @@ class ControllerView(BaseAdminView):
                 name=self.create_url_name,
             ),
             web.get(
-                f'{self.index_url}' + r'{pk:\d+}/delete',
+                f'{self.index_url}' + r'{pk:\w+}/delete',
                 self.get_delete,
                 name=self.delete_url_name,
             ),
             web.post(
-                f'{self.index_url}' + r'{pk:\d+}/delete',
+                f'{self.index_url}' + r'{pk:\w+}/delete',
                 self.post_delete,
                 name=self.delete_post_url_name,
             ),
@@ -234,7 +234,7 @@ class ControllerView(BaseAdminView):
                 name=self.create_post_url_name,
             ),
             web.post(
-                f'{self.index_url}' + r'{pk:\d+}/update_post',
+                f'{self.index_url}' + r'{pk:\w+}/update_post',
                 self.post_update,
                 name=self.update_post_url_name,
             ),

@@ -37,7 +37,7 @@ class FloatField(AbstractField):
 class DateTimeField(AbstractField):
     # todo: make a smart
     def to_python(self) -> datetime:
-        return parser(self._value)
+        return parser.parse(self._value)
 
     def to_raw(self) -> str:
         return str(self._value)

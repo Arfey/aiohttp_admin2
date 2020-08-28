@@ -14,7 +14,7 @@ __all__ = [
 
 class PostgresMapperGeneric(Mapper):
     """
-    This class need for generate Mapper from sqlalchemy's model.
+    This class need for generate Mapper from sqlAlchemy's model.
     """
 
     # todo: added types
@@ -58,14 +58,7 @@ class MongoMapperGeneric(Mapper):
     DEFAULT_FIELD = fields.StringField
 
     def __init_subclass__(cls, table: umongo.Document) -> None:
-        if isinstance(table, umongo.template.MetaTemplate):
-            obj_fields = (
-                (key, value)
-                for key, value in table.__dict__.items()
-                if isinstance(value, umongo.fields.BaseField)
-            )
-        else:
-            obj_fields = table.schema.fields.items()
+        obj_fields = table.schema.fields.items()
 
         for name, column in obj_fields:
             field = \

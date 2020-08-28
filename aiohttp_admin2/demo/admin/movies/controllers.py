@@ -3,7 +3,7 @@ from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 
 from ...catalog.tables import movies
-from ...injectors import postgres_injector
+from ..injectors import postgres_injector
 
 
 # todo: remove table from controller?
