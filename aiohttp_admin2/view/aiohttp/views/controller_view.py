@@ -214,7 +214,7 @@ class ControllerView(BaseAdminView):
                 name=self.detail_url_name,
             ),
             web.get(
-                f'{self.index_url}' + 'create',
+                f'{self.index_url}' + 'create/',
                 self.get_create,
                 name=self.create_url_name,
             ),
@@ -229,7 +229,7 @@ class ControllerView(BaseAdminView):
                 name=self.delete_post_url_name,
             ),
             web.post(
-                f'{self.index_url}' + r'create_post',
+                f'{self.index_url}' + r'create_post/',
                 self.post_create,
                 name=self.create_post_url_name,
             ),
