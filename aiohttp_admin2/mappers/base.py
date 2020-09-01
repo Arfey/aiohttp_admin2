@@ -1,5 +1,4 @@
 import typing as t
-from abc import ABC
 
 from aiohttp_admin2.mappers.fields.abc import AbstractField
 from aiohttp_admin2.mappers.fields.abc import EmptyValue
@@ -54,6 +53,11 @@ class Mapper(metaclass=MapperMeta):
             new_field = field(data.get(field.name, EmptyValue()))
             new_field.name = field.name
             self._fields[field.name] = new_field
+
+    @property
+    def raw_data(self):
+        """Getter for raw mapper data"""
+        return self._data
 
     @property
     def fields(self) -> t.Dict[str, AbstractField]:
