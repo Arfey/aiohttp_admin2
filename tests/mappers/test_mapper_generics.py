@@ -12,7 +12,6 @@ from aiohttp_admin2.mappers.generics import (
 from aiohttp_admin2.mappers import fields
 
 
-
 metadata = sa.MetaData()
 
 
@@ -101,17 +100,16 @@ def test_generic_for_umongo_table():
     assert isinstance(user.fields["age"], fields.IntField)
     assert isinstance(user.fields["some_field"], fields.IntField)
 
-    # Todo: fix
-    # # 3. Rewriting generated fields
-    # class UserMapper(MongoMapperGeneric, table=User):
-    #     id = fields.IntField()
-    #
-    # user = UserMapper({"age": 18, "email": "some@gmail.com"})
-    #
-    # assert len(user.fields) == 3
-    # assert isinstance(user.fields["email"], fields.StringField)
-    # assert isinstance(user.fields["age"], fields.IntField)
-    # assert isinstance(user.fields["id"], fields.IntField)
+    # 3. Rewriting generated fields
+    class UserMapper(MongoMapperGeneric, table=User):
+        id = fields.IntField()
+
+    user = UserMapper({"age": 18, "email": "some@gmail.com"})
+
+    assert len(user.fields) == 3
+    assert isinstance(user.fields["email"], fields.StringField)
+    assert isinstance(user.fields["age"], fields.IntField)
+    assert isinstance(user.fields["id"], fields.IntField)
 
 
 def test_generic_validation_for_umongo_table():
@@ -145,8 +143,7 @@ def test_generic_validation_for_umongo_table():
         "other_field": "text",
     })
 
-    # todo: unknown field
-    # assert not user.is_valid()
+    assert user.is_valid()
 
     assert not user.fields['age'].error
     assert not user.fields['email'].error
@@ -154,8 +151,8 @@ def test_generic_validation_for_umongo_table():
     assert not user.error
 
     # 2. Corrected work of marshmallow validation
-    # todo: not int field
     user = UserMapper({
+        "id": 1,
         "email": "text",
     })
 

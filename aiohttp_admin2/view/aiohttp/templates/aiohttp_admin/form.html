@@ -21,6 +21,7 @@
                 {% if field.error %}
                 <br>
                 <span style="color: red">{{ field.error }}</span>
+                <br>
                 {% endif %}
             </p>
             {% endif %}
@@ -39,11 +40,17 @@
             {% if field.error %}
             <br>
             <span style="color: red">{{ field.error }}</span>
+            <br>
             {% endif %}
         {% endfor %}
 
         {% endif %}
         {% endif %}
+        {% if mapper.error %}
+        <br>
+        <span style="color: red">{{ mapper.error }}</span>
+        <br>
+        {%- endif %}
         <button class="btn {{ submit_cls }}" type="submit">{{ submit_text }}</button>
     </form>
 </div>

@@ -117,7 +117,8 @@ class Mapper(metaclass=MapperMeta):
             if len(e.args):
                 self.error = e.args[0]
             else:
-                self.error = 'Invalid'
+                if not self.error:
+                    self.error = 'Invalid'
 
         return is_valid
 

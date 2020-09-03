@@ -27,21 +27,17 @@ class PostgresMapperGeneric(Mapper):
 
     def __init_subclass__(cls, table: sa.Table) -> None:
         cls._fields = {}
+
+        existing_fields = [field.name for field in cls._fields_cls]
+
+        # todo: add tests
         for name, column in table.columns.items():
             field = \
                 cls.FIELDS_MAPPER.get(type(column.type), cls.DEFAULT_FIELD)()
             field.name = name
-            cls._fields[name] = field
-
-        # todo: add tests
-        if not cls._fields_cls:
-            cls._fields_cls = cls._fields.values()
-        else:
-            existing_fields = [field.name for field in cls._fields_cls]
-
-            for name, field in cls._fields.items():
-                if name not in existing_fields:
-                    cls._fields_cls.append(field)
+            if name not in existing_fields:
+                cls._fields[name] = field
+                cls._fields_cls.append(field)
 
 
 class MongoMapperGeneric(Mapper):
@@ -60,14 +56,18 @@ class MongoMapperGeneric(Mapper):
     DEFAULT_FIELD = fields.StringField
 
     def __init_subclass__(cls, table: umongo.Document) -> None:
+        cls._fields = {}
         cls.table = table
-        obj_fields = table.schema.fields.items()
 
-        for name, column in obj_fields:
+        existing_fields = [field.name for field in cls._fields_cls]
+
+        for name, column in table.schema.fields.items():
             field = \
                 cls.FIELDS_MAPPER.get(type(column), cls.DEFAULT_FIELD)()
             field.name = name
-            cls._fields_cls.append(field)
+            if name not in existing_fields:
+                cls._fields_cls.append(field)
+                cls._fields[name] = field
 
     def validation(self):
         """
@@ -87,11 +87,6 @@ class MongoMapperGeneric(Mapper):
                 # todo: move to list of errors
                 f.error = errors.get(f.name)[0]
                 is_valid = False
-
-        # validation connected with schema or field relationship
-        if errors.get('_schema') and not self.error:
-            self.error = errors.get('_schema')[0]
-            is_valid = False
 
         if not is_valid:
             raise ValidationError
