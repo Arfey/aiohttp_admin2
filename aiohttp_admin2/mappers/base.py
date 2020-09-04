@@ -106,9 +106,9 @@ class Mapper(metaclass=MapperMeta):
             except (ValidationError, TypeError) as e:
                 is_valid = False
                 if len(e.args):
-                    f.error = e.args[0]
+                    f.errors.append(e.args[0])
                 else:
-                    f.error = 'Invalid'
+                    f.errors.append('Invalid')
 
         try:
             self.validation()

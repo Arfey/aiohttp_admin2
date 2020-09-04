@@ -18,10 +18,12 @@
                 <b style="width: 80px; display: inline-block">{{ name }}:</b>
                 <!-- todo: move from _value -->
                 <input name="{{ name }}" value="{{ field._value if field._value }}" />
-                {% if field.error %}
+                {% if field.errors %}
                 <br>
-                <span style="color: red">{{ field.error }}</span>
+                {% for error in field.errors %}
+                <span style="color: red">{{ error }}</span>
                 <br>
+                {% endfor %}
                 {% endif %}
             </p>
             {% endif %}
@@ -37,10 +39,12 @@
                 <input name="{{ name }}" value="{{ field._value if field._value }}" />
             </p>
             {% endif %}
-            {% if field.error %}
+            {% if field.errors %}
             <br>
-            <span style="color: red">{{ field.error }}</span>
+            {% for error in field.errors %}
+            <span style="color: red">{{ error }}</span>
             <br>
+            {% endfor %}
             {% endif %}
         {% endfor %}
 

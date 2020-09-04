@@ -25,7 +25,7 @@ class AbstractField(ABC):
     ) -> None:
         self.name: str = None
         self._value: t.Any = value
-        self.error: t.Optional[str] = None
+        self.errors: t.List[t.Optional[str]] = []
         self.required = required
         self.validators = validators
 

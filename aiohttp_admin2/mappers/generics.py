@@ -83,9 +83,8 @@ class MongoMapperGeneric(Mapper):
 
         # validation for each field
         for f in self.fields.values():
-            if not f.error and errors.get(f.name):
-                # todo: move to list of errors
-                f.error = errors.get(f.name)[0]
+            if errors.get(f.name):
+                f.errors.append(errors.get(f.name)[0])
                 is_valid = False
 
         if not is_valid:
