@@ -1,7 +1,6 @@
 import typing as t
 
 from aiohttp_admin2.mappers.fields.abc import AbstractField
-from aiohttp_admin2.mappers.fields.abc import EmptyValue
 from aiohttp_admin2.mappers.exceptions import ValidationError
 
 
@@ -39,8 +38,6 @@ class MapperMeta(type):
 class Mapper(metaclass=MapperMeta):
 
     # todo: add itter
-    # todo: empty fields
-    # todo: empty fields error think
 
     _data: t.Dict[str, t.Any] = None
     _fields: t.Dict[str, AbstractField] = None
@@ -50,7 +47,7 @@ class Mapper(metaclass=MapperMeta):
         self._data = data
         self._fields = self._fields or {}
         for field in self._fields_cls:
-            new_field = field(data.get(field.name, EmptyValue()))
+            new_field = field(data.get(field.name))
             new_field.name = field.name
             self._fields[field.name] = new_field
 

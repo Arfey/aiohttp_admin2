@@ -3,6 +3,7 @@ import re
 import aiohttp
 import aiopg.sa
 from sqlalchemy import create_engine
+from sqlalchemy.sql import text
 
 from .db import metadata
 from .catalog.tables import (
@@ -239,6 +240,14 @@ async def load_data(db_url_text):
         ])
 
     await execute(config, query)
+
+    await execute(config, text("""
+        SELECT setval('actors_id_seq', 100000, true);
+        SELECT setval('genres_id_seq', 100000, true);
+        SELECT setval('movies_id_seq', 100000, true);
+        SELECT setval('shows_id_seq', 100000, true);
+        SELECT setval('users_id_seq', 100000, true);
+    """))
 
     print('Done...')
 

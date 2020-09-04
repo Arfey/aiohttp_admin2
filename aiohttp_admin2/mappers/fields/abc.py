@@ -9,10 +9,6 @@ from aiohttp_admin2.mappers.exceptions import ValidationError
 __all__ = ['AbstractField', ]
 
 
-class EmptyValue:
-    def __repr__(self):
-        return ''
-
 # todo: add validators
 
 
@@ -21,10 +17,11 @@ class AbstractField(ABC):
         self,
         required: bool = False,
         validators: t.List[t.Any] = [],
-        value: t.Any = None,
+        value: t.Optional[str] = None,
+        default: t.Optional[str] = None
     ) -> None:
         self.name: str = None
-        self._value: t.Any = value
+        self._value: t.Optional[str] = default if value is None else value
         self.errors: t.List[t.Optional[str]] = []
         self.required = required
         self.validators = validators
@@ -39,18 +36,14 @@ class AbstractField(ABC):
         """
         pass
 
-    @abstractmethod
-    def to_raw(self) -> t.Any:
+    def to_raw(self) -> str:
         """
         Convert value to correct storage type.
-
-        Raises:
-            ValueError: if type of value is wrong
         """
-        pass
+        return str(self._value) if self._value is not None else ''
 
     @property
-    def value(self):
+    def value(self) -> t.Any:
         """
         Convert value to correct python type equivalent.
 
@@ -60,7 +53,7 @@ class AbstractField(ABC):
         return self.to_python()
 
     @property
-    def raw_value(self):
+    def raw_value(self) -> t.Any:
         return self.to_raw()
 
     def is_valid(self) -> bool:
@@ -74,6 +67,7 @@ class AbstractField(ABC):
         """
         if self.required and not self.value:
             raise ValidationError(F"{self.name} field is required.")
+
         self.to_python()
         self.to_raw()
 

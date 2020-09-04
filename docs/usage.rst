@@ -20,7 +20,7 @@ You can create your own mapper with custom fields:
     class UserMapper(Mapper):
         """Mapper for user instance."""
         name = fields.StringField(required=True)
-        age =  field.IntField()
+        age =  field.IntField(default=18)
 
 Mappers generator
 .................
