@@ -89,7 +89,7 @@ mypy:
 
 test:
 	@docker stop $(docker ps | grep pytest | awk '{ print $1 }') | true
-	pytest -v -s -p no:warnings
+	pytest --slow -v -s -p no:warnings
 
 demo:
 	WITHOUT_UPDATE_DB=1 DATABASE_URL=postgres://postgres:postgres@0.0.0.0:5432/postgres adev runserver aiohttp_admin2/demo/__init__.py
