@@ -11,6 +11,7 @@ Subpackages
     aiohttp_admin2.mappers
     aiohttp_admin2.resources
     aiohttp_admin2.view
+    aiohttp_admin2.widgets
 
 Submodules
 ----------

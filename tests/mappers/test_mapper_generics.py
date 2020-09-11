@@ -1,3 +1,5 @@
+from enum import Enum
+
 import sqlalchemy as sa
 from umongo import (
     MotorAsyncIOInstance,
@@ -133,9 +135,9 @@ def test_generic_validation_for_umongo_table():
     user = UserMapper({"age": 18, "email": "some@gmail.com"})
 
     assert not user.is_valid()
-    assert not user.fields['age'].error
-    assert not user.fields['email'].error
-    assert user.fields['other_field'].error
+    assert not user.fields['age'].errors
+    assert not user.fields['email'].errors
+    assert user.fields['other_field'].errors
 
     user = UserMapper({
         "age": 18,
@@ -145,9 +147,9 @@ def test_generic_validation_for_umongo_table():
 
     assert user.is_valid()
 
-    assert not user.fields['age'].error
-    assert not user.fields['email'].error
-    assert not user.fields['other_field'].error
+    assert not user.fields['age'].errors
+    assert not user.fields['email'].errors
+    assert not user.fields['other_field'].errors
     assert not user.error
 
     # 2. Corrected work of marshmallow validation
@@ -157,5 +159,45 @@ def test_generic_validation_for_umongo_table():
     })
 
     assert not user.is_valid()
-    assert user.fields['age'].error
-    assert user.fields['email'].error
+    assert user.fields['age'].errors
+    assert user.fields['email'].errors
+
+
+def test_choices_field():
+    """
+    In this test we check correct work of choices field for enum column.
+
+        - correct generation from enum
+        - rewrite choices
+    """
+
+    class SelectEnum(Enum):
+        select = 'select'
+        unselect = 'unselect'
+
+    tbl2 = sa.Table('tbl2', metadata,
+        sa.Column('id', sa.Integer, primary_key=True),
+        sa.Column('type', sa.Enum(SelectEnum)),
+    )
+
+    class SelectMapper(PostgresMapperGeneric, table=tbl2):
+        pass
+
+    # correct generation from enum
+    assert SelectMapper({}).fields['type'].choices == \
+           [('select', 'select'), ('unselect', 'unselect')]
+
+    gender_choices = (
+        ('male', "male"),
+        ('female', "female"),
+    )
+
+    class SelectSecondMapper(PostgresMapperGeneric, table=tbl2):
+        type = fields.ChoicesField(
+            field_cls=fields.StringField,
+            choices=gender_choices,
+            default='male'
+        )
+
+    # rewrite choices
+    assert SelectSecondMapper({}).fields['type'].choices == gender_choices

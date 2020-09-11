@@ -22,6 +22,7 @@ class PostgresMapperGeneric(Mapper):
     FIELDS_MAPPER = {
         sa.Integer: fields.IntField,
         sa.Text: fields.StringField,
+        sa.Enum: fields.ChoicesField,
     }
     DEFAULT_FIELD = fields.StringField
 
@@ -31,9 +32,18 @@ class PostgresMapperGeneric(Mapper):
         existing_fields = [field.name for field in cls._fields_cls]
 
         # todo: add tests
+        # todo: add required field
         for name, column in table.columns.items():
-            field = \
-                cls.FIELDS_MAPPER.get(type(column.type), cls.DEFAULT_FIELD)()
+            field_cls = \
+                cls.FIELDS_MAPPER.get(type(column.type), cls.DEFAULT_FIELD)
+
+            if field_cls is fields.ChoicesField:
+                field = fields.ChoicesField(
+                    choices=[(n, n) for n in column.type.enums]
+                )
+            else:
+                field = field_cls()
+
             field.name = name
             if name not in existing_fields:
                 cls._fields[name] = field

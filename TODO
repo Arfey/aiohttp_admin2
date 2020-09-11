@@ -10,3 +10,7 @@
 - controller name with whitespace
 - datetime field mongodb
 - remove hidden field for update???
+- add required to generic fields
+- add min,max length input
+- test view create/update/delete
+- validator not work + docs validation

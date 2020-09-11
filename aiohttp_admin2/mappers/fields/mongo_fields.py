@@ -7,6 +7,7 @@ __all__ = ["ObjectIdField", ]
 
 
 class ObjectIdField(AbstractField):
+    type_name: str = 'string'
 
     def to_python(self) -> str:
         return str(self._value)

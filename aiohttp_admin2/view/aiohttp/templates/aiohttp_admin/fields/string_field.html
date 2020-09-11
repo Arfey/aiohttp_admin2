@@ -1,0 +1,18 @@
+{% macro field(
+    name,
+    field
+)
+%}
+<p>
+    <b style="width: 80px; display: inline-block">{{ name }}:</b>
+    <!-- todo: move from _value -->
+    <input name="{{ name }}" value="{{ field._value if field._value }}" />
+    {% if field.errors %}
+    <br>
+    {% for error in field.errors %}
+    <span style="color: red">{{ error }}</span>
+    <br>
+    {% endfor %}
+    {% endif %}
+</p>
+{% endmacro %}

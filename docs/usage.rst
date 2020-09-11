@@ -61,6 +61,69 @@ which you specify.
 
 # todo: validation
 
+Fields
+......
+
+**StringField** - field for represented string data.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+
+**IntField** - field for represented integer data.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+
+**FloatField** - field for represented float data.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+
+**DateTimeField** - field for represented datetime data.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+
+**BooleanField** - field for represented boolean data. If value contains '0',
+'false' or 'f' than value will be parse as `False` in other case as `True`.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+
+**ChoicesField** - add predefined values. If you have some finite list of values
+and want that this list will represented like select tag you need to use
+current field type.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+- *field_cls* - field type which will represent selected value
+- *choices* - tuple of tuple with values.
+
+.. code-block:: python
+
+    from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
+    from aiohttp_admin2.mappers import fields
+
+
+    class UserMapper(PostgresMapperGeneric, table=user):
+        """Mapper for user instance."""
+        GENDER_CHOICES = (
+            ('male', "male"),
+            ('female', "female"),
+        )
+
+        gender = fields.ChoicesField(
+            field_cls=fields.StringField,
+            choices=GENDER_CHOICES,
+            default='male'
+        )
+
 Controllers
 -----------
 

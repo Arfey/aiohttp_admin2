@@ -1,6 +1,9 @@
 import typing as t
 from aiohttp import web
 
+from aiohttp_admin2.mappers import fields
+from aiohttp_admin2 import widgets
+
 
 __all__ = ['BaseAdminView', ]
 
@@ -15,6 +18,15 @@ class BaseAdminView:
     icon: str = 'label'
     group_name: str = 'General'
     is_hide_view: bool = False
+
+    # todo: docs
+    fields_widgets = {}
+    default_widget = widgets.StringWidget
+    type_widgets = {}
+    default_type_widgets = {
+        fields.StringField.type_name: widgets.StringWidget,
+        fields.ChoicesField.type_name: widgets.ChoiceWidget,
+    }
 
     def __init__(self, *, params: t.Dict[str, t.Any] = None) -> None:
         default = self.__class__.__name__.lower()
@@ -31,6 +43,7 @@ class BaseAdminView:
         return {
             "request": req,
             "title": self.title,
+            "controller_view": self,
         }
 
     def setup(self, app: web.Application) -> None:
