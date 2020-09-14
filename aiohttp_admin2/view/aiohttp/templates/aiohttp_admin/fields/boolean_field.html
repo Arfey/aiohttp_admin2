@@ -1,0 +1,17 @@
+{% macro field(
+    name,
+    field
+)
+%}
+<p>
+    <b style="width: 80px; display: inline-block">{{ name }}:</b>
+    <input name="{{ name }}" {% if field.value %}checked{% endif %} type="checkbox" />
+    {% if field.errors %}
+    <br>
+    {% for error in field.errors %}
+    <span style="color: red">{{ error }}</span>
+    <br>
+    {% endfor %}
+    {% endif %}
+</p>
+{% endmacro %}

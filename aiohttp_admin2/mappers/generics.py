@@ -23,6 +23,7 @@ class PostgresMapperGeneric(Mapper):
         sa.Integer: fields.IntField,
         sa.Text: fields.StringField,
         sa.Enum: fields.ChoicesField,
+        sa.Boolean: fields.BooleanField,
     }
     DEFAULT_FIELD = fields.StringField
 

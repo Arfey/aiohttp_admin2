@@ -146,8 +146,9 @@ class ControllerView(BaseAdminView):
         mapper = controller.mapper(data)
 
         if mapper.is_valid():
-            del data['id']
-            obj = await controller.create(data)
+            serialize_data = mapper.data
+            del serialize_data['id']
+            obj = await controller.create(serialize_data)
 
             raise web.HTTPFound(
                 req.app.router[self.detail_url_name]
@@ -168,7 +169,9 @@ class ControllerView(BaseAdminView):
         mapper = controller.mapper(dict(data))
 
         if mapper.is_valid():
-            await controller.update(pk, dict(data))
+            serialize_data = mapper.data
+            del serialize_data['id']
+            await controller.update(pk, serialize_data)
 
             raise web.HTTPFound(
                 req.app.router[self.detail_url_name]

@@ -57,6 +57,11 @@ class Mapper(metaclass=MapperMeta):
         return self._data
 
     @property
+    def data(self) -> t.Dict[str, t.Any]:
+        """Return serialize data"""
+        return {f.name: f.to_python() for f in self.fields.values()}
+
+    @property
     def fields(self) -> t.Dict[str, AbstractField]:
         return self._fields
 

@@ -6,7 +6,6 @@
 - move methods for async
 - think about move instance to dict
 - get name of user in nav bar
-- add access inside admin interface
 - controller name with whitespace
 - datetime field mongodb
 - remove hidden field for update???
@@ -14,3 +13,5 @@
 - add min,max length input
 - test view create/update/delete
 - validator not work + docs validation
+- csrf form
+- DETAIL:  Key (id)=(0) already exists.
