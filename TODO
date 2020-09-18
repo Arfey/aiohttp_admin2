@@ -15,3 +15,4 @@
 - validator not work + docs validation
 - csrf form
 - DETAIL:  Key (id)=(0) already exists.
+- update list if not int

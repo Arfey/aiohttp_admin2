@@ -6,7 +6,7 @@
 <p>
     <b style="width: 80px; display: inline-block">{{ name }}:</b>
     <!-- todo: move from _value -->
-    <input name="{{ name }}" value="{{ field.raw_value if field._value }}" />
+    <input class="{{name}}" name="{{ name }}" value="{{field.value | map('string') | join(',') if field._value}}" placeholder="Add tags"/>
     {% if field.errors %}
     <br>
     {% for error in field.errors %}
@@ -14,5 +14,10 @@
     <br>
     {% endfor %}
     {% endif %}
+
+    <script>
+        $(".{{name}}").tagsinput('items');
+    </script>
+
 </p>
 {% endmacro %}

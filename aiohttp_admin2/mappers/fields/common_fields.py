@@ -1,6 +1,7 @@
 import typing as t
 from dateutil import parser
 from datetime import datetime
+import json
 
 from aiohttp_admin2.mappers.fields.abc import AbstractField
 from aiohttp_admin2.mappers.exceptions import ValidationError
@@ -14,6 +15,7 @@ __all__ = [
     "DateTimeField",
     "BooleanField",
     "ChoicesField",
+    "ArrayField",
 ]
 
 
@@ -83,6 +85,7 @@ class ChoicesField(AbstractField):
     ) -> None:
         super().__init__(**kwargs)
         self.field_cls = field_cls
+        # todo: if field_cls is object
         self.field = field_cls(**kwargs)
         self.choices = choices
         self._choice_validation(choices)
@@ -133,6 +136,49 @@ class ChoicesField(AbstractField):
             field_cls=self.field_cls,
             choices=self.choices,
         )
+
+
+class ArrayField(AbstractField):
+    type_name: str = 'array'
+    # todo: min, max
+
+    # todo: move to tags view
+
+    def __init__(self, *, field_cls: AbstractField, **kwargs: t.Any):
+        super().__init__(**kwargs)
+        self.field_cls = field_cls
+        self.field = field_cls(value=None)
+
+    def to_python(self) -> t.Optional[t.List[t.Any]]:
+        print(self._value)
+
+        if self._value:
+            if isinstance(self._value, list):
+                return self._value
+            if self._value.startswith('[') and self._value.endswith(']'):
+                try:
+                    return [
+                        self.field(i).to_python()
+                        for i in json.loads(self._value)
+                    ]
+                except json.decoder.JSONDecodeError:
+                    raise ValidationError("Incorrect format for array field.")
+            else:
+                return [
+                    self.field(i).to_python() for i in self._value.split(',')
+                ]
+
+        return self._value
+
+    def __call__(self, value: t.Any) -> "AbstractField":
+        return self.__class__(
+            field_cls=self.field_cls,
+            required=self.required,
+            validators=self.validators,
+            default=self.default,
+            value=value
+        )
+
 
 # Todo: add other types
 # Todo: add validators

@@ -27,6 +27,7 @@ class BaseAdminView:
         fields.StringField.type_name: widgets.StringWidget,
         fields.ChoicesField.type_name: widgets.ChoiceWidget,
         fields.BooleanField.type_name: widgets.BooleanWidget,
+        fields.ArrayField.type_name: widgets.ArrayWidget,
     }
 
     def __init__(self, *, params: t.Dict[str, t.Any] = None) -> None:

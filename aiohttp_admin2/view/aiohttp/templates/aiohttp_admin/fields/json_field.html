@@ -1,0 +1,29 @@
+{% macro field(
+    name,
+    field
+)
+%}
+<p>
+    <b style="width: 80px; display: inline-block">{{ name }}:</b>
+    <!-- todo: move from _value -->
+    <div id="jsoneditor" style="width: 400px; height: 400px;"></div>
+    <textarea class="{{ name }} json" id="jsoneditor-{{name}}" name="{{ name }}">
+        {{ field.raw_value if field._value }}
+    </textarea>
+    {% if field.errors %}
+    <br>
+    {% for error in field.errors %}
+    <span style="color: red">{{ error }}</span>
+    <br>
+    {% endfor %}
+    {% endif %}
+    <script>
+        const container = document.getElementById("jsoneditor");
+        const options = {};
+        const editor = new JSONEditor(container, options);
+
+        editor.set({})
+
+    </script>
+</p>
+{% endmacro %}

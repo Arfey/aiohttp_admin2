@@ -15,8 +15,8 @@
 
         {{ field_macro(name, field) }}
 
-    {% elif controller_view.default_type_widgets.get(field.type_name) %}
-        {% from controller_view.default_type_widgets.get(field.type_name).template_name import field as field_macro %}
+    {% elif controller_view.default_type_widgets.get(field.type_name, controller_view.default_widget) %}
+        {% from controller_view.default_type_widgets.get(field.type_name, controller_view.default_widget).template_name import field as field_macro %}
 
         {{ field_macro(name, field) }}
     {%- endif %}

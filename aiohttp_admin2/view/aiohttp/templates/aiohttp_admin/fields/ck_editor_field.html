@@ -6,7 +6,9 @@
 <p>
     <b style="width: 80px; display: inline-block">{{ name }}:</b>
     <!-- todo: move from _value -->
-    <input name="{{ name }}" value="{{ field.raw_value if field._value }}" />
+    <textarea class="ckeditor" name="{{ name }}">
+        {{ field.raw_value if field._value }}
+    </textarea>
     {% if field.errors %}
     <br>
     {% for error in field.errors %}

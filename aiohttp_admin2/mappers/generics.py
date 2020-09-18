@@ -24,6 +24,7 @@ class PostgresMapperGeneric(Mapper):
         sa.Text: fields.StringField,
         sa.Enum: fields.ChoicesField,
         sa.Boolean: fields.BooleanField,
+        sa.ARRAY: fields.ArrayField,
     }
     DEFAULT_FIELD = fields.StringField
 
@@ -41,6 +42,11 @@ class PostgresMapperGeneric(Mapper):
             if field_cls is fields.ChoicesField:
                 field = fields.ChoicesField(
                     choices=[(n, n) for n in column.type.enums]
+                )
+            elif field_cls is fields.ArrayField:
+                field = field_cls(
+                    field_cls=cls.FIELDS_MAPPER
+                        .get(type(column.type.item_type), cls.DEFAULT_FIELD),
                 )
             else:
                 field = field_cls()
@@ -62,6 +68,7 @@ class MongoMapperGeneric(Mapper):
         umongo.fields.IntegerField: fields.IntField,
         umongo.fields.StringField: fields.StringField,
         umongo.fields.DateTimeField: fields.DateTimeField,
+        umongo.fields.List: fields.ArrayField,
     }
 
     DEFAULT_FIELD = fields.StringField

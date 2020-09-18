@@ -34,6 +34,20 @@ class ControllerView(BaseAdminView):
         self.title = self.title if not self.title == 'None' else default
         self.params = params or {}
 
+    def get_extra_media(self):
+        css = []
+        js = []
+
+        for w in {
+            **self.default_type_widgets,
+            **self.type_widgets,
+            **self.fields_widgets,
+        }.values():
+            css.extend([link for link in w.css_extra if link not in css])
+            js.extend([link for link in w.js_extra if link not in css])
+
+        return dict(css=css, js=js)
+
     # Urls
     @property
     def detail_url_name(self):
@@ -105,6 +119,7 @@ class ControllerView(BaseAdminView):
             req,
             {
                 **await self.get_context(req),
+                "media": self.get_extra_media(),
                 "object": data,
                 "controller": controller,
                 "title": f"{self.name}#{data.id}",
@@ -129,6 +144,7 @@ class ControllerView(BaseAdminView):
             req,
             {
                 **await self.get_context(req),
+                "media": self.get_extra_media(),
                 "controller": controller,
                 "title": f"Create a new {self.name}",
                 "create_url": self.create_post_url_name,
