@@ -13,6 +13,7 @@ __all__ = [
     "IntField",
     "FloatField",
     "DateTimeField",
+    "DateField",
     "BooleanField",
     "ChoicesField",
     "ArrayField",
@@ -42,6 +43,13 @@ class FloatField(AbstractField):
 
 class DateTimeField(AbstractField):
     type_name: str = 'datetime'
+
+    def to_python(self) -> datetime:
+        return parser.parse(self._value) if self._value else self._value
+
+
+class DateField(AbstractField):
+    type_name: str = 'date'
 
     def to_python(self) -> datetime:
         return parser.parse(self._value) if self._value else self._value

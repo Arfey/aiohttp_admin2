@@ -3,8 +3,8 @@
     field
 )
 %}
-<p>
-    <b style="width: 80px; display: inline-block">{{ name }}:</b>
+<div class="form-group">
+    <label for="jsoneditor-{{name}}">{{ name }}:</label>
     <!-- todo: move from _value -->
     <div id="jsoneditor" style="width: 400px; height: 400px;"></div>
     <textarea class="{{ name }} json" id="jsoneditor-{{name}}" name="{{ name }}">

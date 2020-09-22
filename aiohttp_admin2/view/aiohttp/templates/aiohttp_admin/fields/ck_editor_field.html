@@ -3,10 +3,10 @@
     field
 )
 %}
-<p>
-    <b style="width: 80px; display: inline-block">{{ name }}:</b>
+<div class="form-group">
+    <label for="{{ name }}input">{{ name }}:</label>
     <!-- todo: move from _value -->
-    <textarea class="ckeditor" name="{{ name }}">
+    <textarea class="ckeditor form-control" id="{{ name }}input" name="{{ name }}">
         {{ field.raw_value if field._value }}
     </textarea>
     {% if field.errors %}
@@ -16,5 +16,5 @@
     <br>
     {% endfor %}
     {% endif %}
-</p>
+</div>
 {% endmacro %}

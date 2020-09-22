@@ -3,15 +3,13 @@
     field
 )
 %}
-<p>
+<div class="form-group">
     <!--  Title  -->
-    <b style="width: 80px; display: inline-block">
-        {{ name }}:
-    </b>
+    <label for="{{ name }}input">{{ name }}:</label>
     <!--  end title  -->
 
     <!--  Input  -->
-    <select name="{{ name }}">
+    <select name="{{ name }}" id="{{ name }}input" class="form-control">
 
         {%- if field.value %}
             {% set value_default = field.value %}
@@ -52,5 +50,5 @@
     <!--  end errors  -->
     {% endfor %}
     {% endif %}
-</p>
+</div>
 {% endmacro %}

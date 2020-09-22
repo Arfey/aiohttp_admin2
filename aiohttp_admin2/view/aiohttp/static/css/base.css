@@ -111,3 +111,8 @@ html, body {
 .sort_active {
     transform: rotate(180deg);
 }
+
+.form-group {
+    position: relative;
+    z-index: 10;
+}

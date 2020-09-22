@@ -3,10 +3,10 @@
     field
 )
 %}
-<p>
-    <b style="width: 80px; display: inline-block">{{ name }}:</b>
+<div class="form-group">
+    <label for="{{ name }}input">{{ name }}:</label>
     <!-- todo: move from _value -->
-    <input class="{{name}}" name="{{ name }}" value="{{field.value | map('string') | join(',') if field._value}}" placeholder="Add tags"/>
+    <input id="{{ name }}input" class="{{name}} form-control" name="{{ name }}" value="{{field.value | map('string') | join(',') if field._value}}" placeholder="Add tags"/>
     {% if field.errors %}
     <br>
     {% for error in field.errors %}
@@ -19,5 +19,5 @@
         $(".{{name}}").tagsinput('items');
     </script>
 
-</p>
+</div>
 {% endmacro %}

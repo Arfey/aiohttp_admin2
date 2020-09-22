@@ -5,6 +5,8 @@ __all__ = [
     'BooleanWidget',
     'ArrayWidget',
     'CKEditorWidget',
+    'DateTimeWidget',
+    'DateWidget',
 ]
 
 
@@ -46,6 +48,25 @@ class CKEditorWidget(BaseWidget):
     js_extra = [
         "https://cdn.ckeditor.com/4.15.0/standard/ckeditor.js"
     ]
+
+
+class DateTimeWidget(BaseWidget):
+    template_name = 'aiohttp_admin/fields/datetime_field.html'
+    js_extra = [
+        "https://code.jquery.com/jquery-3.5.1.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"
+
+    ]
+    css_extra = [
+        "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css",
+        "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css",
+     ]
+
+
+class DateWidget(DateTimeWidget):
+    template_name = 'aiohttp_admin/fields/date_field.html'
+
 
 # class JsonWidget(BaseWidget):
 #     template_name = 'aiohttp_admin/fields/json_field.html'

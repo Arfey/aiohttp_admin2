@@ -28,6 +28,8 @@ class BaseAdminView:
         fields.ChoicesField.type_name: widgets.ChoiceWidget,
         fields.BooleanField.type_name: widgets.BooleanWidget,
         fields.ArrayField.type_name: widgets.ArrayWidget,
+        fields.DateTimeField.type_name: widgets.DateTimeWidget,
+        fields.DateField.type_name: widgets.DateWidget,
     }
 
     def __init__(self, *, params: t.Dict[str, t.Any] = None) -> None:

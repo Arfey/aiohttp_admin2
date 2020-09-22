@@ -1,0 +1,33 @@
+{% macro field(
+    name,
+    field
+)
+%}
+
+<div class="form-group">
+    <label for="{{ name }}input">{{ name }}:</label>
+    <!-- todo: move from _value -->
+    <div class='input-group date' id='{{name}}-datetime'>
+        <input type='text' class="form-control" id="{{ name }}input" name="{{ name }}" value="{{ field.raw_value if field._value }}" />
+        <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+    </div>
+
+
+    {% if field.errors %}
+    <br>
+    {% for error in field.errors %}
+    <span style="color: red">{{ error }}</span>
+    <br>
+    {% endfor %}
+    {% endif %}
+
+    <script>
+        $('#{{name}}-datetime').datetimepicker({
+          format: "YYYY-MM-DD"
+        });
+    </script>
+
+</div>
+{% endmacro %}

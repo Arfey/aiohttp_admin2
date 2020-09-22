@@ -3,9 +3,9 @@
     field
 )
 %}
-<p>
-    <b style="width: 80px; display: inline-block">{{ name }}:</b>
-    <input name="{{ name }}" {% if field.value %}checked{% endif %} type="checkbox" />
+<div class="form-group">
+    <label for="{{ name }}input">{{ name }}:</label>
+    <input class="form-check-input" id="{{ name }}input" name="{{ name }}" {% if field.value %}checked{% endif %} type="checkbox" />
     {% if field.errors %}
     <br>
     {% for error in field.errors %}
@@ -13,5 +13,5 @@
     <br>
     {% endfor %}
     {% endif %}
-</p>
+</div>
 {% endmacro %}

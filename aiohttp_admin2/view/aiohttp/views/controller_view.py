@@ -44,7 +44,7 @@ class ControllerView(BaseAdminView):
             **self.fields_widgets,
         }.values():
             css.extend([link for link in w.css_extra if link not in css])
-            js.extend([link for link in w.js_extra if link not in css])
+            js.extend([link for link in w.js_extra if link not in js])
 
         return dict(css=css, js=js)
 

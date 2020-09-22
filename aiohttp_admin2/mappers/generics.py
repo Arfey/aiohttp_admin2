@@ -25,6 +25,8 @@ class PostgresMapperGeneric(Mapper):
         sa.Enum: fields.ChoicesField,
         sa.Boolean: fields.BooleanField,
         sa.ARRAY: fields.ArrayField,
+        sa.DateTime: fields.DateTimeField,
+        sa.Date: fields.DateField,
     }
     DEFAULT_FIELD = fields.StringField
 
