@@ -27,6 +27,7 @@ class PostgresMapperGeneric(Mapper):
         sa.ARRAY: fields.ArrayField,
         sa.DateTime: fields.DateTimeField,
         sa.Date: fields.DateField,
+        sa.JSON: fields.JsonField,
     }
     DEFAULT_FIELD = fields.StringField
 

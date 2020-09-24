@@ -17,6 +17,7 @@ __all__ = [
     "BooleanField",
     "ChoicesField",
     "ArrayField",
+    "JsonField",
 ]
 
 
@@ -158,7 +159,6 @@ class ArrayField(AbstractField):
         self.field = field_cls(value=None)
 
     def to_python(self) -> t.Optional[t.List[t.Any]]:
-        print(self._value)
 
         if self._value:
             if isinstance(self._value, list):
@@ -188,9 +188,36 @@ class ArrayField(AbstractField):
         )
 
 
+class JsonField(AbstractField):
+    type_name: str = 'json'
+
+    def to_python(self) -> t.Optional[t.Dict[str, t.Any]]:
+
+        if self._value:
+            try:
+                return json.loads(self._value)
+            except json.decoder.JSONDecodeError:
+                raise ValidationError(
+                    "Incorrect format for json field.")
+
+        return self._value
+
+    def to_raw(self) -> str:
+        """
+        Convert value to correct storage type.
+        """
+        if self._value is not None:
+            try:
+                if isinstance(self._value, dict):
+                    return json.dumps(self._value, sort_keys=True, indent=4)
+                else:
+                    json.dumps(
+                        json.loads(self._value), sort_keys=True, indent=4)
+            except Exception:
+                return str(self._value)
+
+        return ""
+
 # Todo: add other types
 # Todo: add validators
-# list
-# date
-# json
 # File

@@ -68,12 +68,8 @@ class DateWidget(DateTimeWidget):
     template_name = 'aiohttp_admin/fields/date_field.html'
 
 
-# class JsonWidget(BaseWidget):
-#     template_name = 'aiohttp_admin/fields/json_field.html'
-#     js_extra = [
-#         "https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.1.0/jsoneditor-minimalist.min.js",
-#     ]
-#     css_extra = [
-#         "https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.1.0/jsoneditor.min.css"
-#     ]
-# https://codepen.io/cahil/pen/qYpbGL
+class JsonWidget(BaseWidget):
+    template_name = 'aiohttp_admin/fields/json_field.html'
+    js_extra = [
+        "https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js",
+    ]

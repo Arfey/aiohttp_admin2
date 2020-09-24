@@ -10,4 +10,5 @@ users = sa.Table('users', metadata,
     sa.Column('array_c', sa.ARRAY(sa.Integer)),
     sa.Column('create_at', sa.DateTime()),
     sa.Column('create_at_date', sa.Date()),
+    sa.Column('payload', sa.JSON()),
 )

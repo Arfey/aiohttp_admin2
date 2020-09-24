@@ -30,6 +30,7 @@ class BaseAdminView:
         fields.ArrayField.type_name: widgets.ArrayWidget,
         fields.DateTimeField.type_name: widgets.DateTimeWidget,
         fields.DateField.type_name: widgets.DateWidget,
+        fields.JsonField.type_name: widgets.JsonWidget,
     }
 
     def __init__(self, *, params: t.Dict[str, t.Any] = None) -> None:
