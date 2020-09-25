@@ -214,7 +214,7 @@ class JsonField(AbstractField):
                     json.dumps(
                         json.loads(self._value), sort_keys=True, indent=4)
             except Exception:
-                return str(self._value)
+                return str(self._value).strip()
 
         return ""
 

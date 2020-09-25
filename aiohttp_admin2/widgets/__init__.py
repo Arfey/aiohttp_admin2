@@ -37,10 +37,10 @@ class ArrayWidget(BaseWidget):
         "https://code.jquery.com/jquery-3.5.1.min.js",
         "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js",
     ]
-    css_extra = [
-        "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css",
-        "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-    ]
+    # css_extra = [
+    #     "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css",
+    #     "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    # ]
 
 
 class CKEditorWidget(BaseWidget):
@@ -54,13 +54,13 @@ class DateTimeWidget(BaseWidget):
     template_name = 'aiohttp_admin/fields/datetime_field.html'
     js_extra = [
         "https://code.jquery.com/jquery-3.5.1.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"
+        "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"
 
     ]
     css_extra = [
-        "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css",
         "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css",
+        "https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css",
      ]
 
 

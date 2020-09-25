@@ -32,6 +32,7 @@ class Admin:
     dashboard_class = DashboardView
     nav_groups: t.Dict[str, BaseAdminView] = None
     logout_path: t.Optional[str] = '/logout'
+    cursor_paging = False
 
     def __init__(
         self,
@@ -62,6 +63,7 @@ class Admin:
             "nav_groups": self.nav_groups,
             "index_url": self.dashboard_class.name,
             "logout_path": self.logout_path,
+            "cursor_paging": self.cursor_paging,
             "newParam":
                 lambda new_params, params:
                     f'?{urlencode({**params, **new_params})}'

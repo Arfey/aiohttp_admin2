@@ -6,12 +6,18 @@
 
 <div class="form-group">
     <label for="{{ name }}input">{{ name }}:</label>
-    <!-- todo: move from _value -->
-    <div class='input-group date' id='{{name}}-datetime'>
-        <input type='text' class="form-control" id="{{ name }}input" name="{{ name }}" value="{{ field.raw_value if field._value }}" />
-        <span class="input-group-addon">
-            <span class="glyphicon glyphicon-calendar"></span>
-        </span>
+    <div class='input-group date' id='{{name}}-datetime' data-target-input="nearest">
+        <input
+                type="text"
+                class="form-control datetimepicker-input"
+                id="{{ name }}input"
+                name="{{ name }}"
+                value="{{ field.raw_value if field._value }}"
+                data-target="#{{name}}-datetime"
+        />
+        <div class="input-group-addon input-group-append" data-target="#{{name}}-datetime" data-toggle="datetimepicker">
+            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+        </div>
     </div>
 
 
@@ -30,4 +36,6 @@
     </script>
 
 </div>
+
+
 {% endmacro %}
