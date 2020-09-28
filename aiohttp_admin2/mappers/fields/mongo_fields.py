@@ -12,7 +12,7 @@ class ObjectIdField(AbstractField):
     def to_python(self) -> str:
         return str(self._value)
 
-    def to_raw(self) -> ObjectId:
+    def to_storage(self) -> ObjectId:
         if isinstance(self._value, str):
             return ObjectId(self._value)
 

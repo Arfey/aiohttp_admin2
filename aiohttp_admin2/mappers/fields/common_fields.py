@@ -32,7 +32,10 @@ class IntField(AbstractField):
     type_name: str = 'int'
 
     def to_python(self) -> t.Optional[int]:
-        return int(self._value) if self._value else self._value
+        try:
+            return int(self._value) if self._value else self._value
+        except ValueError:
+            raise ValidationError("Incorrect value for Int field.")
 
 
 class FloatField(AbstractField):
@@ -46,14 +49,14 @@ class DateTimeField(AbstractField):
     type_name: str = 'datetime'
 
     def to_python(self) -> datetime:
-        return parser.parse(self._value) if self._value else self._value
+        try:
+            return parser.parse(self._value) if self._value else None
+        except parser.ParserError:
+            raise ValidationError("Incorrect format for time field.")
 
 
-class DateField(AbstractField):
+class DateField(DateTimeField):
     type_name: str = 'date'
-
-    def to_python(self) -> datetime:
-        return parser.parse(self._value) if self._value else self._value
 
 
 class BooleanField(AbstractField):
@@ -102,8 +105,8 @@ class ChoicesField(AbstractField):
     def to_python(self) -> t.Optional[bool]:
         return self.field.to_python()
 
-    def to_raw(self) -> str:
-        return self.field.to_raw()
+    def to_storage(self) -> str:
+        return self.field.to_storage()
 
     def is_valid(self) -> bool:
         # todo: move to validator
@@ -151,14 +154,13 @@ class ArrayField(AbstractField):
     type_name: str = 'array'
     # todo: min, max
 
-    # todo: move to tags view
-
     def __init__(self, *, field_cls: AbstractField, **kwargs: t.Any):
         super().__init__(**kwargs)
         self.field_cls = field_cls
         self.field = field_cls(value=None)
 
     def to_python(self) -> t.Optional[t.List[t.Any]]:
+        # todo: add validation for inner type
 
         if self._value:
             if isinstance(self._value, list):
@@ -192,8 +194,7 @@ class JsonField(AbstractField):
     type_name: str = 'json'
 
     def to_python(self) -> t.Optional[t.Dict[str, t.Any]]:
-
-        if self._value:
+        if self._value.strip():
             try:
                 return json.loads(self._value)
             except json.decoder.JSONDecodeError:
@@ -202,7 +203,7 @@ class JsonField(AbstractField):
 
         return self._value
 
-    def to_raw(self) -> str:
+    def to_storage(self) -> str:
         """
         Convert value to correct storage type.
         """

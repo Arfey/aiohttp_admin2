@@ -42,7 +42,7 @@ class AbstractField(ABC):
         """
         pass
 
-    def to_raw(self) -> str:
+    def to_storage(self) -> str:
         """
         Convert value to correct storage type.
         """
@@ -60,7 +60,7 @@ class AbstractField(ABC):
 
     @property
     def raw_value(self) -> t.Any:
-        return self.to_raw()
+        return self.to_storage()
 
     def is_valid(self) -> bool:
         """
@@ -71,11 +71,11 @@ class AbstractField(ABC):
             ValueError, TypeError: if type of value is wrong
 
         """
-        if self.required and not self.value:
+        if self.required and not self._value:
             raise ValidationError(F"{self.name} field is required.")
 
         self.to_python()
-        self.to_raw()
+        self.to_storage()
 
         return True
 

@@ -16,3 +16,5 @@
 - csrf form
 - DETAIL:  Key (id)=(0) already exists.
 - update list if not int
+- move validation to controller
+- add validation for inner type
