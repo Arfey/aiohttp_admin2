@@ -21,6 +21,7 @@ setup_requirements = [
     'aiomysql',
     'aiohttp_jinja2',
     'aiohttp',
+    'aiofiles',
 ]
 
 test_requirements = [ ]

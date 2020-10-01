@@ -11,4 +11,5 @@ users = sa.Table('users', metadata,
     sa.Column('create_at', sa.DateTime()),
     sa.Column('create_at_date', sa.Date()),
     sa.Column('payload', sa.JSON()),
+    sa.Column('avatar', sa.Text),
 )

@@ -38,6 +38,7 @@ from .load_data import (
 
 
 THIS_DIR = Path(__file__).parent
+static_dir = THIS_DIR / 'static'
 
 
 async def load_data_cron(db_url_text: str) -> None:
@@ -139,6 +140,9 @@ async def app():
         jinja,
         security,
     ])
+
+    application.router\
+        .add_static('/static/', path=str(static_dir), name='static')
 
     application.add_routes(routes)
 

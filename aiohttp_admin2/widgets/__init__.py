@@ -7,6 +7,7 @@ __all__ = [
     'CKEditorWidget',
     'DateTimeWidget',
     'DateWidget',
+    'FileWidget',
 ]
 
 
@@ -73,3 +74,7 @@ class JsonWidget(BaseWidget):
     js_extra = [
         "https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js",
     ]
+
+
+class FileWidget(BaseWidget):
+    template_name = 'aiohttp_admin/fields/file_field.html'

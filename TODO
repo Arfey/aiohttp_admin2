@@ -18,3 +18,6 @@
 - update list if not int
 - move validation to controller
 - add validation for inner type
+- scroll to error after update and create
+- delete for file
+- image view

@@ -44,14 +44,14 @@ class Controller:
         return self.resource
 
     # CRUD hooks
-    async def pre_create(self, data: t.Dict[str, t.Any]) -> None:
+    async def pre_create(self, data: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
         """
         This hook will be call before create an instance and give simple
         approach to do some before object will be created.
 
         :param data: data which will use for create an instance
         """
-        pass
+        return data
 
     async def pre_delete(self, pk: PK) -> None:
         """
@@ -62,14 +62,14 @@ class Controller:
         """
         pass
 
-    async def pre_update(self, data: t.Dict[str, t.Any]) -> None:
+    async def pre_update(self, data: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
         """
         This hook will be call before update an instance and give simple
         approach to do some before object will be updated.
 
         :param data: data which will use for update an instance
         """
-        pass
+        return data
 
     async def post_create(self, instance: Instance) -> None:
         """
@@ -123,7 +123,7 @@ class Controller:
         if not self.can_update:
             raise PermissionDenied
 
-        await self.pre_update(data)
+        data = await self.pre_update(data)
         instance = Instance()
         instance.__dict__ = data
         res = await self.get_resource().update(pk, instance)
@@ -136,7 +136,7 @@ class Controller:
             raise PermissionDenied
 
         # todo: think about errors
-        await self.pre_create(data)
+        data = await self.pre_create(data)
         instance = Instance()
         instance.__dict__ = data
         res = await self.get_resource().create(instance)
