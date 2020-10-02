@@ -187,3 +187,15 @@ html, body {
 }
 
 /* end tags */
+
+/* image */
+.image-widget__image {
+    padding-bottom: 10px;
+    width: auto;
+    display: block;
+}
+/* end image */
+
+.hidden {
+    display: none;
+}

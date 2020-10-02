@@ -18,7 +18,7 @@ from ..injectors import postgres_injector
 # todo: remove table from controller?
 
 class UsersMapper(PostgresMapperGeneric, table=users):
-    avatar = fields.UrlFileField()
+    avatar = fields.UrlImageField()
 
 
 @postgres_injector.inject
@@ -54,5 +54,4 @@ class UsersPage(ControllerView):
     controller = UsersController
     fields_widgets = {
         "name": CKEditorWidget(),
-        "avatar": FileWidget(),
     }

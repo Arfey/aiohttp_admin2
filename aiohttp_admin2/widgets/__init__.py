@@ -8,6 +8,7 @@ __all__ = [
     'DateTimeWidget',
     'DateWidget',
     'FileWidget',
+    'ImageWidget',
 ]
 
 
@@ -78,3 +79,7 @@ class JsonWidget(BaseWidget):
 
 class FileWidget(BaseWidget):
     template_name = 'aiohttp_admin/fields/file_field.html'
+
+
+class ImageWidget(BaseWidget):
+    template_name = 'aiohttp_admin/fields/image_field.html'

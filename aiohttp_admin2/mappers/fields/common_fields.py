@@ -21,6 +21,7 @@ __all__ = [
     "JsonField",
     "UrlField",
     "UrlFileField",
+    "UrlImageField",
 ]
 
 
@@ -255,6 +256,16 @@ class UrlFileField(StringField):
 
         return self._value
 
+
+class UrlImageField(UrlFileField):
+    def to_python(self) -> t.Optional[str]:
+        if self._value and not hasattr(self._value, 'file'):
+            if self._value in ('None', 'on'):
+                return None
+
+            return str(self._value)
+
+        return self._value
 
 # Todo: add other types
 # Todo: add validators
