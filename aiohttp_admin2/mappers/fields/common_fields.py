@@ -250,6 +250,8 @@ class UrlField(StringField):
 
 
 class UrlFileField(StringField):
+    type_name: str = 'url_file'
+
     def to_python(self) -> t.Optional[str]:
         if self._value and not hasattr(self._value, 'file'):
             return str(self._value)
@@ -258,6 +260,8 @@ class UrlFileField(StringField):
 
 
 class UrlImageField(UrlFileField):
+    type_name: str = 'url_file_image'
+
     def to_python(self) -> t.Optional[str]:
         if self._value and not hasattr(self._value, 'file'):
             if self._value in ('None', 'on'):
