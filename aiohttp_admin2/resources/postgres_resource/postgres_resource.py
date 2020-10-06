@@ -38,17 +38,29 @@ class PostgresResource(AbstractResource):
     table: sa.Table
     limit: int = 50
     name: str
+    custom_sort_list: t.Dict[str, t.Callable] = {}
 
     # todo: *
-    def __init__(self, engine: Engine, table: sa.Table) -> None:
+    def __init__(
+        self,
+        engine: Engine,
+        table: sa.Table,
+        custom_sort_list: t.Dict[str, t.Callable] = None,
+    ) -> None:
         self.engine = engine
         self.table = table
         self.name = table.name.lower()
+        self.custom_sort_list = custom_sort_list or {}
+
+    def get_one_select(self) -> sa.sql.Select:
+        """
+        In this place you can redefine query.
+        """
+        return self.table.select()
 
     async def get_one(self, pk: PK) -> Instance:
         async with self.engine.acquire() as conn:
-            query = self.table\
-                .select()\
+            query = self.get_one_select()\
                 .where(self._primary_key == pk)
 
             cursor = await conn.execute(query)
@@ -71,6 +83,12 @@ class PostgresResource(AbstractResource):
                 for r in await cursor.fetchall()
             }
 
+    def get_list_select(self) -> sa.sql.Select:
+        """
+        In this place you can redefine query.
+        """
+        return self.table.select()
+
     async def get_list(
         self,
         *,
@@ -90,8 +108,8 @@ class PostgresResource(AbstractResource):
             raise ClientException(CURSOR_PAGINATION_ERROR_MESSAGE)
 
         async with self.engine.acquire() as conn:
-            query = self.table\
-                .select().limit(limit + 1)
+            query = self.get_list_select()\
+                .limit(limit + 1)
 
             if cursor is not None:
                 if order_by == id_orders[0]:
@@ -185,11 +203,18 @@ class PostgresResource(AbstractResource):
 
     def get_order(self, order_by: str) -> SortType:
         """
-        Return received order or default order if order_by was not provide.
+        Apply received order or default order if order_by was not provide to
+        query.
         """
         if order_by is not None:
             if order_by.startswith("-"):
+                if self.custom_sort_list.get(order_by[1:]):
+                    return self.custom_sort_list.get(order_by[1:])(True)
                 return sa.desc(to_column(order_by[1:], self.table))
+
+            if self.custom_sort_list.get(order_by):
+                return self.custom_sort_list.get(order_by)(False)
+
             return to_column(order_by, self.table)
 
         return sa.desc(self._primary_key)

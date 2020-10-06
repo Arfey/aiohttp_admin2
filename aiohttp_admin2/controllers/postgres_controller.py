@@ -15,4 +15,12 @@ class PostgresController(Controller):
     connection_injector: ConnectionInjector
 
     def get_resource(self) -> PostgresResource:
-        return self.resource(self.connection_injector.connection, self.table)
+        return self.resource(
+            self.connection_injector.connection,
+            self.table,
+            custom_sort_list={
+                key.replace('_field_sort', ''): getattr(self, key)
+                for key in dir(self)
+                if key.endswith('_field_sort')
+            },
+        )

@@ -64,6 +64,8 @@ class Admin:
             "index_url": self.dashboard_class.name,
             "logout_path": self.logout_path,
             "cursor_paging": self.cursor_paging,
+            "hasattr": hasattr,
+            "getattr": getattr,
             "newParam":
                 lambda new_params, params:
                     f'?{urlencode({**params, **new_params})}'
