@@ -25,4 +25,7 @@
 - multi files widget
 - download bl for file in field DRY
 - move data_field_sort to UserPostgresResource???
+- remove filter
+- id filter
+
 
