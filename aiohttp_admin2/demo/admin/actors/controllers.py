@@ -29,6 +29,8 @@ class ActorController(PostgresController):
     name = 'actor'
     per_page = 10
 
+    list_filter = ['gender', ]
+
 
 class ActorPage(ControllerView):
     controller = ActorController

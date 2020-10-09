@@ -3,6 +3,7 @@ from aiohttp import web
 
 from aiohttp_admin2.mappers import fields
 from aiohttp_admin2 import widgets
+from aiohttp_admin2 import filters
 
 
 __all__ = ['BaseAdminView', ]
@@ -34,6 +35,9 @@ class BaseAdminView:
         fields.UrlFileField.type_name: widgets.FileWidget,
         fields.UrlImageField.type_name: widgets.ImageWidget,
     }
+    default_filter_map = {
+        fields.ChoicesField.type_name: filters.ChoiceFilter,
+    }
 
     def __init__(self, *, params: t.Dict[str, t.Any] = None) -> None:
         default = self.__class__.__name__.lower()
@@ -51,6 +55,7 @@ class BaseAdminView:
             "request": req,
             "title": self.title,
             "controller_view": self,
+            "type_of": type,
         }
 
     def setup(self, app: web.Application) -> None:

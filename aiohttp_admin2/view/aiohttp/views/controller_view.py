@@ -86,7 +86,22 @@ class ControllerView(BaseAdminView):
     async def get_list(self, req: web.Request) -> web.Response:
         params = self.get_params_from_request(req)
         controller = self.get_controller()
-        data = await controller.get_list(**params._asdict())
+
+        filters = []
+
+        for f in controller.list_filter:
+            field = self.controller.mapper({})._fields[f]
+            filter_cls = self.default_filter_map.get(field.type_name)
+            if filter_cls:
+                filters_list = filter_cls(f, req.rel_url.query) \
+                    .get_filter_list()
+
+                if filters_list:
+                    filters.extend(filters_list)
+
+        data = await controller.get_list(**params._asdict(), filters=filters)
+
+        # list_filter
         return aiohttp_jinja2.render_template(
             self.template_list_name,
             req,

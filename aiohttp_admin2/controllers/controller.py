@@ -39,6 +39,7 @@ class Controller:
     # settings
     order_by = 'id'
     per_page = 50
+    list_filter = []
 
     def get_resource(self):
         return self.resource

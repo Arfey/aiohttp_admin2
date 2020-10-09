@@ -1,0 +1,20 @@
+{% macro filter(
+    field,
+    filter
+)
+%}
+<div class="form-group">
+    <ul>
+        {% for name, value in field.choices %}
+        <li>
+            <a
+                class="{% if filter.get_param() == value %}filter-active{% endif %}"
+                href="{{ newParam({ field.name: value, 'page': 1, }, request.rel_url.query) }}"
+            >
+                {{ name }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endmacro %}
