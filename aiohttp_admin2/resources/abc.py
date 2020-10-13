@@ -19,6 +19,7 @@ __all__ = [
     'PK',
     'FilterTuple',
     'FiltersType',
+    'FilterMultiTuple',
 ]
 
 
@@ -66,6 +67,12 @@ class ABCFilter(ABC):
 
 class FilterTuple(t.NamedTuple):
     column_name: str
+    value: t.Union[str, t.Any]
+    filter: t.Union[str, ABCFilter]
+
+
+class FilterMultiTuple(t.NamedTuple):
+    columns_name: t.List[str]
     value: t.Union[str, t.Any]
     filter: t.Union[str, ABCFilter]
 

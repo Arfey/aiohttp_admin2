@@ -27,6 +27,7 @@ class Controller:
 
     read_only_fields = []
     inline_fields = ['id', ]
+    search_fields: t.List[str] = []
     # todo: handle list of fields
     fields: t.Union[str, t.Tuple[t.Any]] = '__all__'
 

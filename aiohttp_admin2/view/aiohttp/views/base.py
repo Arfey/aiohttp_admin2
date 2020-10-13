@@ -38,6 +38,7 @@ class BaseAdminView:
     default_filter_map = {
         fields.ChoicesField.type_name: filters.ChoiceFilter,
     }
+    search_filter = filters.SearchFilter
 
     def __init__(self, *, params: t.Dict[str, t.Any] = None) -> None:
         default = self.__class__.__name__.lower()

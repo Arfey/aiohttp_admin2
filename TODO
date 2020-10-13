@@ -27,5 +27,7 @@
 - move data_field_sort to UserPostgresResource???
 - remove filter
 - id filter
+- refactor filters https://www.dothedev.com/blog/django-admin-list_filter/
+
 
 

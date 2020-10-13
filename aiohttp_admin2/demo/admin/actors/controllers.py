@@ -30,6 +30,7 @@ class ActorController(PostgresController):
     per_page = 10
 
     list_filter = ['gender', ]
+    search_fields = ['name', 'gender']
 
 
 class ActorPage(ControllerView):

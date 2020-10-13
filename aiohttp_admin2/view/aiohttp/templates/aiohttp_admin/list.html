@@ -1,5 +1,6 @@
 {% extends 'aiohttp_admin/base.html' %}
 {% from "aiohttp_admin/pagination.html" import pagination %}
+{% from "aiohttp_admin/filters/search_filter.html" import search_filter %}
 
 {% block main %}
 <div class="wrapper">
@@ -10,6 +11,11 @@
 {% endif %}
 
 <div class="container">
+    <div>
+        {% if controller.search_fields %}
+            {{ search_filter(controller_view.search_filter(controller.search_fields, request.rel_url.query)) }}
+        {% endif %}
+    </div>
     <div class="row">
         <div class="col-sm">
             <table class="table table-striped">

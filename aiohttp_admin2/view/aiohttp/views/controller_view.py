@@ -2,6 +2,7 @@ from aiohttp import web
 import aiohttp_jinja2
 import typing as t
 
+from aiohttp_admin2.filters import SearchFilter
 from aiohttp_admin2.view.aiohttp.views.base import BaseAdminView
 from aiohttp_admin2.controllers.controller import Controller
 from aiohttp_admin2.view.aiohttp.utils import (
@@ -98,6 +99,12 @@ class ControllerView(BaseAdminView):
 
                 if filters_list:
                     filters.extend(filters_list)
+
+        if controller.search_fields:
+            filters.extend(
+                SearchFilter(controller.search_fields, req.rel_url.query)
+                    .get_filter_list()
+            )
 
         data = await controller.get_list(**params._asdict(), filters=filters)
 

@@ -11,6 +11,7 @@ from aiohttp_admin2.resources.abc import (
     Instance,
     InstanceMapper,
     Paginator,
+    FilterMultiTuple,
 )
 from aiohttp_admin2.resources.exceptions import (
     InstanceDoesNotExist,
@@ -231,19 +232,31 @@ class PostgresResource(AbstractResource):
         for i in filters:
             filter_type_cls = i.filter
 
-            if not isinstance(filters, SQLAlchemyBaseFilter):
+            if (
+                isinstance(filter_type_cls, str) or
+                not issubclass(filter_type_cls, SQLAlchemyBaseFilter)
+            ):
                 filter_type_cls = default_filter_mapper.get(filter_type_cls)
 
                 if not filter_type_cls:
                     raise FilterException(
                         f"unknown filter type {i.filter}")
 
-            query = filter_type_cls(
-                table=self.table,
-                column=to_column(i.column_name, self.table),
-                value=i.value,
-                query=query,
-            ).query
+            if isinstance(i, FilterMultiTuple):
+                query = filter_type_cls(
+                    self.table,
+                    columns=[to_column(c, self.table) for c in i.columns_name],
+                    value=i.value,
+                    query=query,
+                ).query
+            else:
+
+                query = filter_type_cls(
+                    self.table,
+                    column=to_column(i.column_name, self.table),
+                    value=i.value,
+                    query=query,
+                ).query
 
         return query
 

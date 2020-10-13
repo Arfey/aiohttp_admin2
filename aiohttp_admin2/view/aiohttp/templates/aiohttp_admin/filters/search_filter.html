@@ -1,0 +1,11 @@
+{% macro search_filter(
+    filter
+)
+%}
+<div class="form-group">
+    <form action="" method="get">
+        <input type="text" name="search" value="{% if filter.get_param() %}{{ filter.get_param() }}{% endif %}" placeholder="search text...">
+        <input type="submit" value="search">
+    </form>
+</div>
+{% endmacro %}
