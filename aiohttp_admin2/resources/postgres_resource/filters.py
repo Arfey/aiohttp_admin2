@@ -39,6 +39,7 @@ class SQLAlchemyBaseFilter(ABCFilter):
     def __init__(self, table: sa.Table, column: sa.Column, *, value: t.Any, query: sa.sql.Select) -> None:
         self.table = table
         self.value = value
+        self.column = column
         self.columns = [column]
         self._query = query
 

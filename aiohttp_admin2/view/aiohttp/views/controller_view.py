@@ -49,6 +49,18 @@ class ControllerView(BaseAdminView):
 
         return dict(css=css, js=js)
 
+    def get_extra_media_list(self):
+        css = []
+        js = []
+
+        for w in {
+            **self.default_filter_map
+        }.values():
+            css.extend([link for link in w.css_extra if link not in css])
+            js.extend([link for link in w.js_extra if link not in js])
+
+        return dict(css=css, js=js)
+
     # Urls
     @property
     def detail_url_name(self):
@@ -118,7 +130,8 @@ class ControllerView(BaseAdminView):
                 "controller": controller,
                 "detail_url": self.detail_url_name,
                 "create_url": self.create_url_name,
-                "message": req.rel_url.query.get('message')
+                "message": req.rel_url.query.get('message'),
+                "media": self.get_extra_media_list(),
             }
         )
 

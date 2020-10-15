@@ -4,7 +4,7 @@
 %}
 <div class="form-group">
     <form action="" method="get">
-        <input type="text" name="search" value="{% if filter.get_param() %}{{ filter.get_param() }}{% endif %}" placeholder="search text...">
+        <input type="text" name="{{ filter.param_key }}" value="{% if filter.get_param() %}{{ filter.get_param() }}{% endif %}" placeholder="search text...">
         <input type="submit" value="search">
     </form>
 </div>

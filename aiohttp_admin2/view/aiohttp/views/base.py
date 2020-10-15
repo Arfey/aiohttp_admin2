@@ -37,6 +37,9 @@ class BaseAdminView:
     }
     default_filter_map = {
         fields.ChoicesField.type_name: filters.ChoiceFilter,
+        fields.BooleanField.type_name: filters.BooleanFilter,
+        fields.DateTimeField.type_name: filters.DateTimeFilter,
+        fields.DateField.type_name: filters.DateFilter,
     }
     search_filter = filters.SearchFilter
 

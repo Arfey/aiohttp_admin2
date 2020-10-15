@@ -63,7 +63,7 @@ class DateTimeWidget(BaseWidget):
     css_extra = [
         "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css",
         "https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css",
-     ]
+    ]
 
 
 class DateWidget(DateTimeWidget):
