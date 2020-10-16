@@ -43,8 +43,7 @@ class UsersController(PostgresController):
     per_page = 10
     upload_to = './aiohttp_admin2/demo/static'
     inline_fields = ['id', 'create_at', 'is_superuser', 'array_c', 'data', ]
-
-    list_filter = ['create_at', 'is_superuser', ]
+    list_filter = ['create_at', 'is_superuser', 'id']
 
     async def prepare_avatar_field(self, avatar: t.Any) -> str:
         if hasattr(avatar, 'file'):

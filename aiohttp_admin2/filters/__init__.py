@@ -66,6 +66,28 @@ class BooleanFilter(FilerBase):
         return []
 
 
+class SingleValueFilter(FilerBase):
+    template_name = 'aiohttp_admin/filters/single_value_filter.html'
+    name: str
+    query: dict
+
+    def __init__(self, name: str, query: dict) -> None:
+        self.name = name
+        self.query = query
+        self.param_key = f'single_value_{name}'
+
+    def get_param(self):
+        return self.query.get(self.param_key)
+
+    def get_filter_list(self):
+        param = self.get_param()
+
+        if param:
+            return [FilterTuple(self.name, param, 'eq')]
+
+        return []
+
+
 class DateTimeFilter(FilerBase):
     template_name = 'aiohttp_admin/filters/datetime_filter.html'
     name: str
@@ -107,9 +129,6 @@ class DateTimeFilter(FilerBase):
 
 
 class DateFilter(DateTimeFilter):
-    template_name = 'aiohttp_admin/filters/datetime_filter.html'
-    name: str
-    query: dict
     format: str = 'YYYY-MM-DD'
 
 

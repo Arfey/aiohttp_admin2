@@ -25,9 +25,5 @@
 - multi files widget
 - download bl for file in field DRY
 - move data_field_sort to UserPostgresResource???
-- remove filter
-- id filter
+- filter validation for some value
 - refactor filters https://www.dothedev.com/blog/django-admin-list_filter/
-
-
-

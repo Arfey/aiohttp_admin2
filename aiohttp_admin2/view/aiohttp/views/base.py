@@ -40,6 +40,10 @@ class BaseAdminView:
         fields.BooleanField.type_name: filters.BooleanFilter,
         fields.DateTimeField.type_name: filters.DateTimeFilter,
         fields.DateField.type_name: filters.DateFilter,
+        fields.StringField.type_name: filters.SingleValueFilter,
+        fields.UrlFileField.type_name: filters.SingleValueFilter,
+        fields.UrlImageField.type_name: filters.SingleValueFilter,
+        fields.IntField.type_name: filters.SingleValueFilter,
     }
     search_filter = filters.SearchFilter
 
