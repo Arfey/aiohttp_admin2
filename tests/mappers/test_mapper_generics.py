@@ -1,6 +1,16 @@
-import sqlalchemy as sa
+from enum import Enum
 
-from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
+import sqlalchemy as sa
+from umongo import (
+    MotorAsyncIOInstance,
+    Document,
+    fields as mongo_fields,
+)
+
+from aiohttp_admin2.mappers.generics import (
+    PostgresMapperGeneric,
+    MongoMapperGeneric,
+)
 from aiohttp_admin2.mappers import fields
 
 
@@ -9,7 +19,8 @@ metadata = sa.MetaData()
 
 def test_generic_for_sql_alchemy_table():
     """
-    In this test we check corrected work of auto generator for mapper.
+    In this test we check corrected work of auto generator for mapper from
+    alchemy table.
 
         1. Generate corrected fields from table.
         2. Mixing generated fields and custom.
@@ -53,4 +64,140 @@ def test_generic_for_sql_alchemy_table():
     assert isinstance(book.fields["title"], fields.StringField)
 
 
-# todo: test for mongo generator
+def test_generic_for_umongo_table():
+    """
+    In this test we check corrected work of auto generator for mapper from
+    umongo table.
+
+        1. Generate corrected fields from table.
+        2. Mixing generated fields and custom.
+        3. Rewriting generated fields
+    """
+    instance = MotorAsyncIOInstance()
+
+    @instance.register
+    class User(Document):
+        age = mongo_fields.IntegerField()
+        email = mongo_fields.EmailField(required=True, unique=True)
+
+    class UserMapper(MongoMapperGeneric, table=User):
+        pass
+
+    user = UserMapper({"age": 18, "email": "some@gmail.com"})
+
+    # 1. Generate corrected fields from table. (with id field)
+    assert len(user.fields) == 3
+
+    assert isinstance(user.fields["age"], fields.IntField)
+    assert isinstance(user.fields["email"], fields.StringField)
+
+    # 2. Mixing generated fields and custom.
+    class UserMapper(MongoMapperGeneric, table=User):
+        some_field = fields.IntField()
+
+    user = UserMapper({"age": 18, "email": "some@gmail.com"})
+
+    assert len(user.fields) == 4
+    assert isinstance(user.fields["email"], fields.StringField)
+    assert isinstance(user.fields["age"], fields.IntField)
+    assert isinstance(user.fields["some_field"], fields.IntField)
+
+    # 3. Rewriting generated fields
+    class UserMapper(MongoMapperGeneric, table=User):
+        id = fields.IntField()
+
+    user = UserMapper({"age": 18, "email": "some@gmail.com"})
+
+    assert len(user.fields) == 3
+    assert isinstance(user.fields["email"], fields.StringField)
+    assert isinstance(user.fields["age"], fields.IntField)
+    assert isinstance(user.fields["id"], fields.IntField)
+
+
+def test_generic_validation_for_umongo_table():
+    """
+    In this test we check corrected work of mapper and marshmallow validation.
+
+        1. Corrected work of marshmallow and generic validation together
+        2. Corrected work of marshmallow validation
+    """
+    instance = MotorAsyncIOInstance()
+
+    @instance.register
+    class User(Document):
+        age = mongo_fields.IntegerField()
+        email = mongo_fields.EmailField(required=True, unique=True)
+
+    class UserMapper(MongoMapperGeneric, table=User):
+        other_field = fields.StringField(required=True)
+
+    # 1. Corrected work of generic validation
+    user = UserMapper({"age": 18, "email": "some@gmail.com"})
+
+    assert not user.is_valid()
+    assert not user.fields['age'].errors
+    assert not user.fields['email'].errors
+    assert user.fields['other_field'].errors
+
+    user = UserMapper({
+        "age": 18,
+        "email": "some@gmail.com",
+        "other_field": "text",
+    })
+
+    assert user.is_valid()
+
+    assert not user.fields['age'].errors
+    assert not user.fields['email'].errors
+    assert not user.fields['other_field'].errors
+    assert not user.error
+
+    # 2. Corrected work of marshmallow validation
+    user = UserMapper({
+        "id": 1,
+        "email": "text",
+    })
+
+    assert not user.is_valid()
+    assert user.fields['age'].errors
+    assert user.fields['email'].errors
+
+
+def test_choices_field():
+    """
+    In this test we check correct work of choices field for enum column.
+
+        - correct generation from enum
+        - rewrite choices
+    """
+
+    class SelectEnum(Enum):
+        select = 'select'
+        unselect = 'unselect'
+
+    tbl2 = sa.Table('tbl2', metadata,
+        sa.Column('id', sa.Integer, primary_key=True),
+        sa.Column('type', sa.Enum(SelectEnum)),
+    )
+
+    class SelectMapper(PostgresMapperGeneric, table=tbl2):
+        pass
+
+    # correct generation from enum
+    assert SelectMapper({}).fields['type'].choices == \
+           [('select', 'select'), ('unselect', 'unselect')]
+
+    gender_choices = (
+        ('male', "male"),
+        ('female', "female"),
+    )
+
+    class SelectSecondMapper(PostgresMapperGeneric, table=tbl2):
+        type = fields.ChoicesField(
+            field_cls=fields.StringField,
+            choices=gender_choices,
+            default='male'
+        )
+
+    # rewrite choices
+    assert SelectSecondMapper({}).fields['type'].choices == gender_choices

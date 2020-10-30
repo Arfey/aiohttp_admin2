@@ -7,8 +7,10 @@
     <p><b>{{ name }}</b>  {{ value }}</p>
     {% endfor %}
     <br>
+    {% if controller.can_delete %}
     <form action="#" method="POST">
         <button class="btn btn-danger" type="submit">Delete</button>
     </form>
+    {% endif %}
 </div>
 {% endblock %}

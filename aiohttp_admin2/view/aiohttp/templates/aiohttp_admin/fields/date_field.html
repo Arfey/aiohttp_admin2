@@ -1,0 +1,41 @@
+{% macro field(
+    name,
+    field
+)
+%}
+
+<div class="form-group">
+    <label for="{{ name }}input">{{ name }}:</label>
+    <div class='input-group date' id='{{name}}-datetime' data-target-input="nearest">
+        <input
+                type="text"
+                class="form-control datetimepicker-input"
+                id="{{ name }}input"
+                name="{{ name }}"
+                value="{{ field.raw_value if field._value }}"
+                data-target="#{{name}}-datetime"
+        />
+        <div class="input-group-addon input-group-append" data-target="#{{name}}-datetime" data-toggle="datetimepicker">
+            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+        </div>
+    </div>
+
+
+    {% if field.errors %}
+    <br>
+    {% for error in field.errors %}
+    <span style="color: red">{{ error }}</span>
+    <br>
+    {% endfor %}
+    {% endif %}
+
+    <script>
+        $('#{{name}}-datetime').datetimepicker({
+          format: "YYYY-MM-DD"
+        });
+    </script>
+
+</div>
+
+
+{% endmacro %}

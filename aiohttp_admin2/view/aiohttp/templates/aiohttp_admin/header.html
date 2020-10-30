@@ -6,8 +6,10 @@
     {{ project_name }}
   </a>
   <ul class="navbar-nav px-3">
+    {%- if logout_path %}
     <li class="nav-item text-nowrap">
-      <a class="nav-link" href="#">Sign out</a>
+      <a class="nav-link" href="{{ logout_path }}">Logout</a>
     </li>
+    {%- endif %}
   </ul>
 </nav>

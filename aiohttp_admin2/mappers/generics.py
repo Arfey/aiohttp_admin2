@@ -4,6 +4,7 @@ import umongo
 from aiohttp_admin2.mappers.base import Mapper
 from aiohttp_admin2.mappers import fields
 from aiohttp_admin2.mappers.fields import mongo_fields
+from aiohttp_admin2.mappers.exceptions import ValidationError
 
 
 __all__ = [
@@ -14,61 +15,98 @@ __all__ = [
 
 class PostgresMapperGeneric(Mapper):
     """
-    This class need for generate Mapper from sqlalchemy's model.
+    This class need for generate Mapper from sqlAlchemy's model.
     """
 
     # todo: added types
     FIELDS_MAPPER = {
         sa.Integer: fields.IntField,
         sa.Text: fields.StringField,
+        sa.Enum: fields.ChoicesField,
+        sa.Boolean: fields.BooleanField,
+        sa.ARRAY: fields.ArrayField,
+        sa.DateTime: fields.DateTimeField,
+        sa.Date: fields.DateField,
+        sa.JSON: fields.JsonField,
     }
     DEFAULT_FIELD = fields.StringField
 
     def __init_subclass__(cls, table: sa.Table) -> None:
         cls._fields = {}
-        for name, column in table.columns.items():
-            field = \
-                cls.FIELDS_MAPPER.get(type(column.type), cls.DEFAULT_FIELD)()
-            field.name = name
-            cls._fields[name] = field
+
+        existing_fields = [field.name for field in cls._fields_cls]
 
         # todo: add tests
-        if not cls._fields_cls:
-            cls._fields_cls = cls._fields.values()
-        else:
-            existing_fields = [field.name for field in cls._fields_cls]
+        # todo: add required field
+        for name, column in table.columns.items():
+            field_cls = \
+                cls.FIELDS_MAPPER.get(type(column.type), cls.DEFAULT_FIELD)
 
-            for name, field in cls._fields.items():
-                if name not in existing_fields:
-                    cls._fields_cls.append(field)
+            if field_cls is fields.ChoicesField:
+                field = fields.ChoicesField(
+                    choices=[(n, n) for n in column.type.enums]
+                )
+            elif field_cls is fields.ArrayField:
+                field = field_cls(
+                    field_cls=cls.FIELDS_MAPPER
+                        .get(type(column.type.item_type), cls.DEFAULT_FIELD),
+                )
+            else:
+                field = field_cls()
+
+            field.name = name
+            if name not in existing_fields:
+                cls._fields[name] = field
+                cls._fields_cls.append(field)
 
 
 class MongoMapperGeneric(Mapper):
     """
     This class need for generate Mapper from Mongo model.
     """
+    table: umongo.Document
 
     FIELDS_MAPPER = {
         umongo.fields.ObjectIdField: mongo_fields.ObjectIdField,
         umongo.fields.IntegerField: fields.IntField,
         umongo.fields.StringField: fields.StringField,
         umongo.fields.DateTimeField: fields.DateTimeField,
+        umongo.fields.List: fields.ArrayField,
     }
 
     DEFAULT_FIELD = fields.StringField
 
     def __init_subclass__(cls, table: umongo.Document) -> None:
-        if isinstance(table, umongo.template.MetaTemplate):
-            obj_fields = (
-                (key, value)
-                for key, value in table.__dict__.items()
-                if isinstance(value, umongo.fields.BaseField)
-            )
-        else:
-            obj_fields = table.schema.fields.items()
+        cls._fields = {}
+        cls.table = table
 
-        for name, column in obj_fields:
+        existing_fields = [field.name for field in cls._fields_cls]
+
+        for name, column in table.schema.fields.items():
             field = \
                 cls.FIELDS_MAPPER.get(type(column), cls.DEFAULT_FIELD)()
             field.name = name
-            cls._fields_cls.append(field)
+            if name not in existing_fields:
+                cls._fields_cls.append(field)
+                cls._fields[name] = field
+
+    def validation(self):
+        """
+        In current method we cover marshmallow validation.
+        """
+        is_valid = True
+
+        errors = self.table\
+            .schema\
+            .as_marshmallow_schema()()\
+            .load(self.raw_data)\
+            .errors
+
+        # validation for each field
+        for f in self.fields.values():
+            if errors.get(f.name):
+                f.errors.append(errors.get(f.name)[0])
+                is_valid = False
+
+        if not is_valid:
+            raise ValidationError

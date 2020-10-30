@@ -39,7 +39,7 @@ def test_success_mapper():
     # 3. check `raw_value` method into fields must converting to right type
     assert book.fields["title"].raw_value == "title value"
     assert book.fields["description"].raw_value == "description value"
-    assert book.fields["pages"].raw_value == 1
+    assert book.fields["pages"].raw_value == "1"
     assert book.fields["created_at"].raw_value == "Aug 28 1999 12:00AM"
 
 
@@ -65,8 +65,8 @@ def test_required_validation():
     assert not book.is_valid(), \
         "title is required field so mapper must be invalid"
 
-    assert book.fields["title"].error
-    assert not book.fields["description"].error
+    assert book.fields["title"].errors
+    assert not book.fields["description"].errors
 
     # 2. mapper is valid if all required field is no empty
     book = BookMapping({
@@ -77,8 +77,8 @@ def test_required_validation():
     assert book.is_valid(), \
         "title is not empty so mapper must be valid"
 
-    assert not book.fields["title"].error
-    assert not book.fields["description"].error
+    assert not book.fields["title"].errors
+    assert not book.fields["description"].errors
 
 
 def test_main_mapper_validation():
@@ -104,16 +104,16 @@ def test_main_mapper_validation():
     book = BookMapping(dict(title="Title", description="Description", pages=1))
 
     assert book.is_valid()
-    assert not book.fields["title"].error
-    assert not book.fields["description"].error
+    assert not book.fields["title"].errors
+    assert not book.fields["description"].errors
     assert not book.error
 
     # 2. test with error
     book = BookMapping(dict(title="Title", description="Title", pages=1))
 
     assert not book.is_valid()
-    assert not book.fields["title"].error
-    assert not book.fields["description"].error
+    assert not book.fields["title"].errors
+    assert not book.fields["description"].errors
     assert book.error
 
     # 3. test with mapper error and field error together
@@ -122,7 +122,7 @@ def test_main_mapper_validation():
     )
 
     assert not book.is_valid()
-    assert not book.fields["title"].error
-    assert not book.fields["description"].error
+    assert not book.fields["title"].errors
+    assert not book.fields["description"].errors
     assert book.error
-    assert book.fields["pages"].error
+    assert book.fields["pages"].errors

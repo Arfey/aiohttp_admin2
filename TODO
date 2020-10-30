@@ -5,3 +5,33 @@
 - add integrate test for resource
 - move methods for async
 - think about move instance to dict
+- get name of user in nav bar
+- controller name with whitespace
+- datetime field mongodb
+- remove hidden field for update???
+- add required to generic fields
+- add min,max length input
+- test view create/update/delete
+- validator not work + docs validation
+- csrf form
+- DETAIL:  Key (id)=(0) already exists.
+- update list if not int
+- move validation to controller
+- add validation for inner type
+- scroll to error after update and create
+- delete for file
+- image view
+- time widget
+- multi files widget
+- download bl for file in field DRY
+- move data_field_sort to UserPostgresResource???
+- filter validation for some value
+- refactor filters https://www.dothedev.com/blog/django-admin-list_filter/
+- link to object (one to one)
+- add transactions for create/update/delete
+- list of field for show on detail page
+
+
+- tabs
+- permission for tabs
+- todo: pagination in tabs

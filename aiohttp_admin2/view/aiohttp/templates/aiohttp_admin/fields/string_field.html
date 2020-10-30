@@ -1,0 +1,18 @@
+{% macro field(
+    name,
+    field
+)
+%}
+<div class="form-group">
+    <label for="{{ name }}input">{{ name }}:</label>
+    <!-- todo: move from _value -->
+    <input type="text" class="form-control" name="{{ name }}" id="{{ name }}input" value="{{ field.raw_value if field._value }}" aria-describedby="inputGroup-sizing-default" />
+    {% if field.errors %}
+    <br>
+    {% for error in field.errors %}
+    <span style="color: red">{{ error }}</span>
+    <br>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endmacro %}

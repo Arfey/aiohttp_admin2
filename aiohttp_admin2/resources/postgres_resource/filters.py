@@ -1,3 +1,5 @@
+from abc import ABC
+
 import sqlalchemy as sa
 import typing as t
 
@@ -34,10 +36,11 @@ comparator_map = {
 class SQLAlchemyBaseFilter(ABCFilter):
     filter_type: str
 
-    def __init__(self, *, table: sa.Table, column: sa.Column, value: t.Any, query: sa.sql.Select) -> None:
+    def __init__(self, table: sa.Table, column: sa.Column, *, value: t.Any, query: sa.sql.Select) -> None:
         self.table = table
         self.value = value
         self.column = column
+        self.columns = [column]
         self._query = query
 
         if not hasattr(self, 'filter_type'):
@@ -55,13 +58,37 @@ class SQLAlchemyBaseFilter(ABCFilter):
         return column_type
 
     def validate(self):
-        base_column = comparator_map.get(self._get_column_base(self.column))
+        for column in self.columns:
+            base_column = comparator_map.get(self._get_column_base(column))
 
-        if base_column and self.filter_type not in base_column:
+            if base_column and self.filter_type not in base_column:
+                raise FilterException(
+                    f"{self.filter_type} operation is not supported for "
+                    f"{column} column."
+                )
+
+
+class SQLAlchemyMultiBaseFilter(SQLAlchemyBaseFilter):
+    filter_type: str
+
+    def __init__(
+        self,
+        table: sa.Table,
+        columns: t.List[sa.Column],
+        *,
+        value: t.Any,
+        query: sa.sql.Select,
+    ) -> None:
+        self.table = table
+        self.value = value
+        self.columns = columns
+        self._query = query
+
+        if not hasattr(self, 'filter_type'):
             raise FilterException(
-                f"{self.filter_type} operation is not supported for "
-                f"{self.column} column."
+                f"filter_type is not defined in {self.__class__}"
             )
+
 
 
 class GT(SQLAlchemyBaseFilter):
@@ -136,6 +163,19 @@ class Like(SQLAlchemyBaseFilter):
         return self._query.where(self.column.like(f'%{self.value}%'))
 
 
+class SearchMulti(SQLAlchemyMultiBaseFilter):
+    """Like filter with lower function for multiple fields."""
+    filter_type: str = 'like'
+
+    def make_lover(self, column):
+        return sa.func.lower(column).like(f'%{str(self.value).lower()}%')
+
+    def apply(self) -> sa.sql.Select:
+        return self._query.where(
+            sa.or_(*[self.make_lover(c) for c in self.columns])
+        )
+
+
 default_filter_mapper = {
     'eq': EQ,
     'ne': NE,
@@ -146,4 +186,5 @@ default_filter_mapper = {
     'in': IN,
     'nin': NIN,
     'like': Like,
+    'search_multi': SearchMulti,
 }

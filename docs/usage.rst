@@ -20,7 +20,7 @@ You can create your own mapper with custom fields:
     class UserMapper(Mapper):
         """Mapper for user instance."""
         name = fields.StringField(required=True)
-        age =  field.IntField()
+        age =  field.IntField(default=18)
 
 Mappers generator
 .................
@@ -61,6 +61,69 @@ which you specify.
 
 # todo: validation
 
+Fields
+......
+
+**StringField** - field for represented string data.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+
+**IntField** - field for represented integer data.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+
+**FloatField** - field for represented float data.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+
+**DateTimeField** - field for represented datetime data.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+
+**BooleanField** - field for represented boolean data. If value contains '0',
+'false' or 'f' than value will be parse as `False` in other case as `True`.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+
+**ChoicesField** - add predefined values. If you have some finite list of values
+and want that this list will represented like select tag you need to use
+current field type.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+- *field_cls* - field type which will represent selected value
+- *choices* - tuple of tuple with values.
+
+.. code-block:: python
+
+    from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
+    from aiohttp_admin2.mappers import fields
+
+
+    class UserMapper(PostgresMapperGeneric, table=user):
+        """Mapper for user instance."""
+        GENDER_CHOICES = (
+            ('male', "male"),
+            ('female', "female"),
+        )
+
+        gender = fields.ChoicesField(
+            field_cls=fields.StringField,
+            choices=GENDER_CHOICES,
+            default='male'
+        )
+
 Controllers
 -----------
 
@@ -75,10 +138,10 @@ Controller generate access to your data based on some engine.
     from aiohttp_admin2.controllers.postgres_controller import PostgresController
 
 
+    @postgres_injector.inject
     class UserController(PostgresController):
         table = user
         mapper = UserMapper
-        engine_name = 'db'
         name = 'user'
         per_page = 10
 
@@ -92,13 +155,86 @@ Controller generate access to your data based on some engine.
 - per_page - number of item per page
 
 
+The Controller need to have connection for engine. For this goal we need to
+inject connection by `ConnectionInjector`.
+
+.. code-block:: python
+
+    from aiohttp_admin2.connection_injectors import ConnectionInjector
+
+
+    postgres_injector = ConnectionInjector()
+
+
+    async def init_db(app):
+        # Context function for initialize connection to db
+        engine = await aiopg.sa.create_engine(
+            user='postgres',
+            database='postgres',
+            host='0.0.0.0',
+            password='postgres',
+        )
+        app['db'] = engine
+
+        # here we add connection for our injector
+        postgres_injector.init(engine)
+
+After that you can user `postgres_injector` to decorate your controllers. For
+`MongoController` you don't need to use `ConnectionInjector` because connection
+to db exist in table instance.
+
 Access
 ......
 
+Admin interface have two approaches for restrict access:
+
+- global middleware
+- `access_hook` for each controller
+
+Global middleware use for restrict access to whole admin interface. It might
+look something like this:
+
+.. code-block:: python
+
+    from aiohttp import web
+
+
+    @web.middleware
+    async def admin_access_middleware(request, handler):
+        """
+        This middleware need for forbidden access to admin interface for users
+        who don't have right permissions.
+        """
+        if await is_anonymous(request):
+            raise web.HTTPFound('/')
+
+        if not await permits(request, 'admin'):
+            raise web.HTTPFound('/')
+
+        return await handler(request)
+
+This middleware you can apply for admin interface using `middleware_list`
+parameter.
+
+.. code-block:: python
+
+    setup_admin(
+        application,
+        # ...
+        middleware_list=[admin_access_middleware, ],
+        logout_path='/logout',
+    )
+
+also you can specify `logout_path` parameter to add logout button inside admin
+header navigation bar.
+
+
+
+
 If you need to make access to some instances you cat do it using: can_create,
 can_update, can_view, can_delete.
-If access must be specefy by some user you also cat use `access_hook`.
-`access_hook` - access hook use befor for each access to data.
+If access must be specify by some user you also cat use `access_hook`.
+`access_hook` - access hook use before for each access to data.
 
 .. code-block:: python
 

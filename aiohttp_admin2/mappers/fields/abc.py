@@ -9,24 +9,27 @@ from aiohttp_admin2.mappers.exceptions import ValidationError
 __all__ = ['AbstractField', ]
 
 
-class EmptyValue:
-    def __repr__(self):
-        return ''
-
 # todo: add validators
 
 
 class AbstractField(ABC):
+    type_name: str = 'string'
+
     def __init__(
         self,
+        *,
         required: bool = False,
         validators: t.List[t.Any] = [],
-        value: t.Any = None,
+        value: t.Optional[str] = None,
+        default: t.Optional[str] = None,
+        **kwargs: t.Any,
     ) -> None:
         self.name: str = None
-        self._value: t.Any = value
-        self.error: t.Optional[str] = None
+        self.default: t.Optional[str] = default
+        self._value: t.Optional[str] = default if value is None else value
+        self.errors: t.List[t.Optional[str]] = []
         self.required = required
+        # todo: add validator
         self.validators = validators
 
     @abstractmethod
@@ -39,18 +42,14 @@ class AbstractField(ABC):
         """
         pass
 
-    @abstractmethod
-    def to_raw(self) -> t.Any:
+    def to_storage(self) -> str:
         """
         Convert value to correct storage type.
-
-        Raises:
-            ValueError: if type of value is wrong
         """
-        pass
+        return str(self._value) if self._value is not None else ''
 
     @property
-    def value(self):
+    def value(self) -> t.Any:
         """
         Convert value to correct python type equivalent.
 
@@ -60,8 +59,8 @@ class AbstractField(ABC):
         return self.to_python()
 
     @property
-    def raw_value(self):
-        return self.to_raw()
+    def raw_value(self) -> t.Any:
+        return self.to_storage()
 
     def is_valid(self) -> bool:
         """
@@ -72,10 +71,11 @@ class AbstractField(ABC):
             ValueError, TypeError: if type of value is wrong
 
         """
-        if self.required and not self.value:
+        if self.required and not self._value:
             raise ValidationError(F"{self.name} field is required.")
+
         self.to_python()
-        self.to_raw()
+        self.to_storage()
 
         return True
 
@@ -83,6 +83,7 @@ class AbstractField(ABC):
         return self.__class__(
             required=self.required,
             validators=self.validators,
+            default=self.default,
             value=value
         )
 

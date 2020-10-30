@@ -2,7 +2,9 @@ from aiohttp import web
 import aiohttp_jinja2
 import typing as t
 
+from aiohttp_admin2.filters import SearchFilter
 from aiohttp_admin2.view.aiohttp.views.base import BaseAdminView
+from aiohttp_admin2.view.aiohttp.views.tab_base_view import TabBaseView
 from aiohttp_admin2.controllers.controller import Controller
 from aiohttp_admin2.view.aiohttp.utils import (
     get_params_from_request,
@@ -22,6 +24,8 @@ class ControllerView(BaseAdminView):
     template_detail_create_name = 'aiohttp_admin/create.html'
     template_delete_name = 'aiohttp_admin/delete.html'
     controller: Controller
+    tabs: t.List[TabBaseView] = []
+    tabs_list = []
 
     # Fields
     exclude_fields = ['id', ]
@@ -33,6 +37,35 @@ class ControllerView(BaseAdminView):
 
         self.title = self.title if not self.title == 'None' else default
         self.params = params or {}
+
+        if self.tabs:
+            self.tabs_list = [Tab(self) for Tab in self.tabs]
+
+    def get_extra_media(self):
+        css = []
+        js = []
+
+        for w in {
+            **self.default_type_widgets,
+            **self.type_widgets,
+            **self.fields_widgets,
+        }.values():
+            css.extend([link for link in w.css_extra if link not in css])
+            js.extend([link for link in w.js_extra if link not in js])
+
+        return dict(css=css, js=js)
+
+    def get_extra_media_list(self):
+        css = []
+        js = []
+
+        for w in {
+            **self.default_filter_map
+        }.values():
+            css.extend([link for link in w.css_extra if link not in css])
+            js.extend([link for link in w.js_extra if link not in js])
+
+        return dict(css=css, js=js)
 
     # Urls
     @property
@@ -72,7 +105,28 @@ class ControllerView(BaseAdminView):
     async def get_list(self, req: web.Request) -> web.Response:
         params = self.get_params_from_request(req)
         controller = self.get_controller()
-        data = await controller.get_list(**params._asdict())
+
+        filters = []
+
+        for f in controller.list_filter:
+            field = self.controller.mapper({})._fields[f]
+            filter_cls = self.default_filter_map.get(field.type_name)
+            if filter_cls:
+                filters_list = filter_cls(f, req.rel_url.query) \
+                    .get_filter_list()
+
+                if filters_list:
+                    filters.extend(filters_list)
+
+        if controller.search_fields:
+            filters.extend(
+                SearchFilter(controller.search_fields, req.rel_url.query)
+                    .get_filter_list()
+            )
+
+        data = await controller.get_list(**params._asdict(), filters=filters)
+
+        # list_filter
         return aiohttp_jinja2.render_template(
             self.template_list_name,
             req,
@@ -82,7 +136,8 @@ class ControllerView(BaseAdminView):
                 "controller": controller,
                 "detail_url": self.detail_url_name,
                 "create_url": self.create_url_name,
-                "message": req.rel_url.query.get('message')
+                "message": req.rel_url.query.get('message'),
+                "media": self.get_extra_media_list(),
             }
         )
 
@@ -93,7 +148,7 @@ class ControllerView(BaseAdminView):
     ) -> web.Response:
         controller = self.get_controller()
         # todo: handle str key for dict
-        data = await controller.get_detail(int(req.match_info['pk']))
+        data = await controller.get_detail(req.match_info['pk'])
 
         template = self.template_detail_edit_name
 
@@ -105,10 +160,12 @@ class ControllerView(BaseAdminView):
             req,
             {
                 **await self.get_context(req),
+                "media": self.get_extra_media(),
                 "object": data,
                 "controller": controller,
                 "title": f"{self.name}#{data.id}",
                 "delete_url": self.delete_url_name,
+                "detail_url": self.detail_url_name,
                 "save_url": self.update_post_url_name,
                 "mapper": mapper or controller.mapper(data.__dict__),
                 "fields": controller.fields,
@@ -129,6 +186,7 @@ class ControllerView(BaseAdminView):
             req,
             {
                 **await self.get_context(req),
+                "media": self.get_extra_media(),
                 "controller": controller,
                 "title": f"Create a new {self.name}",
                 "create_url": self.create_post_url_name,
@@ -146,8 +204,9 @@ class ControllerView(BaseAdminView):
         mapper = controller.mapper(data)
 
         if mapper.is_valid():
-            del data['id']
-            obj = await controller.create(data)
+            serialize_data = mapper.data
+            del serialize_data['id']
+            obj = await controller.create(serialize_data)
 
             raise web.HTTPFound(
                 req.app.router[self.detail_url_name]
@@ -168,7 +227,9 @@ class ControllerView(BaseAdminView):
         mapper = controller.mapper(dict(data))
 
         if mapper.is_valid():
-            await controller.update(pk, dict(data))
+            serialize_data = mapper.data
+            del serialize_data['id']
+            await controller.update(pk, serialize_data)
 
             raise web.HTTPFound(
                 req.app.router[self.detail_url_name]
@@ -209,33 +270,36 @@ class ControllerView(BaseAdminView):
                 name=self.index_url_name,
             ),
             web.get(
-                f'{self.index_url}' + r'{pk:\d+}',
+                f'{self.index_url}' + r'{pk:\w+}',
                 self.get_detail,
                 name=self.detail_url_name,
             ),
             web.get(
-                f'{self.index_url}' + 'create',
+                f'{self.index_url}' + 'create/',
                 self.get_create,
                 name=self.create_url_name,
             ),
             web.get(
-                f'{self.index_url}' + r'{pk:\d+}/delete',
+                f'{self.index_url}' + r'{pk:\w+}/delete',
                 self.get_delete,
                 name=self.delete_url_name,
             ),
             web.post(
-                f'{self.index_url}' + r'{pk:\d+}/delete',
+                f'{self.index_url}' + r'{pk:\w+}/delete',
                 self.post_delete,
                 name=self.delete_post_url_name,
             ),
             web.post(
-                f'{self.index_url}' + r'create_post',
+                f'{self.index_url}' + r'create_post/',
                 self.post_create,
                 name=self.create_post_url_name,
             ),
             web.post(
-                f'{self.index_url}' + r'{pk:\d+}/update_post',
+                f'{self.index_url}' + r'{pk:\w+}/update_post',
                 self.post_update,
                 name=self.update_post_url_name,
             ),
         ])
+
+        for tab in self.tabs_list:
+            tab.setup(app)

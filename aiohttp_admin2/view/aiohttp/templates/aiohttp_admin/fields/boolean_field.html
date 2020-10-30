@@ -1,0 +1,18 @@
+{% macro field(
+    name,
+    field
+)
+%}
+<div class="form-group">
+    <label for="{{ name }}input">{{ name }}:</label>
+    <input id="{{ name }}input" name="{{ name }}" {% if field.value %}checked{% endif %} type="checkbox" />
+    <br>
+    {% if field.errors %}
+    <br>
+    {% for error in field.errors %}
+    <span style="color: red">{{ error }}</span>
+    <br>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endmacro %}

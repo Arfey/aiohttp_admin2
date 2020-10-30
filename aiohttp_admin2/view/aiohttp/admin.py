@@ -31,18 +31,22 @@ class Admin:
     admin_url = '/admin/'
     dashboard_class = DashboardView
     nav_groups: t.Dict[str, BaseAdminView] = None
+    logout_path: t.Optional[str] = '/logout'
+    cursor_paging = False
 
     def __init__(
         self,
         app: web.Application,
-        engines: t.Optional[t.Dict[str, t.Any]],
         views: t.Optional[t.List[BaseAdminView]] = None,
+        middleware_list: t.Optional[t.List[t.Callable]] = None,
+        logout_path: t.Optional[str] = None,
     ) -> None:
         self.app = app
-        self._engines = engines
+        self.logout_path = logout_path
+        self.middleware_list = middleware_list or []
         self._views = [
             self.dashboard_class(),
-            *[view(params={"engines": engines}) for view in views or []]
+            *[view() for view in views or []]
         ]
         self.generate_nav_groups()
 
@@ -58,6 +62,10 @@ class Admin:
             "project_name": self.admin_name,
             "nav_groups": self.nav_groups,
             "index_url": self.dashboard_class.name,
+            "logout_path": self.logout_path,
+            "cursor_paging": self.cursor_paging,
+            "hasattr": hasattr,
+            "getattr": getattr,
             "newParam":
                 lambda new_params, params:
                     f'?{urlencode({**params, **new_params})}'
@@ -74,7 +82,7 @@ class Admin:
         """
         This method will setup admin interface to received aiohttp application.
         """
-        admin = web.Application()
+        admin = web.Application(middlewares=self.middleware_list)
         admin.router\
             .add_static('/static/', path=str(static_dir), name='admin_static')
 

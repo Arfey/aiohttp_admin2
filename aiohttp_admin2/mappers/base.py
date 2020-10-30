@@ -1,8 +1,6 @@
 import typing as t
-from abc import ABC
 
 from aiohttp_admin2.mappers.fields.abc import AbstractField
-from aiohttp_admin2.mappers.fields.abc import EmptyValue
 from aiohttp_admin2.mappers.exceptions import ValidationError
 
 
@@ -40,8 +38,6 @@ class MapperMeta(type):
 class Mapper(metaclass=MapperMeta):
 
     # todo: add itter
-    # todo: empty fields
-    # todo: empty fields error think
 
     _data: t.Dict[str, t.Any] = None
     _fields: t.Dict[str, AbstractField] = None
@@ -51,9 +47,19 @@ class Mapper(metaclass=MapperMeta):
         self._data = data
         self._fields = self._fields or {}
         for field in self._fields_cls:
-            new_field = field(data.get(field.name, EmptyValue()))
+            new_field = field(data.get(field.name))
             new_field.name = field.name
             self._fields[field.name] = new_field
+
+    @property
+    def raw_data(self):
+        """Getter for raw mapper data"""
+        return self._data
+
+    @property
+    def data(self) -> t.Dict[str, t.Any]:
+        """Return serialize data"""
+        return {f.name: f.to_python() for f in self.fields.values()}
 
     @property
     def fields(self) -> t.Dict[str, AbstractField]:
@@ -102,9 +108,9 @@ class Mapper(metaclass=MapperMeta):
             except (ValidationError, TypeError) as e:
                 is_valid = False
                 if len(e.args):
-                    f.error = e.args[0]
+                    f.errors.append(e.args[0])
                 else:
-                    f.error = 'Invalid'
+                    f.errors.append('Invalid')
 
         try:
             self.validation()
@@ -113,7 +119,8 @@ class Mapper(metaclass=MapperMeta):
             if len(e.args):
                 self.error = e.args[0]
             else:
-                self.error = 'Invalid'
+                if not self.error:
+                    self.error = 'Invalid'
 
         return is_valid
 

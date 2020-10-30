@@ -1,0 +1,54 @@
+{% macro field(
+    name,
+    field
+)
+%}
+<div class="form-group">
+    <!--  Title  -->
+    <label for="{{ name }}input">{{ name }}:</label>
+    <!--  end title  -->
+
+    <!--  Input  -->
+    <select name="{{ name }}" id="{{ name }}input" class="form-control">
+
+        {%- if field.value %}
+            {% set value_default = field.value %}
+        {%- elif field.default %}
+            {% set value_default = field.default %}
+        {%- else %}
+            {% set value_default = '' %}
+        {%- endif %}
+
+        <!--   Options     -->
+        {%- if not field.required %}
+        <option
+            value=""
+            {% if value_default %}selected{% endif%}
+        >
+        </option>
+        {%- endif %}
+
+        {%- for value, text in field.choices %}
+        <option
+            value="{{ value }}"
+            {% if value_default | string() == value | string() %}selected{% endif%}
+        >
+            {{ text }}
+        </option>
+        {%- endfor %}
+        <!--   end options     -->
+
+    </select>
+    <!--  end input  -->
+
+    <!--  Errors  -->
+    {% if field.errors %}
+    <br>
+    {% for error in field.errors %}
+    <span style="color: red">{{ error }}</span>
+    <br>
+    <!--  end errors  -->
+    {% endfor %}
+    {% endif %}
+</div>
+{% endmacro %}

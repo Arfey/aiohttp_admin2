@@ -1,6 +1,10 @@
 Aiohttp admin documentation
 ===========================
 
+`Demo site
+<https://shrouded-stream-28595.herokuapp.com/>`_ | `Demo source code
+<https://github.com/Arfey/aiohttp_admin2/tree/master/aiohttp_admin2/demo/>`_.
+
 .. image:: https://img.shields.io/pypi/v/aiohttp_admin2.svg
         :target: https://pypi.python.org/pypi/aiohttp_admin2
 
@@ -60,11 +64,14 @@ If you use sqlalchemy then simple example with integration can be looks like thi
     from aiohttp_admin2.view import ControllerView
     from aiohttp_admin2.controllers.postgres_controller import PostgresController
     from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
+    from aiohttp_admin2.connection_injectors import ConnectionInjector
     import sqlalchemy as sa
+    import aiopg.sa
 
 
     # describe a table
     metadata = sa.MetaData()
+    postgres_injector = ConnectionInjector()
 
     tbl = sa.Table('tbl', metadata,
        sa.Column('id', sa.Integer, primary_key=True),
@@ -75,34 +82,33 @@ If you use sqlalchemy then simple example with integration can be looks like thi
     class UserMapper(PostgresMapperGeneric, table=tbl):
         pass
 
+
     # create controller for table with UserMapper
+    @postgres_injector.inject
     class UserController(PostgresController):
         table = tbl
         mapper = UserMapper
-        engine_name = 'db'
         name = 'user'
+
 
     # create view for table
     class UserPage(ControllerView):
         controller = UserController
 
 
+    async def init_db(app):
+        engine = await aiopg.sa.create_engine(
+            user='postgres',
+            database='postgres',
+            host='0.0.0.0',
+            password='postgres',
+        )
+        postgres_injector.init(engine)
+
+
     app = web.Application()
 
-    engine = await create_engine(user='postgres',
-                                 database='postgres',
-                                 host='0.0.0.0',
-                                 password='postgres').__aenter__()
-    setup_admin(
-        app,
-        # put our engines
-        engines={
-            "db": engine
-        },
-        # put our views
-        views=[UserPage, ],
-    )
-
+    setup_admin(app, views=[UserPage, ])
     web.run_app(app)
 
 
