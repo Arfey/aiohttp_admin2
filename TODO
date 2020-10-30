@@ -27,3 +27,11 @@
 - move data_field_sort to UserPostgresResource???
 - filter validation for some value
 - refactor filters https://www.dothedev.com/blog/django-admin-list_filter/
+- link to object (one to one)
+- add transactions for create/update/delete
+- list of field for show on detail page
+
+
+- tabs
+- permission for tabs
+- todo: pagination in tabs

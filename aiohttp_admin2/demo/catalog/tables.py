@@ -27,6 +27,12 @@ movies = sa.Table('movies', metadata,
     sa.Column('name', sa.String(255)),
 )
 
+movies_actors = sa.Table('movies_actors', metadata,
+    sa.Column('id', sa.Integer, primary_key=True),
+    sa.Column('actor_id', sa.ForeignKey('actors.id')),
+    sa.Column('movie_id', sa.ForeignKey('movie.id')),
+)
+
 shows = sa.Table('shows', metadata,
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('name', sa.String(255)),

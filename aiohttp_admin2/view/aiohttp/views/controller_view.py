@@ -4,6 +4,7 @@ import typing as t
 
 from aiohttp_admin2.filters import SearchFilter
 from aiohttp_admin2.view.aiohttp.views.base import BaseAdminView
+from aiohttp_admin2.view.aiohttp.views.tab_base_view import TabBaseView
 from aiohttp_admin2.controllers.controller import Controller
 from aiohttp_admin2.view.aiohttp.utils import (
     get_params_from_request,
@@ -23,6 +24,8 @@ class ControllerView(BaseAdminView):
     template_detail_create_name = 'aiohttp_admin/create.html'
     template_delete_name = 'aiohttp_admin/delete.html'
     controller: Controller
+    tabs: t.List[TabBaseView] = []
+    tabs_list = []
 
     # Fields
     exclude_fields = ['id', ]
@@ -34,6 +37,9 @@ class ControllerView(BaseAdminView):
 
         self.title = self.title if not self.title == 'None' else default
         self.params = params or {}
+
+        if self.tabs:
+            self.tabs_list = [Tab(self) for Tab in self.tabs]
 
     def get_extra_media(self):
         css = []
@@ -159,6 +165,7 @@ class ControllerView(BaseAdminView):
                 "controller": controller,
                 "title": f"{self.name}#{data.id}",
                 "delete_url": self.delete_url_name,
+                "detail_url": self.detail_url_name,
                 "save_url": self.update_post_url_name,
                 "mapper": mapper or controller.mapper(data.__dict__),
                 "fields": controller.fields,
@@ -293,3 +300,6 @@ class ControllerView(BaseAdminView):
                 name=self.update_post_url_name,
             ),
         ])
+
+        for tab in self.tabs_list:
+            tab.setup(app)

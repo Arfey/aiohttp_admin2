@@ -65,6 +65,7 @@ class UsersController(PostgresController):
         data['avatar'] = await self.prepare_avatar_field(data['avatar'])
         return data
 
+    # todo: rename to inline_data_field
     def data_field(self, obj) -> str:
         if obj.payload and isinstance(obj.payload, dict):
             return obj.payload.get('data', '')
