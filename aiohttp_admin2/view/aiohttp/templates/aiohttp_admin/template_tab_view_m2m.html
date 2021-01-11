@@ -27,15 +27,7 @@
         <div class="row">
             <div class="col-sm">
                 <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            {% for field in controller.inline_fields %}
-                            <th scope="col">
-                                {{ field }}
-                            </th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
+                    {% include 'aiohttp_admin/list_header.html' %}
                     <tbody>
                         {%- for obj in list.instances %}
                         <tr>

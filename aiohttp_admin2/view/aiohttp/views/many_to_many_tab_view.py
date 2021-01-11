@@ -7,12 +7,18 @@ from .tab_template_view import TabTemplateView
 from aiohttp_admin2.controllers.controller import Controller
 from aiohttp_admin2 import widgets
 from aiohttp_admin2.resources.types import FilterTuple
+from aiohttp_admin2 import filters
+from aiohttp_admin2.view.aiohttp.views.utils import ViewUtilsMixin
+from aiohttp_admin2.view.aiohttp.views.base import (
+    DEFAULT_FILTER_MAP,
+    DEFAULT_TYPE_WIDGETS,
+)
 
 
 __all__ = ['ManyToManyTabView', ]
 
 
-class ManyToManyTabView(TabTemplateView):
+class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
     controller: Controller
     template_detail_create_name = 'aiohttp_admin/create_mtm.html'
     template_detail_name = 'aiohttp_admin/detail_mtm.html'
@@ -21,7 +27,9 @@ class ManyToManyTabView(TabTemplateView):
     fields_widgets = {}
     default_widget = widgets.StringWidget
     type_widgets = {}
-    default_type_widgets = {}
+    default_type_widgets = DEFAULT_TYPE_WIDGETS
+    default_filter_map = DEFAULT_FILTER_MAP
+    search_filter = filters.SearchFilter
 
     def get_controller(self):
         return self.controller.builder_form_params({})
@@ -44,7 +52,7 @@ class ManyToManyTabView(TabTemplateView):
 
     def setup(self, app: web.Application) -> None:
         app.add_routes([
-            web.get(self.index_url, self.get, name=self.index_url_name),
+            web.get(self.index_url, self.get_list, name=self.index_url_name),
             web.get(self.index_url + '/create', self.get_create, name=self.create_url_name),
             web.post(self.index_url + '/create_post', self.post_create, name=self.create_post_url_name),
             web.get(self.index_url + '/detail/{nested_pk:\w+}', self.get_detail, name=self.detail_url_name),
@@ -96,12 +104,21 @@ class ManyToManyTabView(TabTemplateView):
         else:
             return await self.get_create(req, mapper)
 
-    async def get(self, req: web.Request) -> web.Response:
+    async def get_list(self, req: web.Request) -> web.Response:
+        params = self.get_params_from_request(req)
         controller = self.get_controller()
+        filters_list = self.get_list_filters(
+            req,
+            controller,
+            self.default_filter_map,
+        )
+        filters_list.append(FilterTuple(
+            controller.left_table_name,
+            self.get_pk(req),
+            'eq',
+        ))
 
-        data = await controller.get_list(filters=[
-            FilterTuple(controller.left_table_name, self.get_pk(req), 'eq')
-        ])
+        data = await controller.get_list(**params._asdict(), filters=filters_list)
 
         return aiohttp_jinja2.render_template(
             self.template_name,

@@ -1,0 +1,29 @@
+<thead>
+    <tr>
+        {% with isDesc=(request.rel_url.query.get('sortDir') == 'desc') %}
+        {% for field in controller.inline_fields %}
+        <th scope="col">
+            {% if not hasattr(controller, "{}_field".format(field)) or hasattr(controller, "{}_field_sort".format(field)) %}
+            <!-- todo: delete pagination after sort  -->
+            <a href="{{ newParam({
+                'sort': field,
+                'sortDir': 'asc' if isDesc else 'desc',
+                'page': 1,
+            }, request.rel_url.query) }}">
+                {{ field }}
+                {% if request.rel_url.query.get('sort') == field %}
+                    {% if isDesc %}
+                    <i class="material-icons">arrow_upward</i>
+                    {% else %}
+                    <i class="material-icons">arrow_downward</i>
+                    {% endif %}
+                {% endif %}
+            </a>
+            {% else %}
+            {{ field }}
+            {% endif %}
+        </th>
+        {% endfor %}
+        {% endwith %}
+    </tr>
+</thead>

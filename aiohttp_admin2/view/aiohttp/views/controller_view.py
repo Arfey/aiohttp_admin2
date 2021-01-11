@@ -2,14 +2,9 @@ from aiohttp import web
 import aiohttp_jinja2
 import typing as t
 
-from aiohttp_admin2.filters import SearchFilter
 from aiohttp_admin2.view.aiohttp.views.base import BaseAdminView
 from aiohttp_admin2.view.aiohttp.views.tab_base_view import TabBaseView
 from aiohttp_admin2.controllers.controller import Controller
-from aiohttp_admin2.view.aiohttp.utils import (
-    get_params_from_request,
-    QueryParams,
-)
 
 
 class ControllerView(BaseAdminView):
@@ -96,9 +91,6 @@ class ControllerView(BaseAdminView):
     def index_url_name(self):
         return self.name
 
-    def get_params_from_request(self, req: web.Request) -> QueryParams:
-        return get_params_from_request(req)
-
     def get_controller(self):
         return self.controller.builder_form_params(self.params)
 
@@ -106,23 +98,11 @@ class ControllerView(BaseAdminView):
         params = self.get_params_from_request(req)
         controller = self.get_controller()
 
-        filters = []
-
-        for f in controller.list_filter:
-            field = self.controller.mapper({})._fields[f]
-            filter_cls = self.default_filter_map.get(field.type_name)
-            if filter_cls:
-                filters_list = filter_cls(f, req.rel_url.query) \
-                    .get_filter_list()
-
-                if filters_list:
-                    filters.extend(filters_list)
-
-        if controller.search_fields:
-            filters.extend(
-                SearchFilter(controller.search_fields, req.rel_url.query)
-                    .get_filter_list()
-            )
+        filters = self.get_list_filters(
+            req,
+            controller,
+            self.default_filter_map,
+        )
 
         data = await controller.get_list(**params._asdict(), filters=filters)
 

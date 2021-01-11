@@ -30,7 +30,7 @@ movies = sa.Table('movies', metadata,
 movies_actors = sa.Table('movies_actors', metadata,
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('actor_id', sa.ForeignKey('actors.id')),
-    sa.Column('movie_id', sa.ForeignKey('movie.id')),
+    sa.Column('movie_id', sa.ForeignKey('movies.id')),
 )
 
 shows = sa.Table('shows', metadata,
