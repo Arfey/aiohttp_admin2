@@ -130,7 +130,7 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
                 'content': await self.get_content(req),
                 "controller": controller,
                 "create_url": self.create_url_name,
-                "detail_url_name": self.delete_url_name,
+                "detail_nested_url": self.delete_url_name,
             },
         )
 

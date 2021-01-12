@@ -39,6 +39,8 @@ class ActorMovieController(ManyToManyPostgresController):
     left_table_name = 'movie_id'
     right_table_name = 'actor_id'
 
+    per_page = 10
+
 
 class ActorTab(ManyToManyTabView):
     name = 'Actors'
@@ -48,4 +50,3 @@ class ActorTab(ManyToManyTabView):
 class MoviesPage(ControllerView):
     controller = MoviesController
     tabs = [ActorTab, ]
-
