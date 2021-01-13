@@ -1,4 +1,5 @@
 import re
+import datetime
 
 import aiohttp
 import aiopg.sa
@@ -6,6 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 
 from .db import metadata
+from .auth.tables import users
 from .catalog.tables import (
     actors,
     genres,
@@ -136,10 +138,36 @@ def recreate_tables(db_url):
     metadata.create_all(sync_engine)
 
 
+async def create_users(config):
+    query = users.insert().values([
+        {
+            "name": "admin",
+            "is_superuser": True,
+            "create_at": datetime.datetime.now(),
+            "create_at_date": datetime.datetime.today(),
+            "payload": {},
+            "avatar": "https://bit.ly/2MZJnqt",
+        },
+        {
+            "name": "user",
+            "is_superuser": False,
+            "create_at": datetime.datetime.now(),
+            "create_at_date": datetime.datetime.today(),
+            "payload": {},
+            "avatar": "https://bit.ly/2MZJnqt",
+        },
+    ])
+
+    await execute(config, query)
+
+
 async def load_data(db_url_text):
     config = get_config_from_db_url(db_url_text)
 
     recreate_tables(db_url_text)
+
+    # create users
+    await create_users(config)
 
     tmdb_client = TMDBClient(API_KEY)
 
