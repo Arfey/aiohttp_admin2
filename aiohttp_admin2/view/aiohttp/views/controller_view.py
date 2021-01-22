@@ -19,19 +19,26 @@ class ControllerView(BaseAdminView):
     template_detail_create_name = 'aiohttp_admin/create.html'
     template_delete_name = 'aiohttp_admin/delete.html'
     controller: Controller
-    tabs: t.List[TabBaseView] = []
-    tabs_list = []
+    tabs: t.List[TabBaseView] = None
+    tabs_list: t.List[t.Any] = None
+    relations: t.List[t.Any] = []
 
     # Fields
     exclude_fields = ['id', ]
 
     def __init__(self, *, params: t.Dict[str, t.Any] = None) -> None:
+        self.tabs_list = self.tabs_list or []
+        self.tabs = self.tabs or []
         default = self.controller.name.lower()
+        self.controller_name = default
         self.index_url = self.index_url or f'/{default}/'
         self.name = self.name or default
 
         self.title = self.title if not self.title == 'None' else default
         self.params = params or {}
+
+        for relation in self.relations:
+            relation.accept(self)
 
         if self.tabs:
             self.tabs_list = [Tab(self) for Tab in self.tabs]
@@ -65,31 +72,31 @@ class ControllerView(BaseAdminView):
     # Urls
     @property
     def detail_url_name(self):
-        return f'{self.name}_detail'
+        return f'{self.controller_name}_detail'
 
     @property
     def create_url_name(self):
-        return f'{self.name}_create'
+        return f'{self.controller_name}_create'
 
     @property
     def create_post_url_name(self):
-        return f'{self.name}_create_post'
+        return f'{self.controller_name}_create_post'
 
     @property
     def update_post_url_name(self):
-        return f'{self.name}_update_post'
+        return f'{self.controller_name}_update_post'
 
     @property
     def delete_url_name(self):
-        return f'{self.name}_delete'
+        return f'{self.controller_name}_delete'
 
     @property
     def delete_post_url_name(self):
-        return f'{self.name}_delete_post'
+        return f'{self.controller_name}_delete_post'
 
     @property
     def index_url_name(self):
-        return self.name
+        return self.controller_name
 
     def get_controller(self):
         return self.controller.builder_form_params(self.params)

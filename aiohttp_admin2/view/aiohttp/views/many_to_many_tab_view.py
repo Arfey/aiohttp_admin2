@@ -18,18 +18,23 @@ from aiohttp_admin2.view.aiohttp.views.base import (
 __all__ = ['ManyToManyTabView', ]
 
 
+# todo: nested from controller
 class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
     controller: Controller
     template_detail_create_name = 'aiohttp_admin/create_mtm.html'
     template_detail_name = 'aiohttp_admin/detail_mtm.html'
     template_name: str = 'aiohttp_admin/template_tab_view_m2m.html'
-    exclude_fields = []
     fields_widgets = {}
     default_widget = widgets.StringWidget
     type_widgets = {}
     default_type_widgets = DEFAULT_TYPE_WIDGETS
     default_filter_map = DEFAULT_FILTER_MAP
     search_filter = filters.SearchFilter
+    left_table_name: str
+    right_table_name: str
+
+    # Fields
+    exclude_fields = ['id', ]
 
     def get_controller(self):
         return self.controller.builder_form_params({})
@@ -76,7 +81,7 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
                 "title": f"Create a new {self.name}",
 
                 "mapper": mapper or controller.mapper({
-                    controller.left_table_name: self.get_pk(req)
+                    self.left_table_name: self.get_pk(req)
                 }),
                 "fields": controller.fields,
                 "exclude_fields": self.exclude_fields,
@@ -87,11 +92,13 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
     async def post_create(self, req: web.Request) -> web.Response:
         controller = self.get_controller()
         data = dict(await req.post())
+        data['id'] = 0
 
         mapper = controller.mapper(data)
 
         if mapper.is_valid():
             serialize_data = mapper.data
+            del serialize_data['id']
             obj = await controller.create(serialize_data)
 
             raise web.HTTPFound(
@@ -113,7 +120,7 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
             self.default_filter_map,
         )
         filters_list.append(FilterTuple(
-            controller.left_table_name,
+            self.left_table_name,
             self.get_pk(req),
             'eq',
         ))

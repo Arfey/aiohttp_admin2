@@ -1,4 +1,5 @@
 import typing as t
+from collections import defaultdict
 
 from aiohttp_admin2.resources.types import (
     PK,
@@ -30,6 +31,8 @@ class Controller:
     search_fields: t.List[str] = []
     # todo: handle list of fields
     fields: t.Union[str, t.Tuple[t.Any]] = '__all__'
+    foreign_keys = {}
+    many_to_many = {}
 
     # CRUD access
     can_create = True
@@ -108,6 +111,35 @@ class Controller:
         """
         pass
 
+    async def prefetch_foreignkey(self, list_data: t.List[Instance]):
+        if not self.foreign_keys:
+
+            return {
+                i.get_pk(): i for i in list_data
+            }
+
+        keys = self.foreign_keys.keys()
+        keys_map = defaultdict(list)
+        result_map = {}
+
+        for item in list_data:
+            for key in keys:
+                keys_map[key].append(getattr(item, key))
+
+        for key in keys:
+            ids = keys_map.get(key)
+            result_map[key] = await self.foreign_keys[key]().get_many(ids)
+
+        for item in list_data:
+            item._relations = {}
+
+            for key in keys:
+                item._relations[key] = result_map[key].get(getattr(item, key))
+
+        return {
+            i.get_pk(): i for i in list_data
+        }
+
     # CRUD
     async def delete(self, pk: PK):
         await self.access_hook()
@@ -153,7 +185,11 @@ class Controller:
         if not self.can_view:
             raise PermissionDenied
 
-        return await self.get_resource().get_one(pk)
+        data = await self.get_resource().get_one(pk)
+
+        result = await self.prefetch_foreignkey([data])
+
+        return result.get(data.get_pk())
 
     async def get_list(
         self,
@@ -181,7 +217,7 @@ class Controller:
         if not self.can_view:
             raise PermissionDenied
 
-        return self.get_resource().get_many(pks)
+        return await self.get_resource().get_many(pks)
 
     @classmethod
     def builder_form_params(cls, params: t.Dict[str, t.Any]):

@@ -8,6 +8,7 @@ from aiohttp_admin2.resources.exceptions import (
     FilterException,
     BadParameters,
 )
+from aiohttp_admin2.exceptions import AdminException
 
 
 __all__ = [
@@ -83,9 +84,22 @@ FiltersType = t.List[FilterTuple]
 class Instance:
     """Object from represent all data connected with instance."""
     pk: PK
+    _name: str = None
+
+    def __init__(self, name: str = None) -> None:
+        self._name = name
 
     def __repr__(self) -> str:
-        return str(self.__dict__)
+        return self._name or str(self.__dict__)
+
+    def get_pk(self) -> PK:
+        if hasattr(self, 'pk'):
+            return self.pk
+
+        if hasattr(self, 'id'):
+            return self.id
+
+        raise AdminException("Instance must have id")
 
 
 class Paginator(t.NamedTuple):

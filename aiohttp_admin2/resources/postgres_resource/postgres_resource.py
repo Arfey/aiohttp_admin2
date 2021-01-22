@@ -260,8 +260,12 @@ class PostgresResource(AbstractResource):
 
         return query
 
+    def object_name(self, row: RowProxy) -> str:
+        return f'<{self.name} id={row.id}>'
+
     def row_to_instance(self, row: RowProxy) -> Instance:
         instance = Instance()
         instance.__dict__ = dict(row)
+        instance._name = self.object_name(row)
 
         return instance
