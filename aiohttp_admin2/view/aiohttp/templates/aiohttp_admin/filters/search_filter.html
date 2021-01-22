@@ -14,10 +14,11 @@
     </div>
     <input type="submit" class="btn btn-secondary mx-sm-3 mb-2" value="search">
     {% for i, k in request.rel_url.query.items() %}
-    {% if i != filter.param_key %}
+    {% if i != filter.param_key and i != 'page' %}
     <input type="hidden" name="{{i}}" value="{{k}}">
     {% endif %}
     {% endfor %}
+    <input type="hidden" name="page" value="1">
     {% if filter.get_param() %}
     <a href="{{ newParam({ filter.param_key: '', 'page': 1 }, request.rel_url.query) }}">clear</a>
     {% endif %}
