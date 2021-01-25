@@ -20,7 +20,13 @@
                         {% if hasattr(controller, "{}_field".format(field)) %}
                             {{ getattr(controller, "{}_field".format(field))(obj)|safe }}
                         {% else %}
-                            {{ obj|attr(field) }}
+                            {% if hasattr(obj, '_relations') and obj._relations.get(field) %}
+                            <a href="{{ url(controller.foreign_keys.get(field)().name + '_detail', pk=getattr(obj, field)) }}">
+                                {{ obj._relations.get(field) }}
+                            </a>
+                            {% else %}
+                            {{ obj|attr(field)|safe }}
+                            {% endif %}
                         {% endif %}
                         {% if loop.first %}
                         {% if controller.can_update %}

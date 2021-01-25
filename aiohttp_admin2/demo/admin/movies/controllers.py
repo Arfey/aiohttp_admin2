@@ -27,7 +27,7 @@ class MoviesController(PostgresController):
 class ActorMovieController(PostgresController):
     table = movies_actors
     mapper = ActorMoviesMapper
-    inline_fields = ['id', 'movie_id', 'actor_id', ]
+    inline_fields = ['id', 'movie_id', 'actor_id', 'movie']
 
     per_page = 10
 
@@ -35,3 +35,6 @@ class ActorMovieController(PostgresController):
         'movie_id': MoviesController,
         'actor_id': ActorController,
     }
+
+    def movie_field(self, obj):
+        return obj._relations.get('movie_id').name

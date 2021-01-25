@@ -203,13 +203,17 @@ class Controller:
         if not self.can_view:
             raise PermissionDenied
 
-        return await self.get_resource().get_list(
+        list_data = await self.get_resource().get_list(
             page=page,
             cursor=cursor,
             limit=self.per_page,
             order_by=order_by or self.order_by,
             filters=filters,
         )
+
+        await self.prefetch_foreignkey(list_data.instances)
+
+        return list_data
 
     async def get_many(self, pks: t.List[PK]):
         await self.access_hook()
