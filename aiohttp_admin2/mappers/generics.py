@@ -44,7 +44,8 @@ class PostgresMapperGeneric(Mapper):
 
             if field_cls is fields.ChoicesField:
                 field = fields.ChoicesField(
-                    choices=[(n, n) for n in column.type.enums]
+                    choices=[(n, n) for n in column.type.enums],
+                    required=not column.nullable,
                 )
             elif field_cls is fields.ArrayField:
                 field = field_cls(
@@ -52,7 +53,7 @@ class PostgresMapperGeneric(Mapper):
                         .get(type(column.type.item_type), cls.DEFAULT_FIELD),
                 )
             else:
-                field = field_cls()
+                field = field_cls(required=not column.nullable)
 
             field.name = name
             if name not in existing_fields:

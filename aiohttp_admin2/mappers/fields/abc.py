@@ -89,4 +89,5 @@ class AbstractField(ABC):
 
     def __repr__(self):
         return \
-            f"{self.__class__.__name__}(name={self.name}, value={self._value})"
+            f"{self.__class__.__name__}(name={self.name}," \
+            f" value={self._value}), required={self.required}"
