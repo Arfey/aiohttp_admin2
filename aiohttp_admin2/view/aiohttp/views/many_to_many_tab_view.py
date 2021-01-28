@@ -92,7 +92,7 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
     async def post_create(self, req: web.Request) -> web.Response:
         controller = self.get_controller()
         data = dict(await req.post())
-        data['id'] = 0
+        data['id'] = -1
 
         mapper = controller.mapper(data)
 

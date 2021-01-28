@@ -208,8 +208,10 @@ class ControllerView(BaseAdminView):
     # todo: concat post and get update
     async def post_update(self, req: web.Request) -> web.Response:
         controller = self.get_controller()
-        data = await req.post()
+        data = dict(await req.post())
+        # todo: get_pk_name
         pk = req.match_info['pk']
+        data['id'] = pk
 
         mapper = controller.mapper(dict(data))
 

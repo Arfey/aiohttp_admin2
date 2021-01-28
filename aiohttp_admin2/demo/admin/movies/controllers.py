@@ -28,6 +28,7 @@ class ActorMovieController(PostgresController):
     table = movies_actors
     mapper = ActorMoviesMapper
     inline_fields = ['id', 'movie_id', 'actor_id', 'movie']
+    list_filter = ['id']
 
     per_page = 10
 

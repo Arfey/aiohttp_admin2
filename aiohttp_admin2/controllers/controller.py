@@ -128,7 +128,10 @@ class Controller:
 
         for key in keys:
             ids = keys_map.get(key)
-            result_map[key] = await self.foreign_keys[key]().get_many(ids)
+            if ids:
+                result_map[key] = await self.foreign_keys[key]().get_many(ids)
+            else:
+                result_map[key] = {}
 
         for item in list_data:
             item._relations = {}
