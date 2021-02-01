@@ -24,7 +24,6 @@ class AbstractField(ABC):
         default: t.Optional[str] = None,
         **kwargs: t.Any,
     ) -> None:
-        self.name: str = None
         self.default: t.Optional[str] = default
         self._value: t.Optional[str] = default if value is None else value
         self.errors: t.List[t.Optional[str]] = []
@@ -72,7 +71,7 @@ class AbstractField(ABC):
 
         """
         if self.required and not self._value:
-            raise ValidationError(F"{self.name} field is required.")
+            raise ValidationError("field is required.")
 
         self.to_python()
         self.to_storage()
@@ -89,5 +88,5 @@ class AbstractField(ABC):
 
     def __repr__(self):
         return \
-            f"{self.__class__.__name__}(name={self.name}," \
+            f"{self.__class__.__name__}(name={self.type_name}," \
             f" value={self._value}), required={self.required}"

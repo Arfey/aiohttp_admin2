@@ -20,14 +20,12 @@
         {%- endif %}
 
         <!--   Options     -->
-        {%- if not field.required %}
         <option
             value=""
             {% if value_default %}selected{% endif%}
         >
             {{ field.empty_value }}
         </option>
-        {%- endif %}
 
         {%- for value, text in field.choices %}
         <option
