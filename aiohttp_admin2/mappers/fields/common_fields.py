@@ -39,7 +39,9 @@ class IntField(AbstractField):
         try:
             return int(self._value) if self._value else self._value
         except ValueError:
-            raise ValidationError("Incorrect value for Int field.")
+            raise ValidationError(
+                f"Incorrect value for Int field. {self._value}"
+            )
 
 
 class FloatField(AbstractField):
@@ -56,7 +58,9 @@ class DateTimeField(AbstractField):
         try:
             return parser.parse(self._value) if self._value else None
         except parser.ParserError:
-            raise ValidationError("Incorrect format for time field.")
+            raise ValidationError(
+                f"Incorrect format for time field. {self._value}"
+            )
 
 
 class DateField(DateTimeField):

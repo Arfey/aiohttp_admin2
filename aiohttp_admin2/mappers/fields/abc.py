@@ -19,7 +19,7 @@ class AbstractField(ABC):
         self,
         *,
         required: bool = False,
-        validators: t.List[t.Any] = [],
+        validators: t.List[t.Callable[[t.Any], bool]] = None,
         value: t.Optional[str] = None,
         default: t.Optional[str] = None,
         **kwargs: t.Any,
@@ -29,7 +29,7 @@ class AbstractField(ABC):
         self.errors: t.List[t.Optional[str]] = []
         self.required = required
         # todo: add validator
-        self.validators = validators
+        self.validators = validators or []
 
     @abstractmethod
     def to_python(self) -> t.Any:
@@ -75,6 +75,9 @@ class AbstractField(ABC):
 
         self.to_python()
         self.to_storage()
+
+        for validator in self.validators:
+            validator(self.value)
 
         return True
 

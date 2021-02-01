@@ -37,7 +37,6 @@ class PostgresMapperGeneric(Mapper):
         existing_fields = [field.name for field in cls._fields_cls]
 
         # todo: add tests
-        # todo: add required field
         for name, column in table.columns.items():
             field_cls = \
                 cls.FIELDS_MAPPER.get(type(column.type), cls.DEFAULT_FIELD)
@@ -51,6 +50,7 @@ class PostgresMapperGeneric(Mapper):
                 field = field_cls(
                     field_cls=cls.FIELDS_MAPPER
                         .get(type(column.type.item_type), cls.DEFAULT_FIELD),
+                    required=not column.nullable,
                 )
             else:
                 field = field_cls(required=not column.nullable)
