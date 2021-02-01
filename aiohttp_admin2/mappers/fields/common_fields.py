@@ -90,6 +90,7 @@ class ChoicesField(AbstractField):
 
     """
     type_name: str = 'choice'
+    empty_value: str = '-- empty --'
     field: AbstractField
 
     def __init__(
@@ -97,17 +98,25 @@ class ChoicesField(AbstractField):
         *,
         choices=None,
         field_cls=StringField,
+        empty_value: str = None,
         **kwargs: t.Any,
     ) -> None:
         super().__init__(**kwargs)
         self.field_cls = field_cls
         # todo: if field_cls is object
         self.field = field_cls(**kwargs)
+        self.empty_value = \
+            self.empty_value if empty_value is None else empty_value
         self.choices = choices
         self._choice_validation(choices)
 
     def to_python(self) -> t.Optional[bool]:
-        return self.field.to_python()
+        value = self.field.to_python()
+
+        if value == '':
+            return None
+
+        return value
 
     def to_storage(self) -> str:
         return self.field.to_storage()
@@ -123,9 +132,9 @@ class ChoicesField(AbstractField):
             return is_valid
         else:
             raise ValidationError(
-                f"{self.__class__.__name__}.{self.name} has wrong value."
+                f"{self.__class__.__name__} has wrong value."
                 f" It must be on of {[value for value, _ in self.choices]} "
-                f"but received {self.value}"
+                f"but received '{self.value}'"
             )
 
     def _choice_validation(self, choices):

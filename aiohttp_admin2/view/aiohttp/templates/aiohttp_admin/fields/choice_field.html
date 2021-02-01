@@ -25,6 +25,7 @@
             value=""
             {% if value_default %}selected{% endif%}
         >
+            {{ field.empty_value }}
         </option>
         {%- endif %}
 
