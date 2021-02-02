@@ -12,7 +12,7 @@
                 class="form-control datetimepicker-input"
                 id="{{ name }}input"
                 name="{{ name }}"
-                value="{{ field.raw_value if field._value }}"
+                value="{{ field.failure_safe_value if field.is_not_none }}"
                 data-target="#{{name}}-datetime"
         />
         <div class="input-group-addon input-group-append" data-target="#{{name}}-datetime" data-toggle="datetimepicker">

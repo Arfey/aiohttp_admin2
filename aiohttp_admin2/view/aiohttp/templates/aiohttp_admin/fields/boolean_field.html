@@ -5,7 +5,7 @@
 %}
 <div class="form-group">
     <label for="{{ name }}input">{{ name }}:</label>
-    <input id="{{ name }}input" name="{{ name }}" {% if field.value %}checked{% endif %} type="checkbox" />
+    <input id="{{ name }}input" name="{{ name }}" {% if field.failure_safe_value %}checked{% endif %} type="checkbox" />
     <br>
     {% if field.errors %}
     <br>

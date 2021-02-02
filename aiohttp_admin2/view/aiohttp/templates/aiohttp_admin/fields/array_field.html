@@ -5,8 +5,7 @@
 %}
 <div class="form-group">
     <label for="{{ name }}input">{{ name }}:</label>
-    <!-- todo: move from _value -->
-    <input id="{{ name }}input" class="{{name}} form-control" name="{{ name }}" value="{{field.value | map('string') | join(',') if field._value}}" placeholder="Add tags"/>
+    <input id="{{ name }}input" class="{{name}} form-control" name="{{ name }}" value="{{field.failure_safe_value | map('string') | join(',') if field.is_not_none}}" placeholder="Add tags"/>
     {% if field.errors %}
     <br>
     {% for error in field.errors %}

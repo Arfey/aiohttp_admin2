@@ -177,8 +177,6 @@ class ArrayField(AbstractField):
         self.field = field_cls(value=None)
 
     def to_python(self) -> t.Optional[t.List[t.Any]]:
-        # todo: add validation for inner type
-
         if self._value:
             if isinstance(self._value, list):
                 return self._value
@@ -195,6 +193,15 @@ class ArrayField(AbstractField):
                     self.field(i).to_python() for i in self._value.split(',')
                 ]
 
+        return self._value
+
+    @property
+    def failure_safe_value(self):
+        if self._value:
+            if isinstance(self._value, list):
+                return self._value
+            else:
+                return self._value.split(',')
         return self._value
 
     def __call__(self, value: t.Any) -> "AbstractField":

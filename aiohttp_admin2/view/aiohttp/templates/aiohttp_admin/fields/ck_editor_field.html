@@ -5,9 +5,8 @@
 %}
 <div class="form-group">
     <label for="{{ name }}input">{{ name }}:</label>
-    <!-- todo: move from _value -->
     <textarea class="ckeditor form-control" id="{{ name }}input" name="{{ name }}">
-        {{ field.raw_value if field._value }}
+        {{ field.failure_safe_value if field.is_not_none }}
     </textarea>
     {% if field.errors %}
     <br>

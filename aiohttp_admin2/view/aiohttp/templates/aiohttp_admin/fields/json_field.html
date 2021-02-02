@@ -5,11 +5,10 @@
 %}
 <div class="form-group">
     <label>{{ name }}:</label>
-    <!-- todo: move from _value -->
     <div class="wrapper-json">
-        <div class="{{ name }} json" id="jsoneditor-{{name}}" name="{{ name }}">{{ field.raw_value if field._value != None }}</div>
+        <div class="{{ name }} json" id="jsoneditor-{{name}}" name="{{ name }}">{{ field.raw_value if field.is_not_none }}</div>
         <textarea class="{{ name }}-json hidden" name="{{ name }}">
-            {{ field.raw_value if field._value != None }}
+            {{ field.raw_value if field.is_not_none }}
         </textarea>
     </div>
     {% if field.errors %}

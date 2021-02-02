@@ -61,6 +61,22 @@ class AbstractField(ABC):
     def raw_value(self) -> t.Any:
         return self.to_storage()
 
+    @property
+    def failure_safe_value(self) -> t.Any:
+        """
+        This method need to return value even if value is invalid. It's might
+        be helpful in case when we need to show error and show value which
+        raise current error.
+        """
+        try:
+            return self.value
+        except Exception:
+            return self.raw_value
+
+    @property
+    def is_not_none(self):
+        return self._value is not None
+
     def is_valid(self) -> bool:
         """
         In this method check is current field valid and have correct value.
