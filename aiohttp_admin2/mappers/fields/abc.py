@@ -9,9 +9,6 @@ from aiohttp_admin2.mappers.exceptions import ValidationError
 __all__ = ['AbstractField', ]
 
 
-# todo: add validators
-
-
 class AbstractField(ABC):
     type_name: str = 'string'
 
@@ -28,7 +25,6 @@ class AbstractField(ABC):
         self._value: t.Optional[str] = value
         self.errors: t.List[t.Optional[str]] = []
         self.required = required
-        # todo: add validator
         self.validators = validators or []
 
     @abstractmethod
