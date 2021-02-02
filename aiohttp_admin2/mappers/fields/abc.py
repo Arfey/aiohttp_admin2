@@ -25,7 +25,7 @@ class AbstractField(ABC):
         **kwargs: t.Any,
     ) -> None:
         self.default: t.Optional[str] = default
-        self._value: t.Optional[str] = default if value is None else value
+        self._value: t.Optional[str] = value
         self.errors: t.List[t.Optional[str]] = []
         self.required = required
         # todo: add validator
