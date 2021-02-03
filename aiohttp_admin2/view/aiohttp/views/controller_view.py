@@ -29,9 +29,10 @@ class ControllerView(BaseAdminView):
     def __init__(self, *, params: t.Dict[str, t.Any] = None) -> None:
         self.tabs_list = self.tabs_list or []
         self.tabs = self.tabs or []
-        default = self.controller.name.lower()
-        self.controller_name = default
-        self.index_url = self.index_url or f'/{default}/'
+        default = self.controller.name
+
+        self.controller_url = self.controller.url_name()
+        self.index_url = self.index_url or f'/{self.controller_url}/'
         self.name = self.name or default
 
         self.title = self.title if not self.title == 'None' else default
@@ -72,31 +73,31 @@ class ControllerView(BaseAdminView):
     # Urls
     @property
     def detail_url_name(self):
-        return f'{self.controller_name}_detail'
+        return f'{self.controller_url}_detail'
 
     @property
     def create_url_name(self):
-        return f'{self.controller_name}_create'
+        return f'{self.controller_url}_create'
 
     @property
     def create_post_url_name(self):
-        return f'{self.controller_name}_create_post'
+        return f'{self.controller_url}_create_post'
 
     @property
     def update_post_url_name(self):
-        return f'{self.controller_name}_update_post'
+        return f'{self.controller_url}_update_post'
 
     @property
     def delete_url_name(self):
-        return f'{self.controller_name}_delete'
+        return f'{self.controller_url}_delete'
 
     @property
     def delete_post_url_name(self):
-        return f'{self.controller_name}_delete_post'
+        return f'{self.controller_url}_delete_post'
 
     @property
     def index_url_name(self):
-        return self.controller_name
+        return self.controller_url
 
     def get_controller(self):
         return self.controller.builder_form_params(self.params)

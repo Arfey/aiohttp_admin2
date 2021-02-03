@@ -25,6 +25,7 @@ class Controller:
     """
     resource: AbstractResource
     mapper: Mapper = None
+    name: str
 
     read_only_fields = []
     inline_fields = ['id', ]
@@ -243,3 +244,7 @@ class Controller:
             for name, value in fields
             if name in self.fields
         }
+
+    @classmethod
+    def url_name(cls) -> str:
+        return "_".join(cls.name.lower().split(" "))

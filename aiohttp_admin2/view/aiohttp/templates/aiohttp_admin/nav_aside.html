@@ -10,12 +10,12 @@
         {%- for view in views %}
         <li class="nav-aside__item">
             <a
-                {%- if request.app.router[view.name].url_for().path == request.rel_url.path %}
+                {%- if request.app.router[view.controller_url].url_for().path == request.rel_url.path %}
                 class="nav-aside__link nav-aside__link_active"
                 {%- else %}
                 class="nav-aside__link"
                 {%- endif %}
-                href="{{ url(view.name) }}"
+                href="{{ url(view.controller_url) }}"
                 title="{{ view.title | capitalize }}"
             >
                 <i class="material-icons">{{ view.icon }}</i>
