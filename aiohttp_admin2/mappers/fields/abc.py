@@ -4,7 +4,10 @@ from abc import (
     abstractmethod,
 )
 
-from aiohttp_admin2.mappers.exceptions import ValidationError
+from aiohttp_admin2.mappers.validators import (
+    required as required_validator,
+    length,
+)
 
 __all__ = ['AbstractField', ]
 
@@ -16,7 +19,7 @@ class AbstractField(ABC):
         self,
         *,
         required: bool = False,
-        validators: t.List[t.Callable[[t.Any], bool]] = None,
+        validators: t.List[t.Callable[[t.Any], None]] = None,
         value: t.Optional[str] = None,
         default: t.Optional[str] = None,
         **kwargs: t.Any,
@@ -26,6 +29,17 @@ class AbstractField(ABC):
         self.errors: t.List[t.Optional[str]] = []
         self.required = required
         self.validators = validators or []
+        self.kwargs = kwargs
+        self.init_default_validators()
+
+    def init_default_validators(self):
+        if self.required:
+            self.validators.append(required_validator)
+
+        max_length = self.kwargs.get('max_length')
+
+        if max_length:
+            self.validators.append(length(max_value=max_length))
 
     @abstractmethod
     def to_python(self) -> t.Any:
@@ -82,9 +96,6 @@ class AbstractField(ABC):
             ValueError, TypeError: if type of value is wrong
 
         """
-        if self.required and not self._value:
-            raise ValidationError("field is required.")
-
         self.to_python()
         self.to_storage()
 

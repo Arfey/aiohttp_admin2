@@ -22,6 +22,7 @@ class PostgresMapperGeneric(Mapper):
     FIELDS_MAPPER = {
         sa.Integer: fields.IntField,
         sa.Text: fields.StringField,
+        sa.String: fields.StringField,
         sa.Enum: fields.ChoicesField,
         sa.Boolean: fields.BooleanField,
         sa.ARRAY: fields.ArrayField,
@@ -41,19 +42,25 @@ class PostgresMapperGeneric(Mapper):
             field_cls = \
                 cls.FIELDS_MAPPER.get(type(column.type), cls.DEFAULT_FIELD)
 
+            max_length = hasattr(column.type, 'length') and column.type.length
+            field_kwargs = {
+                "max_length": max_length,
+                "required": not column.nullable
+            }
+
             if field_cls is fields.ChoicesField:
                 field = fields.ChoicesField(
                     choices=[(n, n) for n in column.type.enums],
-                    required=not column.nullable,
+                    **field_kwargs
                 )
             elif field_cls is fields.ArrayField:
                 field = field_cls(
                     field_cls=cls.FIELDS_MAPPER
                         .get(type(column.type.item_type), cls.DEFAULT_FIELD),
-                    required=not column.nullable,
+                    **field_kwargs
                 )
             else:
-                field = field_cls(required=not column.nullable)
+                field = field_cls(**field_kwargs)
 
             field.name = name
             if name not in existing_fields:

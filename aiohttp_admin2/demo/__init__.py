@@ -18,7 +18,7 @@ import jinja2
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from .admin.actors.controllers import ActorPage
-from .admin.genres.controllers import GenresPage
+from .admin.genres.pages import GenresPage
 from .admin.movies.pages import MoviesPage
 from .admin.shows.controllers import ShowsPage
 from .admin.users.controllers import UsersPage
