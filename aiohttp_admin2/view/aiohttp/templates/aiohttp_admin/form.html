@@ -8,7 +8,8 @@
     method='POST',
     submit_text='submit',
     submit_cls='',
-    exclude=[]
+    exclude=[],
+    with_defaults=False
 )
 %}
 <div>
@@ -18,7 +19,7 @@
 
         {% for name, field in mapper.fields.items() %}
             {% if name not in exclude %}
-                {{ field_generator(name, field, controller_view) }}
+                {{ field_generator(name, field, controller_view, with_defaults) }}
             {% endif %}
         {% endfor %}
 
@@ -26,7 +27,7 @@
 
         {% for name, field in mapper.fields.items() %}
             {% if name not in exclude %}
-                {{ field_generator(name, field, controller_view) }}
+                {{ field_generator(name, field, controller_view, with_defaults) }}
             {% endif %}
         {% endfor %}
 

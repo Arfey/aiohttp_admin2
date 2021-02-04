@@ -1,11 +1,19 @@
 {% macro field(
     name,
-    field
+    field,
+    with_defaults=False
 )
 %}
 <div class="form-group">
-    <label for="{{ name }}input">{{ name }}:</label>
-    <input id="{{ name }}input" class="{{name}} form-control" name="{{ name }}" value="{{field.failure_safe_value | map('string') | join(',') if field.is_not_none}}" placeholder="Add tags"/>
+    {% include 'aiohttp_admin/blocks/form/field_title.html' %}
+    {%- if field.is_not_none %}
+        {% set field_value = field.failure_safe_value %}
+    {%- elif field.default and with_defaults %}
+        {% set field_value = field.default %}
+    {%- else %}
+        {% set field_value = None %}
+    {%- endif %}
+    <input id="{{ name }}input" class="{{name}} form-control" name="{{ name }}" value="{{field_value | map('string') | join(',') if field.is_not_none}}" placeholder="Add tags"/>
     {% if field.errors %}
     <br>
     {% for error in field.errors %}

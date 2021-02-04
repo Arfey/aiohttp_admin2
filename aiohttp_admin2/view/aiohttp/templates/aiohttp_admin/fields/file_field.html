@@ -1,10 +1,11 @@
 {% macro field(
     name,
-    field
+    field,
+    with_defaults=False
 )
 %}
 <div class="form-group">
-    <label for="{{ name }}input">{{ name }}:</label>
+    {% include 'aiohttp_admin/blocks/form/field_title.html' %}
     <!-- todo: move from _value -->
     {% if field._value %}
     <a href="{{ field._value  }}" target="_blank">{{ field._value }}</a>

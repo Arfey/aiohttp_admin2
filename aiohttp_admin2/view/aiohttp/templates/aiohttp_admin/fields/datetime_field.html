@@ -1,18 +1,26 @@
 {% macro field(
     name,
-    field
+    field,
+    with_defaults=False
 )
 %}
 
 <div class="form-group">
-    <label for="{{ name }}input">{{ name }}:</label>
+    {% include 'aiohttp_admin/blocks/form/field_title.html' %}
+    {%- if field.is_not_none %}
+        {% set field_value = field.failure_safe_value %}
+    {%- elif field.default and with_defaults %}
+        {% set field_value = field.default %}
+    {%- else %}
+        {% set field_value = '' %}
+    {%- endif %}
     <div class='input-group date' id='{{name}}-datetime' data-target-input="nearest">
         <input
                 type="text"
                 class="form-control datetimepicker-input"
                 id="{{ name }}input"
                 name="{{ name }}"
-                value="{{ field.failure_safe_value if field.is_not_none }}"
+                value="{{ field_value }}"
                 data-target="#{{name}}-datetime"
         />
         <div class="input-group-addon input-group-append" data-target="#{{name}}-datetime" data-toggle="datetimepicker">
