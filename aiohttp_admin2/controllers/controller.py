@@ -155,33 +155,64 @@ class Controller:
         await self.get_resource().delete(pk)
         await self.post_delete(pk)
 
-    async def update(self, pk: PK, data: t.Dict[str, t.Any]):
+    async def update(
+        self,
+        pk: PK,
+        data: t.Dict[str, t.Any],
+    ) -> t.Union[Instance, Mapper]:
         await self.access_hook()
 
         if not self.can_update:
             raise PermissionDenied
 
-        data = await self.pre_update(data)
-        instance = Instance()
-        instance.__dict__ = data
-        res = await self.get_resource().update(pk, instance)
-        await self.post_update(res)
+        # todo: get_pk_name
+        data['id'] = pk
 
-    async def create(self, data: t.Dict[str, t.Any]):
+        data = await self.pre_update(data)
+
+        mapper = self.mapper(data)
+
+        if mapper.is_valid():
+            serialize_data = mapper.data
+            del serialize_data['id']
+            instance = Instance()
+            instance.__dict__ = serialize_data
+
+            instance = await self.get_resource().update(pk, instance)
+            await self.post_update(instance)
+
+            return instance
+
+        return mapper
+
+    async def create(
+        self,
+        data: t.Dict[str, t.Any],
+    ) -> t.Union[Instance, Mapper]:
         await self.access_hook()
 
         if not self.can_create:
             raise PermissionDenied
 
-        # todo: think about errors
         data = await self.pre_create(data)
-        instance = Instance()
-        instance.__dict__ = data
-        res = await self.get_resource().create(instance)
 
-        await self.post_create(res)
+        data['id'] = -1
 
-        return res
+        mapper = self.mapper(data)
+
+        if mapper.is_valid():
+            serialize_data = mapper.data
+            del serialize_data['id']
+            instance = Instance()
+            instance.__dict__ = serialize_data
+
+            instance = await self.get_resource().create(instance)
+
+            await self.post_create(instance)
+
+            return instance
+
+        return mapper
 
     async def get_detail(self, pk: PK):
         await self.access_hook()

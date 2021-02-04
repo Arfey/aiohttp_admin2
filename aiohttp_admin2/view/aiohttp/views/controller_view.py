@@ -5,6 +5,7 @@ import typing as t
 from aiohttp_admin2.view.aiohttp.views.base import BaseAdminView
 from aiohttp_admin2.view.aiohttp.views.tab_base_view import TabBaseView
 from aiohttp_admin2.controllers.controller import Controller
+from aiohttp_admin2.mappers import Mapper
 
 
 class ControllerView(BaseAdminView):
@@ -187,24 +188,19 @@ class ControllerView(BaseAdminView):
     async def post_create(self, req: web.Request) -> web.Response:
         controller = self.get_controller()
         data = dict(await req.post())
-        data['id'] = -1
 
-        mapper = controller.mapper(data)
+        obj = await controller.create(data)
 
-        if mapper.is_valid():
-            serialize_data = mapper.data
-            del serialize_data['id']
-            obj = await controller.create(serialize_data)
-
+        if isinstance(obj, Mapper):
+            return await self.get_create(req, obj)
+        else:
             raise web.HTTPFound(
                 req.app.router[self.detail_url_name]
                     .url_for(pk=str(obj.id))
                     .with_query(
-                        f'message=The {self.name}#{obj.id} has been created'
-                    )
+                    f'message=The {self.name}#{obj.id} has been created'
+                )
             )
-        else:
-            return await self.get_create(req, mapper)
 
     # todo: concat post and get update
     async def post_update(self, req: web.Request) -> web.Response:
@@ -212,24 +208,19 @@ class ControllerView(BaseAdminView):
         data = dict(await req.post())
         # todo: get_pk_name
         pk = req.match_info['pk']
-        data['id'] = pk
 
-        mapper = controller.mapper(dict(data))
+        obj = await controller.update(pk, data)
 
-        if mapper.is_valid():
-            serialize_data = mapper.data
-            del serialize_data['id']
-            await controller.update(pk, serialize_data)
-
+        if isinstance(obj, Mapper):
+            return await self.get_detail(req, obj)
+        else:
             raise web.HTTPFound(
                 req.app.router[self.detail_url_name]
                     .url_for(pk=pk)
                     .with_query(
-                        f'message=The {self.name}#{pk} has been updated'
-                    )
+                    f'message=The {self.name}#{pk} has been updated'
+                )
             )
-        else:
-            return await self.get_detail(req, mapper)
 
     async def get_delete(self, req: web.Request) -> web.Response:
         return aiohttp_jinja2.render_template(
