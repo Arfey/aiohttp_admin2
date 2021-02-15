@@ -13,6 +13,15 @@ from .catalog.tables import (
     genres,
     movies,
     shows,
+    movies_status_mapper,
+    shows_status_mapper,
+    movies_genres,
+    movies_actors,
+    shows_actors,
+    shows_genres,
+    shows_seasons,
+    images_links,
+    ImagesEnum,
 )
 
 
@@ -80,13 +89,19 @@ class TMDBClient:
         """
         This method return full data connected with received movie.
         """
-        pass
+        return await self.get(f'movie/{movie_id}')
 
-    async def get_detail_show(self, movie_id):
+    async def get_detail_show(self, tv_id):
         """
         This method return full data connected with received show.
         """
-        pass
+        return await self.get(f'tv/{tv_id}]')
+
+    async def get_shows_images(self, tv_id):
+        return await self.get(f'tv/{tv_id}/images')
+
+    async def get_movie_images(self, movie_id):
+        return await self.get(f'movie/{movie_id}/images')
 
     async def get_movie_genres(self):
         """
@@ -162,6 +177,9 @@ async def create_users(config):
 
 
 async def load_data(db_url_text):
+    print("Start to load data ...")
+
+    tmdb_client = TMDBClient(API_KEY)
     config = get_config_from_db_url(db_url_text)
 
     recreate_tables(db_url_text)
@@ -169,72 +187,83 @@ async def load_data(db_url_text):
     # create users
     await create_users(config)
 
-    tmdb_client = TMDBClient(API_KEY)
-
     # Create genres
+    genres_ids_movie = [
+        {
+            'id': genre.get('id'),
+            'name': genre.get('name'),
+            'type': 'movie',
+        } for genre in await tmdb_client.get_movie_genres()
+    ]
+
+    genres_ids_tv = [
+        {
+            'id': genre.get('id'),
+            'name': genre.get('name'),
+            'type': 'tv',
+        } for genre in await tmdb_client.get_show_genres()
+        if genre['id'] not in [i['id'] for i in genres_ids_movie]
+    ]
+
     query = genres\
         .insert()\
-        .values([
-            {
-                'id': genre.get('id'),
-                'name': genre.get('name'),
-                'type': 'movie',
-            } for genre in await tmdb_client.get_movie_genres()
-        ])
+        .values([*genres_ids_movie, *genres_ids_tv])
 
     await execute(config, query)
-
-    # query = genres\
-    #     .insert()\
-    #     .values([
-    #         {
-    #             'id': genre.get('id'),
-    #             'name': genre.get('name'),
-    #             'type': 'tv',
-    #         } for genre in await tmdb_client.get_show_genres()
-    #     ])
-    #
-    # await execute(config, query)
 
     # Create actors
 
     movies_dict = {}
     shows_dict = {}
-    max_count_of_movies = 100
+    max_count_of_movies = 50
 
     for i in range(1, int(max_count_of_movies / 20)):
         res = await tmdb_client.get_movies(page=i)
 
         for movie in res:
-            movies_dict[movie["id"]] = {
-                "id": movie["id"],
-                "name": movie["title"],
-            }
+            movies_dict[movie["id"]] = \
+                await tmdb_client.get_detail_movie(movie["id"])
 
     for i in range(1, int(max_count_of_movies / 20)):
         res = await tmdb_client.get_shows(page=i)
 
         for show in res:
-            shows_dict[show["id"]] = {
-                "id": show["id"],
-                "name": show["name"],
-            }
+            shows_dict[show["id"]] = await tmdb_client\
+                .get_detail_show(show["id"])
 
     actors_dict = {}
+    movies_cast = []
+    tv_cast = []
 
     for movie in movies_dict.keys():
         for cast in await tmdb_client.get_movie_credits(movie):
             actors_dict[cast["id"]] = {
                 "name": cast["name"],
+                "url": cast["profile_path"],
+                "gender": cast["gender"],
                 "id": cast["id"],
             }
+            movies_cast.append({
+                "actor_id": cast["id"],
+                "movie_id": movie,
+                "character": cast["character"],
+                "order": cast["order"],
+            })
 
     for show in shows_dict.keys():
         for cast in await tmdb_client.get_show_credits(show):
             actors_dict[cast["id"]] = {
                 "name": cast["name"],
+                "url": cast["profile_path"],
+                "gender": cast["gender"],
                 "id": cast["id"],
             }
+            tv_cast.append({
+                "actor_id": cast["id"],
+                "show_id": show,
+                "character": cast["character"],
+                "order": cast["order"],
+            })
 
     query = actors\
         .insert()\
@@ -242,33 +271,204 @@ async def load_data(db_url_text):
             {
                 'id': actor.get('id'),
                 'name': actor.get('name'),
+                'url': actor.get('url'),
+                'gender': "male" if actor.get('gender') == 1 else 'female',
             } for actor in actors_dict.values()
         ])
 
     await execute(config, query)
 
-    query = movies\
-        .insert()\
-        .values([
+    data = [
             {
                 'id': movie.get('id'),
-                'name': movie.get('name'),
+                'tmdb': movie.get('id'),
+                'imdb': movie.get('imdb_id'),
+                'title': movie.get('title'),
+                'tag_line': movie.get('tagline'),
+                'overview': movie.get('overview'),
+                'homepage': movie.get('homepage'),
+                'runtime': movie.get('runtime'),
+                'budget': movie.get('budget'),
+                'revenue': movie.get('revenue'),
+                'release_date': movie.get('release_date'),
+                'vote_average': movie.get('vote_average'),
+                'vote_count': movie.get('vote_count'),
+                'poster_path': movie.get('poster_path'),
+                'status': movies_status_mapper.get(
+                    movie.get('status').lower()
+                ),
             } for movie in movies_dict.values()
-        ])
+        ]
+
+    query = movies\
+        .insert()\
+        .values(data)
 
     await execute(config, query)
+
+    genres_movies_list = []
+    for data in movies_dict.values():
+        for genre in data["genres"]:
+            genres_movies_list.append({
+                "genre_id": genre.get("id"),
+                "movie_id": data.get("id"),
+            })
+
+    # genres movies
+    query = movies_genres\
+        .insert() \
+        .values([
+        {
+            'genre_id': data.get('genre_id'),
+            'movie_id': data.get('movie_id'),
+        } for data in genres_movies_list
+    ])
+
+    await execute(config, query)
+
+    query = movies_actors\
+        .insert() \
+        .values([
+        {
+            'actor_id': actor.get('actor_id'),
+            'movie_id': actor.get('movie_id'),
+            'character': actor.get('character'),
+            'order': actor.get('order'),
+        } for actor in movies_cast
+    ])
+
+    await execute(config, query)
+
+    movies_images_dict = {
+        movie_id: await tmdb_client.get_movie_images(movie_id)
+        for movie_id in movies_dict.keys()
+    }
+
+    movies_images_values = []
+
+    for show_id, data in movies_images_dict.items():
+        for backdrop in data.get('backdrops', []):
+            movies_images_values.append({
+                "movie_id": show_id,
+                "type": ImagesEnum.backdrops,
+                "url": backdrop.get('file_path')
+            })
+
+        for posters in data.get('posters', []):
+            movies_images_values.append({
+                "movie_id": show_id,
+                "type": ImagesEnum.posters,
+                "url": posters.get('file_path')
+            })
+
+    query = images_links \
+        .insert() \
+        .values(movies_images_values)
+
+    await execute(config, query)
+
+    shows_values = []
+    shows_seasons_dict = {}
+
+    for show in shows_dict.values():
+        shows_values.append({
+            'id': show.get('id'),
+            'tmdb': show.get('id'),
+            'first_air_date': show.get('first_air_date'),
+            'last_air_date': show.get('last_air_date'),
+            'overview': show.get('overview'),
+            'homepage': show.get('homepage'),
+            'title': show.get('name'),
+            'vote_average': show.get('vote_average'),
+            'vote_count': show.get('vote_count'),
+            'poster_path': show.get('poster_path'),
+            'status': shows_status_mapper.get(
+                show.get('status').lower()
+            ),
+        })
+
+        shows_seasons_dict[show.get('id')] = show.get('seasons')
 
     query = shows\
         .insert()\
-        .values([
-            {
-                'id': show.get('id'),
-                'name': show.get('name'),
-            } for show in shows_dict.values()
-        ])
+        .values(shows_values)
 
     await execute(config, query)
 
+    seasons_values = []
+
+    for show_id, seasons in shows_seasons_dict.items():
+        for season in seasons:
+            seasons_values.append({"show_id": show_id, **season})
+
+    query = shows_seasons\
+        .insert()\
+        .values(seasons_values)
+
+    await execute(config, query)
+
+    query = shows_actors\
+        .insert() \
+        .values([
+        {
+            'actor_id': actor.get('actor_id'),
+            'movie_id': actor.get('show_id'),
+            'character': actor.get('character'),
+            'order': actor.get('order'),
+        } for actor in tv_cast
+    ])
+
+    await execute(config, query)
+
+    genres_show_list = []
+    for data in shows_dict.values():
+        for genre in data["genres"]:
+            genres_show_list.append({
+                "genre_id": genre.get("id"),
+                "show_id": data.get("id"),
+            })
+
+    query = shows_genres\
+        .insert() \
+        .values([
+        {
+            'genre_id': data.get('genre_id'),
+            'show_id': data.get('show_id'),
+        } for data in genres_show_list
+    ])
+
+    await execute(config, query)
+
+    shows_images_dict = {
+        show_id: await tmdb_client.get_shows_images(show_id)
+        for show_id in shows_dict.keys()
+    }
+
+    shows_images_values = []
+
+    for show_id, data in shows_images_dict.items():
+        for backdrop in data.get('backdrops', []):
+            shows_images_values.append({
+                "show_id": show_id,
+                "type": ImagesEnum.backdrops,
+                "url": backdrop.get('file_path')
+            })
+
+        for posters in data.get('posters', []):
+            shows_images_values.append({
+                "show_id": show_id,
+                "type": ImagesEnum.posters,
+                "url": posters.get('file_path')
+            })
+
+    query = images_links\
+        .insert()\
+        .values(shows_images_values)
+
+    await execute(config, query)
+
+    # set sequence value to so high to avoid problem with creating new
+    # instances
     await execute(config, text("""
         SELECT setval('actors_id_seq', 10000000, true);
         SELECT setval('genres_id_seq', 10000000, true);

@@ -46,8 +46,8 @@ async def load_data_cron(db_url_text: str) -> None:
     Runner for sync data form tmdb database.
     """
     while True:
-        if not os.getenv("WITHOUT_UPDATE_DB"):
-            await load_data(db_url_text)
+        # if not os.getenv("WITHOUT_UPDATE_DB"):
+        # await load_data(db_url_text)
 
         # we need to sync data each 24 hours
         await asyncio.sleep(60 * 60 * 24)

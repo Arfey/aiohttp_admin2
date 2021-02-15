@@ -11,3 +11,5 @@ class GenresController(PostgresController):
     mapper = GenresMapper
     name = 'genres'
     per_page = 10
+
+    inline_fields = ['name', 'type', ]

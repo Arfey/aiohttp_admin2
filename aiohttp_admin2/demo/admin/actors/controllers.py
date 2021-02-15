@@ -32,6 +32,14 @@ class ActorController(PostgresController):
     list_filter = ['gender', ]
     search_fields = ['name', 'gender']
 
+    inline_fields = ['photo', 'name', ]
+
+    def photo_field(self, obj):
+        return f'<img ' \
+               f'src="https://image.tmdb.org/t/p/w200/' \
+               f'{obj.url}"' \
+               f'width="100">'
+
 
 class ActorPage(ControllerView):
     controller = ActorController
