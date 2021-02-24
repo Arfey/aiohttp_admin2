@@ -4,7 +4,12 @@ import aiohttp_jinja2
 from aiohttp import web
 
 from .tab_template_view import TabTemplateView
-from aiohttp_admin2.controllers.controller import Controller
+from aiohttp_admin2.controllers.controller import (
+    Controller,
+    DETAIL_NAME,
+    FOREIGNKEY_DETAIL_NAME,
+)
+from aiohttp_admin2.resources.types import Instance
 from aiohttp_admin2 import widgets
 from aiohttp_admin2.resources.types import FilterTuple
 from aiohttp_admin2 import filters
@@ -125,7 +130,31 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
             'eq',
         ))
 
-        data = await controller.get_list(**params._asdict(), filters=filters_list)
+        def url_builder(obj: Instance, url_type: str, **kwargs) -> str:
+            if url_type is DETAIL_NAME:
+                return str(
+                    req.app.router[self.detail_url_name]
+                    .url_for(
+                        nested_pk=str(obj.get_pk()),
+                        pk=req.match_info['pk']
+                    )
+                )
+            elif url_type is FOREIGNKEY_DETAIL_NAME:
+                url_name = kwargs.get('url_name')
+                return str(
+                    req.app.router[url_name + '_detail']
+                        .url_for(
+                            pk=str(obj.get_pk())
+                        )
+                    )
+
+            return ''
+
+        data = await controller.get_list(
+            **params._asdict(),
+            filters=filters_list,
+            url_builder=url_builder,
+        )
 
         return aiohttp_jinja2.render_template(
             self.template_name,
@@ -137,7 +166,6 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
                 'content': await self.get_content(req),
                 "controller": controller,
                 "create_url": self.create_url_name,
-                "detail_nested_url": self.delete_url_name,
             },
         )
 

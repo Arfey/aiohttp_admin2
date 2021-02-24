@@ -45,10 +45,12 @@ class ShowsController(PostgresController):
         'vote_average',
     ]
 
-    def poster_field(self, obj):
+    async def poster_field(self, obj):
         return f'<img ' \
                f'src="https://image.tmdb.org/t/p/w200/{obj.poster_path}"' \
                f'width="100">'
+
+    poster_field.is_safe = True
 
 
 @postgres_injector.inject
@@ -68,14 +70,16 @@ class ActorShowController(PostgresController):
         'actor_id': ActorController,
     }
 
-    def actor_field(self, obj):
+    async def actor_field(self, obj):
         return obj._relations.get('actor_id').name
 
-    def poster_field(self, obj):
+    async def poster_field(self, obj):
         return f'<img ' \
                f'src="https://image.tmdb.org/t/p/w200/' \
                f'{obj._relations.get("actor_id").url}"' \
                f'width="100">'
+
+    poster_field.is_safe = True
 
 
 @postgres_injector.inject
@@ -91,7 +95,7 @@ class GenreShowController(PostgresController):
         'genre_id': GenresController,
     }
 
-    def name_field(self, obj) -> str:
+    async def name_field(self, obj) -> str:
         return obj._relations.get('genre_id').name
 
 
@@ -107,13 +111,15 @@ class SeasonShowController(PostgresController):
         'show_id': ShowsController,
     }
 
-    def genre_name_field(self, obj) -> str:
+    async def genre_name_field(self, obj) -> str:
         return obj._relations.get('genre_id').name
 
-    def poster_field(self, obj):
+    async def poster_field(self, obj):
         return f'<img ' \
                f'src="https://image.tmdb.org/t/p/w200/{obj.poster_path}"' \
                f'width="100">'
+
+    poster_field.is_safe = True
 
 
 class ShowsPage(ControllerView):

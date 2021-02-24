@@ -4,7 +4,12 @@ import typing as t
 
 from aiohttp_admin2.view.aiohttp.views.base import BaseAdminView
 from aiohttp_admin2.view.aiohttp.views.tab_base_view import TabBaseView
-from aiohttp_admin2.controllers.controller import Controller
+from aiohttp_admin2.resources.types import Instance
+from aiohttp_admin2.controllers.controller import (
+    Controller,
+    DETAIL_NAME,
+    FOREIGNKEY_DETAIL_NAME,
+)
 from aiohttp_admin2.mappers import Mapper
 
 
@@ -113,7 +118,28 @@ class ControllerView(BaseAdminView):
             self.default_filter_map,
         )
 
-        data = await controller.get_list(**params._asdict(), filters=filters)
+        def url_builder(obj: Instance, url_type: str, **kwargs) -> str:
+            if url_type is DETAIL_NAME:
+                return str(
+                    req.app.router[self.detail_url_name]
+                    .url_for(pk=str(obj.get_pk()))
+                )
+            elif url_type is FOREIGNKEY_DETAIL_NAME:
+                url_name = kwargs.get('url_name')
+                return str(
+                    req.app.router[url_name + '_detail']
+                        .url_for(
+                            pk=str(obj.get_pk())
+                        )
+                    )
+
+            return ''
+
+        data = await controller.get_list(
+            **params._asdict(),
+            filters=filters,
+            url_builder=url_builder,
+        )
 
         # list_filter
         return aiohttp_jinja2.render_template(

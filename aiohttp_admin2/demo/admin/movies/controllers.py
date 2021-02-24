@@ -28,10 +28,12 @@ class MoviesController(PostgresController):
         'poster', 'title', 'status', 'release_date', 'vote_average',
     ]
 
-    def poster_field(self, obj):
+    async def poster_field(self, obj):
         return f'<img ' \
                f'src="https://image.tmdb.org/t/p/w200/{obj.poster_path}"' \
                f'width="100">'
+
+    poster_field.is_safe = True
 
 
 @postgres_injector.inject
@@ -50,13 +52,15 @@ class ActorMovieController(PostgresController):
         'actor_id': ActorController,
     }
 
-    def photo_field(self, obj):
+    async def photo_field(self, obj):
         return f'<img ' \
                f'src="https://image.tmdb.org/t/p/w200/' \
                f'{obj._relations.get("actor_id").url}"' \
                f'width="100">'
 
-    def actor_name_field(self, obj):
+    photo_field.is_safe = True
+
+    async def actor_name_field(self, obj):
         return obj._relations.get('actor_id').name
 
 
@@ -66,8 +70,9 @@ class GenreMovieController(PostgresController):
     mapper = GenreMoviesMapper
     inline_fields = ['id', 'name', ]
 
-    def name_field(self, obj) -> str:
+    async def name_field(self, obj) -> str:
         return obj._relations.get('genre_id').name
+
 
     per_page = 10
 
@@ -75,4 +80,3 @@ class GenreMovieController(PostgresController):
         'movie_id': MoviesController,
         'genre_id': GenresController,
     }
-

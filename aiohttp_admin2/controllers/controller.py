@@ -11,8 +11,16 @@ from aiohttp_admin2.controllers.exceptions import PermissionDenied
 from aiohttp_admin2.mappers import Mapper
 
 from aiohttp_admin2.mappers.fields.abc import AbstractField
+from aiohttp_admin2.controllers.types import (
+    Cell,
+    ListObject,
+)
 
 # todo: test
+
+# todo: move to url tyep
+DETAIL_NAME = 'detail'
+FOREIGNKEY_DETAIL_NAME = 'foreignkey_detail'
 
 
 class Controller:
@@ -228,6 +236,7 @@ class Controller:
 
     async def get_list(
         self,
+        url_builder,
         page: int = 1,
         cursor: t.Optional[int] = None,
         order_by: t.Optional[str] = None,
@@ -248,7 +257,54 @@ class Controller:
 
         await self.prefetch_foreignkey(list_data.instances)
 
-        return list_data
+        rows = []
+
+        for i in list_data.instances:
+            row = []
+
+            for index, field in enumerate(self.inline_fields):
+                field_method_name = "{}_field".format(field)
+                is_foreignkey = False
+                is_safe = False
+
+                if hasattr(self, field_method_name):
+                    getter = getattr(self, field_method_name)
+                    is_safe = \
+                        hasattr(getter, 'is_safe')\
+                        and getattr(getter, 'is_safe')
+                    value = await getter(i)
+                elif hasattr(i, '_relations') and i._relations.get(field):
+                    value = i._relations.get(field)
+                    is_foreignkey = True
+                else:
+                    value = getattr(i, field)
+
+                if index == 0 and self.can_update:
+                    # todo: can view
+                    url = url_builder(i, DETAIL_NAME)
+                elif is_foreignkey:
+                    # todo: can view, can edit
+                    url = url_builder(
+                        value,
+                        FOREIGNKEY_DETAIL_NAME,
+                        # todo: drop detail prefix
+                        url_name=self.foreign_keys.get(field)().url_name()
+                    )
+                else:
+                    url = None
+
+                row.append(Cell(value=value, is_safe=is_safe, url=url))
+
+            rows.append(row)
+
+        return ListObject(
+            rows=rows,
+            has_next=list_data.has_next,
+            hex_prev=list_data.hex_prev,
+            count=list_data.count,
+            active_page=list_data.active_page,
+            per_page=list_data.per_page,
+        )
 
     async def get_many(self, pks: t.List[PK]):
         await self.access_hook()
