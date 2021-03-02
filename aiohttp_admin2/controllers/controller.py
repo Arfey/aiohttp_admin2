@@ -1,3 +1,4 @@
+import logging
 import typing as t
 from collections import defaultdict
 
@@ -16,9 +17,18 @@ from aiohttp_admin2.controllers.types import (
     ListObject,
 )
 
+if t.TYPE_CHECKING:
+    from aiohttp_admin2.controllers.relations import (
+        ToManyRelation,
+        ToOneRelation,
+    )
+
+
+logger = logging.getLogger(__name__)
+
 # todo: test
 
-# todo: move to url tyep
+# todo: move to url type
 DETAIL_NAME = 'detail'
 FOREIGNKEY_DETAIL_NAME = 'foreignkey_detail'
 
@@ -40,7 +50,8 @@ class Controller:
     search_fields: t.List[str] = []
     # todo: handle list of fields
     fields: t.Union[str, t.Tuple[t.Any]] = '__all__'
-    foreign_keys = {}
+    relations_to_one: t.List["ToOneRelation"] = []
+    foreign_keys_map: t.Dict[str, "ToOneRelation"] = {}
     many_to_many = {}
 
     # CRUD access
@@ -53,6 +64,28 @@ class Controller:
     order_by = 'id'
     per_page = 50
     list_filter = []
+
+    def __init__(self):
+        self.prefetch_cache = defaultdict(dict)
+        foreign_keys = [key for key in self.relations_to_one if not key.hidden]
+        self.foreign_keys_map = {
+            key.name: key
+            for key in self.relations_to_one
+        }
+        for relation_to_one in foreign_keys:
+            name = f'{relation_to_one.field_name}_field'
+
+            async def _get_foreign(obj: Instance) -> t.Any:
+                return await obj.get_relation(relation_to_one.name)
+
+            _get_foreign.is_foreignkey = True
+
+            if not hasattr(self, name):
+                setattr(
+                    self,
+                    f'{relation_to_one.field_name}_field',
+                    _get_foreign,
+                )
 
     def get_resource(self):
         return self.resource
@@ -119,38 +152,6 @@ class Controller:
         etc.) and will be call before each call to resources.
         """
         pass
-
-    async def prefetch_foreignkey(self, list_data: t.List[Instance]):
-        if not self.foreign_keys:
-
-            return {
-                i.get_pk(): i for i in list_data
-            }
-
-        keys = self.foreign_keys.keys()
-        keys_map = defaultdict(list)
-        result_map = {}
-
-        for item in list_data:
-            for key in keys:
-                keys_map[key].append(getattr(item, key))
-
-        for key in keys:
-            ids = keys_map.get(key)
-            if ids:
-                result_map[key] = await self.foreign_keys[key]().get_many(ids)
-            else:
-                result_map[key] = {}
-
-        for item in list_data:
-            item._relations = {}
-
-            for key in keys:
-                item._relations[key] = result_map[key].get(getattr(item, key))
-
-        return {
-            i.get_pk(): i for i in list_data
-        }
 
     # CRUD
     async def delete(self, pk: PK):
@@ -230,9 +231,54 @@ class Controller:
 
         data = await self.get_resource().get_one(pk)
 
-        result = await self.prefetch_foreignkey([data])
+        self.prepare_instances([data])
 
-        return result.get(data.get_pk())
+        return data
+
+    def prepare_instances(self, instances: t.List[Instance]):
+        controller_maps = {}
+
+        # relations to one
+        for foreignkey_name, foreignkey in self.foreign_keys_map.items():
+            controller_maps[foreignkey_name] = foreignkey.controller()
+
+        def _get_relation(instance: Instance):
+            async def get_relation(name: str) -> Instance:
+                controller = controller_maps.get(name)
+                foreign_key = self.foreign_keys_map.get(name)
+                cache = self.prefetch_cache.get(foreign_key.name)
+                relation_id = getattr(instance, foreign_key.field_name)
+
+                if cache:
+                    if relation_id in cache.keys():
+                        logger.debug(
+                            f"Get data from cache {foreign_key.field_name} "
+                            f"{relation_id}"
+                        )
+                        return cache.get(relation_id)
+
+                fetch_ids = [
+                    getattr(p, foreign_key.field_name)
+                    for p in instance.prefetch_together
+                ]
+
+                data = await controller.get_many(
+                    fetch_ids,
+                    field=foreign_key.target_field_name,
+                )
+
+                logger.debug(
+                    f"Fetch data {foreign_key.field_name} for {fetch_ids}"
+                )
+
+                self.prefetch_cache[foreign_key.name].update(data)
+
+                return self.prefetch_cache[foreign_key.name].get(relation_id)
+
+            return get_relation
+
+        for i in instances:
+            i.get_relation = _get_relation(i)
 
     async def get_list(
         self,
@@ -255,7 +301,7 @@ class Controller:
             filters=filters,
         )
 
-        await self.prefetch_foreignkey(list_data.instances)
+        self.prepare_instances(list_data.instances)
 
         rows = []
 
@@ -273,9 +319,8 @@ class Controller:
                         hasattr(getter, 'is_safe')\
                         and getattr(getter, 'is_safe')
                     value = await getter(i)
-                elif hasattr(i, '_relations') and i._relations.get(field):
-                    value = i._relations.get(field)
-                    is_foreignkey = True
+                    if getattr(getter, 'is_foreignkey', False):
+                        is_foreignkey = True
                 else:
                     value = getattr(i, field)
 
@@ -288,7 +333,10 @@ class Controller:
                         value,
                         FOREIGNKEY_DETAIL_NAME,
                         # todo: drop detail prefix
-                        url_name=self.foreign_keys.get(field)().url_name()
+                        # relation to one
+                        url_name=self.foreign_keys_map.get(field)
+                            .controller()
+                            .url_name()
                     )
                 else:
                     url = None
@@ -306,13 +354,13 @@ class Controller:
             per_page=list_data.per_page,
         )
 
-    async def get_many(self, pks: t.List[PK]):
+    async def get_many(self, pks: t.List[PK], field: str = None):
         await self.access_hook()
 
         if not self.can_view:
             raise PermissionDenied
 
-        return await self.get_resource().get_many(pks)
+        return await self.get_resource().get_many(pks, field=field)
 
     @classmethod
     def builder_form_params(cls, params: t.Dict[str, t.Any]):

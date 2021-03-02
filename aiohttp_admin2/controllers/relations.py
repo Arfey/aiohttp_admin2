@@ -1,4 +1,6 @@
 import typing as t
+from dataclasses import dataclass
+
 
 from aiohttp_admin2.view import ManyToManyTabView
 
@@ -6,13 +8,13 @@ if t.TYPE_CHECKING:
     from aiohttp_admin2.view import ControllerView
 
 
-__all__ = ['CrossTableRelation', ]
+__all__ = ['ToManyRelation', 'ToOneRelation', ]
 
 
-class CrossTableRelation:
+class ToManyRelation:
     """
-    Current class need to describe relation between to tables which implement
-    via other table (many to many).
+    The current class need to describe one to many or many to many relation
+    between two tables.
     """
     def __init__(
         self,
@@ -39,3 +41,16 @@ class CrossTableRelation:
         )
 
         obj.tabs.append(tab)
+
+
+@dataclass
+class ToOneRelation:
+    """
+    The current class need to describe one to one or many to one relation
+    between two tables.
+    """
+    name: str
+    field_name: str
+    controller: t.Any
+    hidden: bool = False
+    target_field_name: str = None

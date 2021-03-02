@@ -1,7 +1,10 @@
 from aiohttp_admin2.view import ControllerView
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
-from aiohttp_admin2.controllers.relations import CrossTableRelation
+from aiohttp_admin2.controllers.relations import (
+    ToManyRelation,
+    ToOneRelation,
+)
 
 from ...catalog.tables import (
     shows,
@@ -65,18 +68,28 @@ class ActorShowController(PostgresController):
 
     per_page = 10
 
-    foreign_keys = {
-        'movie_id': ShowsController,
-        'actor_id': ActorController,
-    }
+    relations_to_one = [
+        ToOneRelation(
+            name='movie_id',
+            field_name='movie_id',
+            controller=ShowsController,
+        ),
+        ToOneRelation(
+            name='actor_id',
+            field_name='actor_id',
+            controller=ActorController,
+        ),
+    ]
 
     async def actor_field(self, obj):
-        return obj._relations.get('actor_id').name
+        actor = await obj.get_relation('actor_id')
+        return actor.name
 
     async def poster_field(self, obj):
+        actor = await obj.get_relation("actor_id")
         return f'<img ' \
                f'src="https://image.tmdb.org/t/p/w200/' \
-               f'{obj._relations.get("actor_id").url}"' \
+               f'{actor.url}"' \
                f'width="100">'
 
     poster_field.is_safe = True
@@ -90,13 +103,22 @@ class GenreShowController(PostgresController):
 
     per_page = 10
 
-    foreign_keys = {
-        'show_id': ShowsController,
-        'genre_id': GenresController,
-    }
+    relations_to_one = [
+        ToOneRelation(
+            name='show_id',
+            field_name='show_id',
+            controller=ShowsController
+        ),
+        ToOneRelation(
+            name='genre_id',
+            field_name='genre_id',
+            controller=GenresController
+        )
+    ]
 
     async def name_field(self, obj) -> str:
-        return obj._relations.get('genre_id').name
+        genre = await obj.get_relation('genre_id')
+        return genre.name
 
 
 @postgres_injector.inject
@@ -107,12 +129,17 @@ class SeasonShowController(PostgresController):
 
     per_page = 10
 
-    foreign_keys = {
-        'show_id': ShowsController,
-    }
+    relations_to_one = [
+        ToOneRelation(
+            name='show_id',
+            field_name='show_id',
+            controller=ShowsController
+        )
+    ]
 
     async def genre_name_field(self, obj) -> str:
-        return obj._relations.get('genre_id').name
+        genre = await obj.get_relation('genre_id')
+        return genre.name
 
     async def poster_field(self, obj):
         return f'<img ' \
@@ -126,25 +153,25 @@ class ShowsPage(ControllerView):
     controller = ShowsController
 
     relations = [
-        CrossTableRelation(
+        ToManyRelation(
             name='Actors_tv',
             left_table_pk='movie_id',
             right_table_pk='actor_id',
             relation_controller=ActorShowController
         ),
-        CrossTableRelation(
+        ToManyRelation(
             name='Genres_tv',
             left_table_pk='show_id',
             right_table_pk='genre_id',
             relation_controller=GenreShowController
         ),
-        CrossTableRelation(
+        ToManyRelation(
             name='Seasons',
             left_table_pk='show_id',
             right_table_pk='id',
             relation_controller=SeasonShowController
         ),
-        CrossTableRelation(
+        ToManyRelation(
             name='ImagesTV',
             left_table_pk='show_id',
             right_table_pk='id',

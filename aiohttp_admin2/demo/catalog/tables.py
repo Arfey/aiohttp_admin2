@@ -48,6 +48,12 @@ actors = sa.Table('actors', metadata,
     sa.Column('url', sa.String(255)),
 )
 
+actors_hash = sa.Table('actors_hash', metadata,
+    sa.Column('id', sa.Integer, primary_key=True),
+    sa.Column('actor_id', sa.ForeignKey('actors.id')),
+    sa.Column('hash', sa.String(255)),
+)
+
 genres = sa.Table('genres', metadata,
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('name', sa.String(255)),

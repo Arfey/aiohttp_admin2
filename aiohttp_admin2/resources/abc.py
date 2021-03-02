@@ -85,6 +85,7 @@ class Instance:
     """Object from represent all data connected with instance."""
     pk: PK
     _name: str = None
+    _prefetch_together: t.List["Instance"] = []
 
     def __init__(self, name: str = None) -> None:
         self._name = name
@@ -100,6 +101,16 @@ class Instance:
             return self.id
 
         raise AdminException("Instance must have id")
+
+    @property
+    def prefetch_together(self) -> t.List["Instance"]:
+        if self._prefetch_together:
+            return self._prefetch_together
+
+        return [self]
+
+    def get_relation(self, name: str) -> t.Optional["Instance"]:
+        return None
 
 
 class Paginator(t.NamedTuple):
@@ -134,7 +145,7 @@ class AbstractResource(ABC):
         """
 
     @abstractmethod
-    async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
+    async def get_many(self, pks: t.List[PK], field: str = None) -> InstanceMapper:
         """
         Get many instances by ids from a storage. This method will use as a
         dataloader. This method mainly will use on list page in cases when

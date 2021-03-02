@@ -1,4 +1,5 @@
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
+from aiohttp_admin2.controllers.relations import ToOneRelation
 
 from .mappers import (
     ActorMoviesMapper,
@@ -47,21 +48,32 @@ class ActorMovieController(PostgresController):
 
     per_page = 10
 
-    foreign_keys = {
-        'movie_id': MoviesController,
-        'actor_id': ActorController,
-    }
+    relations_to_one = [
+        ToOneRelation(
+            name='movie_id',
+            field_name='movie_id',
+            controller=MoviesController,
+        ),
+        ToOneRelation(
+            name='actor_id',
+            field_name='actor_id',
+            controller=ActorController,
+        ),
+    ]
 
     async def photo_field(self, obj):
+        actor = await obj.get_relation("actor_id")
         return f'<img ' \
                f'src="https://image.tmdb.org/t/p/w200/' \
-               f'{obj._relations.get("actor_id").url}"' \
+               f'{actor.url}"' \
                f'width="100">'
 
     photo_field.is_safe = True
 
     async def actor_name_field(self, obj):
-        return obj._relations.get('actor_id').name
+        actor = await obj.get_relation('actor_id')
+        movie = await obj.get_relation('movie_id')
+        return actor.name + "|" + movie.title
 
 
 @postgres_injector.inject
@@ -71,12 +83,20 @@ class GenreMovieController(PostgresController):
     inline_fields = ['id', 'name', ]
 
     async def name_field(self, obj) -> str:
-        return obj._relations.get('genre_id').name
-
+        genre = await obj.get_relation('genre_id')
+        return genre.name
 
     per_page = 10
 
-    foreign_keys = {
-        'movie_id': MoviesController,
-        'genre_id': GenresController,
-    }
+    relations_to_one = [
+        ToOneRelation(
+            name='movie_id',
+            field_name='movie_id',
+            controller=MoviesController,
+        ),
+        ToOneRelation(
+            name='genre_id',
+            field_name='genre_id',
+            controller=GenresController,
+        ),
+    ]

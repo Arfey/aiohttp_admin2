@@ -6,14 +6,7 @@
     {% for name, value in object.__dict__.items() %}
     {% if not name.startswith('_') %}
 
-    {% if hasattr(object, '_relations') and object._relations.get(name) %}
-    <b>{{ name }}</b>
-    <a href="{{ url(controller.foreign_keys.get(name)().name + '_detail', pk=value) }}">
-        {{ object._relations.get(name) }}
-    </a>
-    {% else %}
     <p><b>{{ name }}</b> {{ value }}</p>
-    {% endif %}
     <p></p>
     {% endif %}
     {% endfor %}
