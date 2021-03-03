@@ -55,6 +55,33 @@ class ShowsController(PostgresController):
 
     poster_field.is_safe = True
 
+    relations_to_many = [
+        ToManyRelation(
+            name='Actors_tv',
+            left_table_pk='movie_id',
+            right_table_pk='actor_id',
+            relation_controller=lambda: ActorShowController
+        ),
+        ToManyRelation(
+            name='Genres_tv',
+            left_table_pk='show_id',
+            right_table_pk='genre_id',
+            relation_controller=lambda: GenreShowController
+        ),
+        ToManyRelation(
+            name='Seasons',
+            left_table_pk='show_id',
+            right_table_pk='id',
+            relation_controller=lambda: SeasonShowController
+        ),
+        ToManyRelation(
+            name='ImagesTV',
+            left_table_pk='show_id',
+            right_table_pk='id',
+            relation_controller=ImageController
+        ),
+    ]
+
 
 @postgres_injector.inject
 class ActorShowController(PostgresController):
@@ -151,31 +178,3 @@ class SeasonShowController(PostgresController):
 
 class ShowsPage(ControllerView):
     controller = ShowsController
-
-    relations = [
-        ToManyRelation(
-            name='Actors_tv',
-            left_table_pk='movie_id',
-            right_table_pk='actor_id',
-            relation_controller=ActorShowController
-        ),
-        ToManyRelation(
-            name='Genres_tv',
-            left_table_pk='show_id',
-            right_table_pk='genre_id',
-            relation_controller=GenreShowController
-        ),
-        ToManyRelation(
-            name='Seasons',
-            left_table_pk='show_id',
-            right_table_pk='id',
-            relation_controller=SeasonShowController
-        ),
-        ToManyRelation(
-            name='ImagesTV',
-            left_table_pk='show_id',
-            right_table_pk='id',
-            relation_controller=ImageController
-        ),
-    ]
-

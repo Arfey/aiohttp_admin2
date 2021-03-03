@@ -1,9 +1,6 @@
 import typing as t
 from dataclasses import dataclass
 
-
-from aiohttp_admin2.view import ManyToManyTabView
-
 if t.TYPE_CHECKING:
     from aiohttp_admin2.view import ControllerView
 
@@ -11,36 +8,22 @@ if t.TYPE_CHECKING:
 __all__ = ['ToManyRelation', 'ToOneRelation', ]
 
 
+@dataclass
 class ToManyRelation:
     """
     The current class need to describe one to many or many to many relation
     between two tables.
     """
-    def __init__(
-        self,
-        name: str,
-        left_table_pk: str,
-        right_table_pk: str,
-        relation_controller: t.Any,
-    ) -> None:
-        self.name = name
-        self.left_table_pk = left_table_pk
-        self.right_table_pk = right_table_pk
-        self.relation_controller = relation_controller
+    name: str
+    left_table_pk: str
+    right_table_pk: str
+    relation_controller: t.Any
 
     def accept(self, obj: 'ControllerView') -> None:
-        tab = type(
-            f'{self.__class__.__name__}ManyToManyTab',
-            (ManyToManyTabView, ),
-            {
-                "name": self.name,
-                "controller": self.relation_controller,
-                "left_table_name": self.left_table_pk,
-                "right_table_name": self.right_table_pk,
-            }
-        )
+        if callable(self.relation_controller):
+            self.relation_controller = self.relation_controller()
 
-        obj.tabs.append(tab)
+        obj.visit_to_many_relations(self)
 
 
 @dataclass

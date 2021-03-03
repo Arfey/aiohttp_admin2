@@ -51,6 +51,7 @@ class Controller:
     # todo: handle list of fields
     fields: t.Union[str, t.Tuple[t.Any]] = '__all__'
     relations_to_one: t.List["ToOneRelation"] = []
+    relations_to_many: t.List["ToManyRelation"] = []
     foreign_keys_map: t.Dict[str, "ToOneRelation"] = {}
     many_to_many = {}
 

@@ -1,6 +1,6 @@
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
+from aiohttp_admin2.controllers.relations import ToManyRelation
 from aiohttp_admin2.controllers.relations import ToOneRelation
-
 from .mappers import (
     ActorMoviesMapper,
     MoviesMapper,
@@ -8,13 +8,13 @@ from .mappers import (
 )
 from ..actors.controllers import ActorController
 from ..genres.controllers import GenresController
+from ..images.controller import ImageController
 from ..injectors import postgres_injector
 from ...catalog.tables import (
     movies,
     movies_actors,
     movies_genres,
 )
-
 
 __all__ = ['MoviesController', 'ActorMovieController', 'GenreMovieController', ]
 
@@ -35,6 +35,27 @@ class MoviesController(PostgresController):
                f'width="100">'
 
     poster_field.is_safe = True
+
+    relations_to_many = [
+        ToManyRelation(
+            name='Actors',
+            left_table_pk='movie_id',
+            right_table_pk='actor_id',
+            relation_controller=lambda: ActorMovieController
+        ),
+        ToManyRelation(
+            name='Genres',
+            left_table_pk='movie_id',
+            right_table_pk='genre_id',
+            relation_controller=lambda: GenreMovieController
+        ),
+        ToManyRelation(
+            name='Images',
+            left_table_pk='movie_id',
+            right_table_pk='id',
+            relation_controller=ImageController
+        ),
+    ]
 
 
 @postgres_injector.inject

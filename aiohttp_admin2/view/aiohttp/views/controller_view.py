@@ -4,6 +4,9 @@ import typing as t
 
 from aiohttp_admin2.view.aiohttp.views.base import BaseAdminView
 from aiohttp_admin2.view.aiohttp.views.tab_base_view import TabBaseView
+from aiohttp_admin2.view.aiohttp.views.many_to_many_tab_view import \
+    ManyToManyTabView
+from aiohttp_admin2.controllers.relations import ToManyRelation
 from aiohttp_admin2.resources.types import Instance
 from aiohttp_admin2.controllers.controller import (
     Controller,
@@ -27,7 +30,6 @@ class ControllerView(BaseAdminView):
     controller: Controller
     tabs: t.List[TabBaseView] = None
     tabs_list: t.List[t.Any] = None
-    relations: t.List[t.Any] = []
 
     # Fields
     exclude_fields = ['id', ]
@@ -44,7 +46,7 @@ class ControllerView(BaseAdminView):
         self.title = self.title if not self.title == 'None' else default
         self.params = params or {}
 
-        for relation in self.relations:
+        for relation in self.controller.relations_to_many:
             relation.accept(self)
 
         if self.tabs:
@@ -310,3 +312,17 @@ class ControllerView(BaseAdminView):
 
         for tab in self.tabs_list:
             tab.setup(app)
+
+    def visit_to_many_relations(self, obj: ToManyRelation) -> None:
+        tab = type(
+            f'{self.__class__.__name__}ManyToManyTab',
+            (ManyToManyTabView,),
+            {
+                "name": obj.name,
+                "controller": obj.relation_controller,
+                "left_table_name": obj.left_table_pk,
+                "right_table_name": obj.right_table_pk,
+            }
+        )
+
+        self.tabs.append(tab)
