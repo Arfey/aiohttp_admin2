@@ -57,6 +57,8 @@ class Controller:
     foreign_keys_map: t.Dict[str, "ToOneRelation"] = {}
     foreign_keys_field_map: t.Dict[str, "ToOneRelation"] = {}
     many_to_many = {}
+    exclude_update_fields = ['id', ]
+    exclude_create_fields = ['id', ]
 
     # CRUD access
     can_create = True

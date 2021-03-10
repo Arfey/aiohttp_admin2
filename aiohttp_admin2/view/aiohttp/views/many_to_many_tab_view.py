@@ -40,9 +40,6 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
     left_table_name: str
     right_table_name: str
 
-    # Fields
-    exclude_fields = ['id', ]
-
     def get_extra_media(self):
         css = []
         js = []
@@ -140,7 +137,7 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
                     self.left_table_name: self.get_pk(req)
                 }),
                 "fields": controller.fields,
-                "exclude_fields": self.exclude_fields,
+                "exclude_fields": self.controller.exclude_create_fields,
                 "create_url": self.create_post_url_name,
             }
         )
@@ -249,7 +246,7 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
                 **await self.get_context(req),
                 "object": data,
                 "media": self.get_extra_media(),
-                "exclude_fields": self.exclude_fields,
+                "exclude_fields": self.controller.exclude_update_fields,
                 "controller": controller,
                 "title": f"{self.name}#{data.id}",
                 "pk": self.get_pk(req),

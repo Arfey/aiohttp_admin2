@@ -67,6 +67,7 @@ class ActorMovieController(PostgresController):
         'id', 'photo', 'actor_id', 'actor_name', 'character', 'order'
     ]
     autocomplete_search_fields = ['name', ]
+    exclude_update_fields = ['actor_id', 'movie_id', 'id', ]
     order_by = 'order'
 
     per_page = 10

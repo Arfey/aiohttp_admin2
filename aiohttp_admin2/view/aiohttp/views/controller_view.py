@@ -32,9 +32,6 @@ class ControllerView(BaseAdminView):
     tabs: t.List[TabBaseView] = None
     tabs_list: t.List[t.Any] = None
 
-    # Fields
-    exclude_fields = ['id', ]
-
     def __init__(self, *, params: t.Dict[str, t.Any] = None) -> None:
         self.tabs_list = self.tabs_list or []
         self.tabs = self.tabs or []
@@ -197,7 +194,7 @@ class ControllerView(BaseAdminView):
                 "mapper": mapper or controller.mapper(data.__dict__),
                 "fields": controller.fields,
                 "message": req.rel_url.query.get('message'),
-                "exclude_fields": self.exclude_fields,
+                "exclude_fields": self.controller.exclude_update_fields,
             }
         )
 
@@ -219,7 +216,7 @@ class ControllerView(BaseAdminView):
                 "create_url": self.create_post_url_name,
                 "mapper": mapper or controller.mapper({}),
                 "fields": controller.fields,
-                "exclude_fields": self.exclude_fields,
+                "exclude_fields": self.controller.exclude_create_fields,
             }
         )
 
