@@ -289,8 +289,9 @@ class Controller:
             return get_relation
 
         for i in instances:
-            i.get_relation = _get_relation(i)
-            i.set_name(await self.get_object_name(i))
+            if i:
+                i.get_relation = _get_relation(i)
+                i.set_name(await self.get_object_name(i))
 
     async def get_autocomplete_items(self, *, text: str, page: int):
         await self.access_hook()
