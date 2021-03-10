@@ -11,6 +11,7 @@ from aiohttp_admin2.resources.abc import AbstractResource
 from aiohttp_admin2.controllers.exceptions import PermissionDenied
 from aiohttp_admin2.mappers import Mapper
 
+from aiohttp_admin2 import filters
 from aiohttp_admin2.mappers.fields.abc import AbstractField
 from aiohttp_admin2.controllers.types import (
     Cell,
@@ -48,11 +49,13 @@ class Controller:
     read_only_fields = []
     inline_fields = ['id', ]
     search_fields: t.List[str] = []
+    autocomplete_search_fields: t.List[str] = []
     # todo: handle list of fields
     fields: t.Union[str, t.Tuple[t.Any]] = '__all__'
     relations_to_one: t.List["ToOneRelation"] = []
     relations_to_many: t.List["ToManyRelation"] = []
     foreign_keys_map: t.Dict[str, "ToOneRelation"] = {}
+    foreign_keys_field_map: t.Dict[str, "ToOneRelation"] = {}
     many_to_many = {}
 
     # CRUD access
@@ -73,6 +76,11 @@ class Controller:
             key.name: key
             for key in self.relations_to_one
         }
+        self.foreign_keys_field_map = {
+            key.field_name: key
+            for key in foreign_keys
+        }
+        # todo: relation list created a lot of instances
         for relation_to_one in foreign_keys:
             name = f'{relation_to_one.field_name}_field'
 
@@ -232,11 +240,11 @@ class Controller:
 
         data = await self.get_resource().get_one(pk)
 
-        self.prepare_instances([data])
+        await self.prepare_instances([data])
 
         return data
 
-    def prepare_instances(self, instances: t.List[Instance]):
+    async def prepare_instances(self, instances: t.List[Instance]):
         controller_maps = {}
 
         # relations to one
@@ -280,6 +288,46 @@ class Controller:
 
         for i in instances:
             i.get_relation = _get_relation(i)
+            i.set_name(await self.get_object_name(i))
+
+    async def get_autocomplete_items(self, *, text: str, page: int):
+        await self.access_hook()
+
+        if not self.can_view:
+            raise PermissionDenied
+
+        search_fields = \
+            self.autocomplete_search_fields or self.search_fields
+
+        if not search_fields:
+            return {}
+
+        filters_list = [
+            filters.FilterMultiTuple(
+                search_fields,
+                text,
+                'search_multi',
+            ),
+        ]
+
+        list_data = await self.get_resource().get_list(
+            limit=self.per_page,
+            order_by=self.order_by,
+            filters=filters_list,
+            page=page,
+        )
+
+        await self.prepare_instances(list_data.instances)
+
+        return {
+            "results": [
+                {"id": i.get_pk(), "text": str(i)}
+                for i in list_data.instances
+            ],
+            "pagination": {
+                "more": list_data.has_next
+            }
+        }
 
     async def get_list(
         self,
@@ -302,7 +350,7 @@ class Controller:
             filters=filters,
         )
 
-        self.prepare_instances(list_data.instances)
+        await self.prepare_instances(list_data.instances)
 
         rows = []
 
@@ -361,7 +409,17 @@ class Controller:
         if not self.can_view:
             raise PermissionDenied
 
-        return await self.get_resource().get_many(pks, field=field)
+        data = await self.get_resource().get_many(pks, field=field)
+        await self.prepare_instances(data.values())
+
+        return data
+
+    async def get_object_name(self, obj: Instance) -> str:
+        return str(obj)
+
+    @classmethod
+    def with_autocomplete(cls):
+        return bool(cls.autocomplete_search_fields or cls.search_fields)
 
     @classmethod
     def builder_form_params(cls, params: t.Dict[str, t.Any]):

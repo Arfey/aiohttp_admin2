@@ -28,6 +28,7 @@ class ControllerView(BaseAdminView):
     template_detail_create_name = 'aiohttp_admin/create.html'
     template_delete_name = 'aiohttp_admin/delete.html'
     controller: Controller
+    _controller_instance: Controller = None
     tabs: t.List[TabBaseView] = None
     tabs_list: t.List[t.Any] = None
 
@@ -107,8 +108,17 @@ class ControllerView(BaseAdminView):
     def index_url_name(self):
         return self.controller_url
 
+    def get_autocomplete_url(self, name: str) -> str:
+        return f'/{self.index_url_name}/_autocomplete_{name}'
+
+    def get_autocomplete_url_name(self, name: str) -> str:
+        return f'{self.index_url_name}_autocomplete_{name}'
+
     def get_controller(self):
-        return self.controller.builder_form_params(self.params)
+        if not self._controller_instance:
+            self._controller_instance = self.controller\
+                .builder_form_params(self.params)
+        return self._controller_instance
 
     async def get_list(self, req: web.Request) -> web.Response:
         params = self.get_params_from_request(req)
@@ -312,6 +322,22 @@ class ControllerView(BaseAdminView):
 
         for tab in self.tabs_list:
             tab.setup(app)
+
+        controller = self.get_controller()
+
+        # autocomplete
+        autocomplete_routes = []
+        for name, relation in controller.foreign_keys_field_map.items():
+            async def autocomplete(req):
+                return web.json_response([])
+
+            autocomplete_routes.append(web.get(
+                self.get_autocomplete_url(name),
+                autocomplete,
+                name=self.get_autocomplete_url_name(name)
+            ))
+
+        app.add_routes(autocomplete_routes)
 
     def visit_to_many_relations(self, obj: ToManyRelation) -> None:
         tab = type(

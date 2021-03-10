@@ -39,10 +39,6 @@ class ArrayWidget(BaseWidget):
         "https://code.jquery.com/jquery-3.5.1.min.js",
         "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js",
     ]
-    # css_extra = [
-    #     "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css",
-    #     "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-    # ]
 
 
 class CKEditorWidget(BaseWidget):
@@ -83,3 +79,13 @@ class FileWidget(BaseWidget):
 
 class ImageWidget(BaseWidget):
     template_name = 'aiohttp_admin/fields/image_field.html'
+
+
+class AutocompleteStringWidget(StringWidget):
+    template_name = 'aiohttp_admin/fields/autocomplete_field.html'
+    css_extra = [
+        "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css",
+    ]
+    js_extra = [
+        "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js",
+    ]

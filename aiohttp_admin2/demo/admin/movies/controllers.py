@@ -28,6 +28,7 @@ class MoviesController(PostgresController):
     inline_fields = [
         'poster', 'title', 'status', 'release_date', 'vote_average',
     ]
+    autocomplete_search_fields = ['title', ]
 
     async def poster_field(self, obj):
         return f'<img ' \
@@ -65,6 +66,7 @@ class ActorMovieController(PostgresController):
     inline_fields = [
         'id', 'photo', 'actor_id', 'actor_name', 'character', 'order'
     ]
+    autocomplete_search_fields = ['name', ]
     order_by = 'order'
 
     per_page = 10

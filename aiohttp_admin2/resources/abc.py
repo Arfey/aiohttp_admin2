@@ -93,6 +93,9 @@ class Instance:
     def __repr__(self) -> str:
         return self._name or str(self.__dict__)
 
+    def set_name(self, name: str) -> None:
+        self._name = name
+
     def get_pk(self) -> PK:
         if hasattr(self, 'pk'):
             return self.pk

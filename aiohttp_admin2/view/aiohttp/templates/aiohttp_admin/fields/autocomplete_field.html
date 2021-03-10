@@ -1,0 +1,38 @@
+{% macro field(
+    name,
+    field,
+    with_defaults=False
+)
+%}
+<div class="form-group">
+    {% include 'aiohttp_admin/blocks/form/field_title.html' %}
+    {%- if field.is_not_none %}
+        {% set field_value = field.failure_safe_value %}
+    {%- elif field.default and with_defaults %}
+        {% set field_value = field.default %}
+    {%- else %}
+        {% set field_value = '' %}
+    {%- endif %}
+    <select class="form-control js-autocomplete-{{name}} autocomplete-input" name="{{ name }}" id="{{ name }}input" aria-describedby="inputGroup-sizing-default">
+        {% if field_value %}
+            <option value="{{ field_value }}">{{ field_value }}</option>
+        {% endif %}
+    </select>
+    {% if field.errors %}
+    <br>
+    {% for error in field.errors %}
+    <span style="color: red">{{ error }}</span>
+    <br>
+    {% endfor %}
+    {% endif %}
+    <script>
+        $('.js-autocomplete-{{name}}').select2({
+          ajax: {
+            url: "{{ autocomplete_url }}",
+            dataType: 'json',
+            delay: 100
+          },
+        });
+    </script>
+</div>
+{% endmacro %}

@@ -13,3 +13,7 @@ class GenresController(PostgresController):
     per_page = 10
 
     inline_fields = ['name', 'type', ]
+    autocomplete_search_fields = ['name', ]
+
+    async def get_object_name(self, obj):
+        return obj.name

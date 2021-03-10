@@ -20,6 +20,7 @@ DEFAULT_TYPE_WIDGETS = {
     fields.JsonField.type_name: widgets.JsonWidget,
     fields.UrlFileField.type_name: widgets.FileWidget,
     fields.UrlImageField.type_name: widgets.ImageWidget,
+    'autocomplete': widgets.AutocompleteStringWidget,
 }
 DEFAULT_FILTER_MAP = {
     fields.ChoicesField.type_name: filters.ChoiceFilter,
@@ -47,6 +48,7 @@ class BaseAdminView(ViewUtilsMixin):
     # todo: docs
     fields_widgets = {}
     default_widget = widgets.StringWidget
+    foreignkey_widget = widgets.AutocompleteStringWidget
     type_widgets = {}
     default_type_widgets = DEFAULT_TYPE_WIDGETS
     default_filter_map = DEFAULT_FILTER_MAP

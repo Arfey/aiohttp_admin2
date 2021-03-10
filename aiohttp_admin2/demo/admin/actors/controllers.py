@@ -69,6 +69,9 @@ class ActorController(PostgresController):
         profile = await obj.get_relation('profile_hash')
         return profile.hash if profile else None
 
+    async def get_object_name(self, obj):
+        return f"{obj.get_pk()} - {obj.name}"
+
 
 class ActorPage(ControllerView):
     controller = ActorController
