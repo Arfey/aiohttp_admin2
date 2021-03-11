@@ -11,6 +11,7 @@
     {{
         form(
             url(create_url, pk=pk),
+            get_field_value=get_field_value,
             submit_text='Create',
             mapper=mapper,
             exclude=exclude_fields,

@@ -3,6 +3,8 @@ import typing as t
 from aiohttp import web
 from abc import abstractmethod
 
+from aiohttp_admin2.view.aiohttp.utils import get_field_value
+
 __all__ = ['TabBaseView', ]
 
 
@@ -19,6 +21,7 @@ class TabBaseView:
             'parent': self.parent,
             'pk': req.match_info['pk'],
             "message": req.rel_url.query.get('message'),
+            "get_field_value": get_field_value,
         }
 
     @abstractmethod

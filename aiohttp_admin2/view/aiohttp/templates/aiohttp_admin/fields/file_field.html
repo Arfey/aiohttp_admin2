@@ -1,22 +1,22 @@
 {% macro field(
     name,
     field,
+    get_field_value,
     with_defaults=False
 )
 %}
 <div class="form-group">
     {% include 'aiohttp_admin/blocks/form/field_title.html' %}
-    <!-- todo: move from _value -->
-    {% if field._value %}
-    <a href="{{ field._value  }}" target="_blank">{{ field._value }}</a>
+    {% if field.value %}
+    <a href="{{ field.value }}" target="_blank">{{ field.value }}</a>
     {% endif %}
-    <input type="file" class="form-control-file" name="{{ name }}" id="{{ name }}input" aria-describedby="inputGroup-sizing-default" />
-    {% if field.errors %}
-    <br>
-    {% for error in field.errors %}
-    <span style="color: red">{{ error }}</span>
-    <br>
-    {% endfor %}
-    {% endif %}
+    <input
+        type="file"
+        class="form-control-file"
+        name="{{ name }}"
+        id="{{ name }}_input"
+        aria-describedby="inputGroup-sizing-default"
+    />
+    {% include 'aiohttp_admin/blocks/form/field_errors.html' -%}
 </div>
 {% endmacro %}

@@ -1,49 +1,11 @@
+{% from 'aiohttp_admin/fields/datetime_field.html' import field as field_macro with context %}
+
 {% macro field(
     name,
     field,
+    get_field_value,
     with_defaults=False
 )
 %}
-
-<div class="form-group">
-    {% include 'aiohttp_admin/blocks/form/field_title.html' %}
-    {%- if field.is_not_none %}
-        {% set field_value = field.failure_safe_value %}
-    {%- elif field.default and with_defaults %}
-        {% set field_value = field.default %}
-    {%- else %}
-        {% set field_value = '' %}
-    {%- endif %}
-    <div class='input-group date' id='{{name}}-datetime' data-target-input="nearest">
-        <input
-                type="text"
-                class="form-control datetimepicker-input"
-                id="{{ name }}input"
-                name="{{ name }}"
-                value="{{ field_value }}"
-                data-target="#{{name}}-datetime"
-        />
-        <div class="input-group-addon input-group-append" data-target="#{{name}}-datetime" data-toggle="datetimepicker">
-            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-        </div>
-    </div>
-
-
-    {% if field.errors %}
-    <br>
-    {% for error in field.errors %}
-    <span style="color: red">{{ error }}</span>
-    <br>
-    {% endfor %}
-    {% endif %}
-
-    <script>
-        $('#{{name}}-datetime').datetimepicker({
-          format: "YYYY-MM-DD"
-        });
-    </script>
-
-</div>
-
-
+    {{ field_macro(name, field, get_field_value, with_defaults, format="YYYY-MM-DD") }}
 {% endmacro %}

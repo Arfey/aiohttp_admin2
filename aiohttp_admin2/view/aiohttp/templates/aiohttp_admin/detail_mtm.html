@@ -11,6 +11,7 @@
     {{
         form(
             url(save_url, pk=pk, nested_pk=nested_pk),
+            get_field_value=get_field_value,
             submit_text='Update',
             mapper=mapper,
             exclude=exclude_fields,
@@ -21,6 +22,7 @@
     {{
         form(
             url(delete_url, pk=pk, nested_pk=nested_pk),
+            get_field_value=get_field_value,
             submit_text='Delete',
             method='GET',
             submit_cls='btn-danger',

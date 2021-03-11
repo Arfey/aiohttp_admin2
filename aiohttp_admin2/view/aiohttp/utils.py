@@ -3,7 +3,7 @@ import typing as t
 from aiohttp import web
 
 
-__all__ = ['get_params_from_request', 'QueryParams', ]
+__all__ = ['get_params_from_request', 'QueryParams', 'get_field_value', ]
 
 
 class QueryParams(t.NamedTuple):
@@ -33,3 +33,15 @@ def get_params_from_request(req: web.Request) -> QueryParams:
         cursor=int(cursor) if cursor else None,
         order_by=sort,
     )
+
+
+def get_field_value(field, with_defaults) -> str:
+    """
+    This helper need to extract value from field.
+    """
+    if field.is_not_none:
+        return field.failure_safe_value
+    elif field.default and with_defaults:
+        return field.default
+
+    return ''

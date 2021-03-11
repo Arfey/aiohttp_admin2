@@ -1,29 +1,22 @@
 {% macro field(
     name,
     field,
+    get_field_value,
     with_defaults=False
 )
 %}
 <div class="form-group">
     {% include 'aiohttp_admin/blocks/form/field_title.html' %}
-    {%- if field.is_not_none %}
-        {% set field_value = field.failure_safe_value %}
-    {%- elif field.default and with_defaults %}
-        {% set field_value = field.default %}
-    {%- else %}
-        {% set field_value = '' %}
-    {%- endif %}
+    {% set field_value = get_field_value(field, with_defaults) -%}
     <div class="wrapper-json">
-        <div class="{{ name }} json" id="jsoneditor-{{name}}" name="{{ name }}">{{ field_value }}</div>
-        <textarea class="{{ name }}-json hidden" name="{{ name }}">{{ field_value }}</textarea>
+        <div class="{{ name }} json" id="jsoneditor-{{name}}" name="{{ name }}">
+            {{ field_value }}
+        </div>
+        <textarea class="{{ name }}-json hidden" name="{{ name }}">
+            {{ field_value }}
+        </textarea>
     </div>
-    {% if field.errors %}
-    <br>
-    {% for error in field.errors %}
-    <span style="color: red">{{ error }}</span>
-    <br>
-    {% endfor %}
-    {% endif %}
+    {% include 'aiohttp_admin/blocks/form/field_errors.html' -%}
     <script>
         const editor{{name}} = ace.edit('jsoneditor-{{name}}', {
           mode: 'ace/mode/json',

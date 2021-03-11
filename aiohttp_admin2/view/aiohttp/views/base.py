@@ -4,6 +4,7 @@ from aiohttp import web
 from aiohttp_admin2.mappers import fields
 from aiohttp_admin2 import widgets
 from aiohttp_admin2 import filters
+from aiohttp_admin2.view.aiohttp.utils import get_field_value
 from aiohttp_admin2.view.aiohttp.views.utils import ViewUtilsMixin
 
 
@@ -71,6 +72,7 @@ class BaseAdminView(ViewUtilsMixin):
             "title": self.title,
             "controller_view": self,
             "type_of": type,
+            "get_field_value": get_field_value,
         }
 
     def setup(self, app: web.Application) -> None:

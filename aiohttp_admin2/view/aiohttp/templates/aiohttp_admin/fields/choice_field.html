@@ -1,25 +1,14 @@
 {% macro field(
     name,
     field,
+    get_field_value,
     with_defaults=False
 )
 %}
 <div class="form-group">
-    <!--  Title  -->
     {% include 'aiohttp_admin/blocks/form/field_title.html' %}
-    <!--  end title  -->
-
-    {%- if field.is_not_none %}
-        {% set value_default = field.value %}
-    {%- elif field.default and with_defaults %}
-        {% set value_default = field.default %}
-    {%- else %}
-        {% set value_default = '' %}
-    {%- endif %}
-
-    <!--  Input  -->
+    {% set field_value = get_field_value(field, with_defaults) -%}
     <select name="{{ name }}" id="{{ name }}input" class="form-control">
-        <!--   Options     -->
         <option
             value=""
             {% if not field.is_not_none %}selected{% endif%}
@@ -30,24 +19,12 @@
         {%- for value, text in field.choices %}
         <option
             value="{{ value }}"
-            {% if value_default | string() == value | string() %}selected{% endif%}
+            {% if field_value | string() == value | string() %}selected{% endif%}
         >
             {{ text }}
         </option>
         {%- endfor %}
-        <!--   end options     -->
-
     </select>
-    <!--  end input  -->
-
-    <!--  Errors  -->
-    {% if field.errors %}
-    <br>
-    {% for error in field.errors %}
-    <span style="color: red">{{ error }}</span>
-    <br>
-    <!--  end errors  -->
-    {% endfor %}
-    {% endif %}
+    {% include 'aiohttp_admin/blocks/form/field_errors.html' -%}
 </div>
 {% endmacro %}
