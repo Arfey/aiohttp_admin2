@@ -2,9 +2,10 @@
 {% from 'aiohttp_admin/blocks/form/form.html' import form %}
 
 {% block main %}
-<div style="width: 100%">
+<div class="wrapper">
     <p class="content__empty-title">{{ title }}</p>
     <!--  create form  -->
+    {% if controller.can_create %}
     {{
         form(
             create_post_url,
@@ -16,5 +17,11 @@
             with_defaults=True,
         )
     }}
+    {% else %}
+    <div class="alert alert-danger" role="alert">
+      You do not have access to create a new {{ title }} object.
+    </div>
+    {% endif %}
+
 </div>
 {% endblock main %}

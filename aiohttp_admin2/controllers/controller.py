@@ -332,6 +332,15 @@ class Controller:
             }
         }
 
+    def is_field_sortable(self, name: str) -> bool:
+        field_method_name = "{}_field".format(name)
+        sort_method_name = "{}_field_sort".format(name)
+
+        return (
+            not hasattr(self, field_method_name)
+            or hasattr(self, sort_method_name)
+        )
+
     async def get_list(
         self,
         url_builder,

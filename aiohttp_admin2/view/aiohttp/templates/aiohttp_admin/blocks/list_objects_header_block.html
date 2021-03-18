@@ -3,7 +3,7 @@
         {% with isDesc=(request.rel_url.query.get('sortDir') == 'desc') %}
         {% for field in controller.inline_fields %}
         <th scope="col">
-            {% if not hasattr(controller, "{}_field".format(field)) or hasattr(controller, "{}_field_sort".format(field)) %}
+            {% if controller.is_field_sortable(field) %}
             <!-- todo: delete pagination after sort  -->
             <a href="{{ newParam({
                 'sort': field,

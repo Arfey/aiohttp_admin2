@@ -2,7 +2,7 @@
 {% from 'aiohttp_admin/blocks/form/form.html' import form %}
 
 {% block main %}
-    <div style="width: 100%">
+    <div class="wrapper">
         <div class="container">
         <div class="row justify-content-between list-nav">
             <div>
@@ -14,6 +14,7 @@
     {% include 'aiohttp_admin/blocks/tabs_bar.html' %}
 
     <!--  update form  -->
+    {% if controller.can_update %}
     {{
         form(
             save_url,
@@ -24,7 +25,13 @@
             controller_view=controller_view,
         )
     }}
+    {% else %}
+    <div class="alert alert-danger" role="alert">
+      You do not have access to update the {{ title }}.
+    </div>
+    {% endif %}
     <!--  delete form  -->
+    {% if controller.can_delete %}
     {{
         form(
             delete_url,
@@ -35,5 +42,6 @@
             controller_view=controller_view,
         )
     }}
+    {% endif %}
 </div>
-{% endblock %}
+{% endblock main %}
