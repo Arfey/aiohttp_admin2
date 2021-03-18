@@ -22,11 +22,12 @@ class ControllerView(BaseAdminView):
     interface.
     """
     # Templates
-    template_list_name = 'aiohttp_admin/list.html'
-    template_detail_name = 'aiohttp_admin/detail.html'
-    template_detail_edit_name = 'aiohttp_admin/detail_edit.html'
-    template_detail_create_name = 'aiohttp_admin/create.html'
-    template_delete_name = 'aiohttp_admin/delete.html'
+    template_list_name = 'aiohttp_admin/layouts/list_page.html'
+    template_detail_name = 'aiohttp_admin/layouts/detail_view_page.html'
+    template_detail_edit_name = 'aiohttp_admin/layouts/detail_edit_page.html'
+    template_detail_create_name = 'aiohttp_admin/layouts/create_page.html'
+    template_delete_name = 'aiohttp_admin/layouts/delete_page.html'
+
     controller: Controller
     _controller_instance: Controller = None
     tabs: t.List[TabBaseView] = None
@@ -101,6 +102,12 @@ class ControllerView(BaseAdminView):
     def delete_post_url_name(self):
         return f'{self.controller_url}_delete_post'
 
+    def resolve_create_url(self, req: web.Request) -> str:
+        return str(req.app.router[self.create_url_name].url_for())
+
+    def resolve_create_post_url(self, req: web.Request) -> str:
+        return str(req.app.router[self.create_post_url_name].url_for())
+
     @property
     def index_url_name(self):
         return self.controller_url
@@ -159,7 +166,7 @@ class ControllerView(BaseAdminView):
                 "list": data,
                 "controller": controller,
                 "detail_url": self.detail_url_name,
-                "create_url": self.create_url_name,
+                "create_url": self.resolve_create_url(req),
                 "message": req.rel_url.query.get('message'),
                 "media": self.get_extra_media_list(),
             }
@@ -172,7 +179,8 @@ class ControllerView(BaseAdminView):
     ) -> web.Response:
         controller = self.get_controller()
         # todo: handle str key for dict
-        data = await controller.get_detail(req.match_info['pk'])
+        pk = req.match_info['pk']
+        data = await controller.get_detail(pk)
 
         template = self.template_detail_edit_name
 
@@ -188,13 +196,19 @@ class ControllerView(BaseAdminView):
                 "object": data,
                 "controller": controller,
                 "title": f"{self.name}#{data.id}",
-                "delete_url": self.delete_url_name,
-                "detail_url": self.detail_url_name,
-                "save_url": self.update_post_url_name,
+                "delete_url": req.app.router[self.delete_url_name]
+                    .url_for(pk=pk),
+                "detail_url": req.app.router[self.detail_url_name]
+                    .url_for(pk=pk),
+                "save_url": req.app.router[self.update_post_url_name]
+                    .url_for(pk=pk),
                 "mapper": mapper or controller.mapper(data.__dict__),
                 "fields": controller.fields,
                 "message": req.rel_url.query.get('message'),
                 "exclude_fields": self.controller.exclude_update_fields,
+                "is_common": True,
+                "tabs": self.tabs_list,
+                "pk": pk,
             }
         )
 
@@ -213,10 +227,10 @@ class ControllerView(BaseAdminView):
                 "media": self.get_extra_media(),
                 "controller": controller,
                 "title": f"Create a new {self.name}",
-                "create_url": self.create_post_url_name,
                 "mapper": mapper or controller.mapper({}),
                 "fields": controller.fields,
                 "exclude_fields": self.controller.exclude_create_fields,
+                "create_post_url": self.resolve_create_post_url(req)
             }
         )
 
@@ -258,14 +272,19 @@ class ControllerView(BaseAdminView):
             )
 
     async def get_delete(self, req: web.Request) -> web.Response:
+        pk = req.match_info['pk']
+        controller = self.get_controller()
+
         return aiohttp_jinja2.render_template(
             self.template_delete_name,
             req,
             {
                 **await self.get_context(req),
-                "title": f"Confirm delete {self.name}#{req.match_info['pk']}",
-                "delete_url": self.delete_post_url_name,
-                "pk": req.match_info['pk'],
+                "title": f"Confirm delete {self.name}#{pk}",
+                "controller": controller,
+                "delete_url": req.app.router[self.delete_post_url_name]
+                    .url_for(pk=pk),
+                "pk": pk,
             }
         )
 

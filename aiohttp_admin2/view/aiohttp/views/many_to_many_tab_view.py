@@ -27,9 +27,9 @@ __all__ = ['ManyToManyTabView', ]
 # todo: nested from controller
 class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
     controller: Controller
-    template_detail_create_name = 'aiohttp_admin/create_mtm.html'
-    template_detail_name = 'aiohttp_admin/detail_mtm.html'
-    template_name: str = 'aiohttp_admin/template_tab_view_m2m.html'
+    template_detail_create_name = 'aiohttp_admin/layouts/create_page.html'
+    template_detail_name = 'aiohttp_admin/layouts/detail_edit_page.html'
+    template_name: str = 'aiohttp_admin/layouts/list_page.html'
     fields_widgets = {}
     default_widget = widgets.StringWidget
     foreignkey_widget = widgets.AutocompleteStringWidget
@@ -123,6 +123,7 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
         mapper: t.Dict[str, t.Any] = None,
     ) -> web.Response:
         controller = self.get_controller()
+        pk = req.match_info['pk']
 
         return aiohttp_jinja2.render_template(
             self.template_detail_create_name,
@@ -132,13 +133,13 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
                 "media": self.get_extra_media(),
                 "controller": controller,
                 "title": f"Create a new {self.name}",
-
                 "mapper": mapper or controller.mapper({
                     self.left_table_name: self.get_pk(req)
                 }),
                 "fields": controller.fields,
                 "exclude_fields": self.controller.exclude_create_fields,
-                "create_url": self.create_post_url_name,
+                "create_post_url": req.app.router[self.create_post_url_name]
+                    .url_for(pk=pk)
             }
         )
 
@@ -227,7 +228,11 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
                 'list': data,
                 'content': await self.get_content(req),
                 "controller": controller,
-                "create_url": self.create_url_name,
+                "tabs": self.parent.tabs_list,
+                "detail_url": req.app.router[self.parent.detail_url_name]
+                    .url_for(pk=req.match_info['pk']),
+                "create_url": req.app.router[self.create_url_name]
+                    .url_for(pk=req.match_info['pk'])
             },
         )
 
@@ -237,6 +242,8 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
         mapper: t.Dict[str, t.Any] = None,
     ) -> web.Response:
         controller = self.get_controller()
+        pk = req.match_info['pk']
+        nested_pk = req.match_info['nested_pk']
         data = await controller.get_detail(req.match_info['nested_pk'])
 
         return aiohttp_jinja2.render_template(
@@ -251,8 +258,12 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
                 "title": f"{self.name}#{data.id}",
                 "pk": self.get_pk(req),
                 "nested_pk": req.match_info['nested_pk'],
-                "delete_url": self.delete_url_name,
-                "save_url": self.update_post_url_name,
+                "delete_url": req.app.router[self.delete_url_name]
+                    .url_for(pk=pk, nested_pk=nested_pk),
+                "detail_url": req.app.router[self.detail_url_name]
+                    .url_for(pk=pk, nested_pk=nested_pk),
+                "save_url": req.app.router[self.update_post_url_name]
+                    .url_for(pk=pk, nested_pk=nested_pk),
                 "mapper": mapper or controller.mapper(data.__dict__),
                 "fields": controller.fields,
             }

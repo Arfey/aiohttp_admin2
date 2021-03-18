@@ -7,7 +7,7 @@ __all__ = ['TabTemplateView', ]
 
 
 class TabTemplateView(TabBaseView):
-    template_name: str = 'aiohttp_admin/template_tab_view.html'
+    template_name: str = 'aiohttp_admin/layouts/custom_tab_page.html'
 
     async def get_content(self, req):
         return ''

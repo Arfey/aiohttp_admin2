@@ -1,16 +1,22 @@
-{% extends 'aiohttp_admin/base.html' %}
-{% from 'aiohttp_admin/form.html' import form %}
+{% extends 'aiohttp_admin/layouts/base.html' %}
+{% from 'aiohttp_admin/blocks/form/form.html' import form %}
 
 {% block main %}
-<div style="width: 100%">
-    {% if message %}
-    <p class="alert alert-dark">{{ message }}</p>
-    {% endif %}
-    <p class="content__empty-title">{{ title }}</p>
+    <div style="width: 100%">
+        <div class="container">
+        <div class="row justify-content-between list-nav">
+            <div>
+                <p class="content__empty-title">{{ title }}</p>
+            </div>
+        </div>
+    </div>
+
+    {% include 'aiohttp_admin/blocks/tabs_bar.html' %}
+
     <!--  update form  -->
     {{
         form(
-            url(save_url, pk=pk, nested_pk=nested_pk),
+            save_url,
             get_field_value=get_field_value,
             submit_text='Update',
             mapper=mapper,
@@ -21,7 +27,7 @@
     <!--  delete form  -->
     {{
         form(
-            url(delete_url, pk=pk, nested_pk=nested_pk),
+            delete_url,
             get_field_value=get_field_value,
             submit_text='Delete',
             method='GET',

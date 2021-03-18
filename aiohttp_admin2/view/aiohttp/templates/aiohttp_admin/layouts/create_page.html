@@ -1,16 +1,13 @@
-{% extends 'aiohttp_admin/base.html' %}
-{% from 'aiohttp_admin/form.html' import form %}
+{% extends 'aiohttp_admin/layouts/base.html' %}
+{% from 'aiohttp_admin/blocks/form/form.html' import form %}
 
 {% block main %}
 <div style="width: 100%">
-    {% if message %}
-    <p class="alert alert-dark">{{ message }}</p>
-    {% endif %}
     <p class="content__empty-title">{{ title }}</p>
     <!--  create form  -->
     {{
         form(
-            url(create_url, pk=pk),
+            create_post_url,
             get_field_value=get_field_value,
             submit_text='Create',
             mapper=mapper,
@@ -20,4 +17,4 @@
         )
     }}
 </div>
-{% endblock %}
+{% endblock main %}

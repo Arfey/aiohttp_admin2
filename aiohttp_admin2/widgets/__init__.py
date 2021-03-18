@@ -22,22 +22,22 @@ class BaseWidget:
 
 class StringWidget(BaseWidget):
     """This widget represent a field as a simple text input."""
-    template_name = 'aiohttp_admin/fields/string_field.html'
+    template_name = 'aiohttp_admin/blocks/form/fields/string_field.html'
 
 
 class ChoiceWidget(BaseWidget):
     """This widget represent a field as a select input."""
-    template_name = 'aiohttp_admin/fields/choice_field.html'
+    template_name = 'aiohttp_admin/blocks/form/fields/choice_field.html'
 
 
 class BooleanWidget(BaseWidget):
     """This widget represent a field as a checkbox input."""
-    template_name = 'aiohttp_admin/fields/boolean_field.html'
+    template_name = 'aiohttp_admin/blocks/form/fields/boolean_field.html'
 
 
 class ArrayWidget(BaseWidget):
     """This widget represent a field as a list of the separated tags."""
-    template_name = 'aiohttp_admin/fields/array_field.html'
+    template_name = 'aiohttp_admin/blocks/form/fields/array_field.html'
     js_extra = [
         JQUERY_CDN,
         (
@@ -49,7 +49,7 @@ class ArrayWidget(BaseWidget):
 
 class CKEditorWidget(BaseWidget):
     """This widget represent a field as a smart html editor."""
-    template_name = 'aiohttp_admin/fields/ck_editor_field.html'
+    template_name = 'aiohttp_admin/blocks/form/fields/ck_editor_field.html'
     js_extra = [
         "https://cdn.ckeditor.com/4.15.0/standard/ckeditor.js"
     ]
@@ -57,7 +57,7 @@ class CKEditorWidget(BaseWidget):
 
 class DateTimeWidget(BaseWidget):
     """This widget represent a field as a input with the datetime dropdown."""
-    template_name = 'aiohttp_admin/fields/datetime_field.html'
+    template_name = 'aiohttp_admin/blocks/form/fields/datetime_field.html'
     js_extra = [
         JQUERY_CDN,
         (
@@ -84,12 +84,12 @@ class DateTimeWidget(BaseWidget):
 
 class DateWidget(DateTimeWidget):
     """This widget represent a field as a input with the date dropdown."""
-    template_name = 'aiohttp_admin/fields/date_field.html'
+    template_name = 'aiohttp_admin/blocks/form/fields/date_field.html'
 
 
 class JsonWidget(BaseWidget):
     """This widget represent a field as a smart json editor."""
-    template_name = 'aiohttp_admin/fields/json_field.html'
+    template_name = 'aiohttp_admin/blocks/form/fields/json_field.html'
     js_extra = [
         "https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js",
     ]
@@ -97,7 +97,7 @@ class JsonWidget(BaseWidget):
 
 class FileWidget(BaseWidget):
     """This widget represent a field as a file input."""
-    template_name = 'aiohttp_admin/fields/file_field.html'
+    template_name = 'aiohttp_admin/blocks/form/fields/file_field.html'
 
 
 class ImageWidget(BaseWidget):
@@ -105,14 +105,14 @@ class ImageWidget(BaseWidget):
     This widget represent a field as a file input with an image
     representation.
     """
-    template_name = 'aiohttp_admin/fields/image_field.html'
+    template_name = 'aiohttp_admin/blocks/form/fields/image_field.html'
 
 
 class AutocompleteStringWidget(StringWidget):
     """
     This widget represent a field as a text input with able to suggests.
     """
-    template_name = 'aiohttp_admin/fields/autocomplete_field.html'
+    template_name = 'aiohttp_admin/blocks/form/fields/autocomplete_field.html'
     css_extra = [
         (
             "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2."

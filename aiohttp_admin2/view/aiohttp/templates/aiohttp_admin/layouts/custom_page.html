@@ -1,4 +1,4 @@
-{% extends 'aiohttp_admin/base.html' %}
+{% extends 'aiohttp_admin/layouts/base.html' %}
 
 {% block main %}
 {%- if content  %}
@@ -6,4 +6,4 @@
 {%- else %}
  <p class="content__empty-title">{{ title }}</p>
 {%- endif %}
-{% endblock %}
+{% endblock main %}

@@ -23,7 +23,7 @@ class FilerBase(ABC):
 
 
 class ChoiceFilter(FilerBase):
-    template_name = 'aiohttp_admin/filters/choice_filter.html'
+    template_name = 'aiohttp_admin/blocks/filters/choice_filter.html'
     name: str
     query: dict
 
@@ -45,7 +45,7 @@ class ChoiceFilter(FilerBase):
 
 
 class BooleanFilter(FilerBase):
-    template_name = 'aiohttp_admin/filters/boolean_filter.html'
+    template_name = 'aiohttp_admin/blocks/filters/boolean_filter.html'
     name: str
     query: dict
 
@@ -67,7 +67,7 @@ class BooleanFilter(FilerBase):
 
 
 class SingleValueFilter(FilerBase):
-    template_name = 'aiohttp_admin/filters/single_value_filter.html'
+    template_name = 'aiohttp_admin/blocks/filters/single_value_filter.html'
     name: str
     query: dict
 
@@ -89,7 +89,7 @@ class SingleValueFilter(FilerBase):
 
 
 class DateTimeFilter(FilerBase):
-    template_name = 'aiohttp_admin/filters/datetime_filter.html'
+    template_name = 'aiohttp_admin/blocks/filters/datetime_filter.html'
     name: str
     query: dict
     format: str = 'YYYY-MM-DD HH:mm:ss'
@@ -133,7 +133,7 @@ class DateFilter(DateTimeFilter):
 
 
 class SearchFilter(FilerBase):
-    template_name = 'aiohttp_admin/filters/search_filter.html'
+    template_name = 'aiohttp_admin/blocks/filters/search_filter.html'
     name: str
     query: dict
     fields: t.List[str]
