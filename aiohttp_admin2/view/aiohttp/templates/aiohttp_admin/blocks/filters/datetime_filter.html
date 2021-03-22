@@ -7,26 +7,38 @@
     <form action="" method="get">
         <div class="form-group">
             <label for="{{field.name}}dateFrom">date from</label>
-
-            <div class='input-group' id='{{field.name}}-datetime-from' data-target-input="nearest">
+            <div
+                class='input-group'
+                id='{{field.name}}-datetime-from'
+                data-target-input="nearest"
+            >
                 <input
-                        type="text"
-                        class="form-control datetimepicker-input"
-                        id="{{field.name}}dateFrom"
-                        name="{{ filter.param_key_from }}"
-                        value="{{ filter.get_params()[0] or '' }}"
-                        data-target="#{{field.name}}-datetime-from"
+                    type="text"
+                    class="form-control datetimepicker-input"
+                    id="{{field.name}}dateFrom"
+                    name="{{ filter.param_key_from }}"
+                    value="{{ filter.get_params()[0] or '' }}"
+                    data-target="#{{field.name}}-datetime-from"
                 />
-                <div class="input-group-addon input-group-append" data-target="#{{field.name}}-datetime-from" data-toggle="datetimepicker">
-                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                <div
+                    class="input-group-addon input-group-append"
+                    data-target="#{{field.name}}-datetime-from"
+                    data-toggle="datetimepicker"
+                >
+                    <div class="input-group-text">
+                        <i class="fa fa-calendar"></i>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="form-group">
             <label for="{{field.name}}dateTo">date to</label>
-
-            <div class='input-group' id='{{field.name}}-datetime-to' data-target-input="nearest">
+            <div
+                class='input-group'
+                id='{{field.name}}-datetime-to'
+                data-target-input="nearest"
+            >
                 <input
                         type="text"
                         class="form-control datetimepicker-input"
@@ -35,30 +47,38 @@
                         value="{{ filter.get_params()[1] or '' }}"
                         data-target="#{{field.name}}-datetime-to"
                 />
-                <div class="input-group-addon input-group-append" data-target="#{{field.name}}-datetime-to" data-toggle="datetimepicker">
-                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                <div
+                    class="input-group-addon input-group-append"
+                    data-target="#{{field.name}}-datetime-to"
+                    data-toggle="datetimepicker"
+                >
+                    <div class="input-group-text">
+                        <i class="fa fa-calendar"></i>
+                    </div>
                 </div>
             </div>
         </div>
+
         <input type="submit" value="submit" class="btn btn-secondary">
+
         {% for i, k in request.rel_url.query.items() %}
-        {% if i not in [filter.param_key_to, filter.param_key_from] %}
-        <input type="hidden" name="{{i}}" value="{{k}}">
-        {% endif %}
+            {% if i not in [filter.param_key_to, filter.param_key_from, "page"] %}
+                <input type="hidden" name="{{i}}" value="{{k}}">
+            {% endif %}
         {% endfor %}
+
     </form>
 
     <script>
-        $('#{{field.name}}-datetime-from').datetimepicker({
-          format: "{{ filter.format }}"
-        });
-        $('#{{field.name}}-datetime-to').datetimepicker({
+        $('#{{field.name}}-datetime-from, #{{field.name}}-datetime-to').datetimepicker({
           format: "{{ filter.format }}"
         });
     </script>
 
     {% if filter.get_params()[1] or filter.get_params()[0] %}
-    <a href="{{ newParam({ filter.param_key_from: '', filter.param_key_to: '', 'page': 1 }, request.rel_url.query) }}">clear</a>
+        <a href="{{ newParam({ filter.param_key_from: '', filter.param_key_to: '', 'page': 1 }, request.rel_url.query) }}">
+            clear
+        </a>
     {% endif %}
 </div>
 {% endmacro %}
