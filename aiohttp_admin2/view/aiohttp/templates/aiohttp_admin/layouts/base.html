@@ -1,3 +1,5 @@
+{% from 'aiohttp_admin/blocks/messages.html' import messages %}
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -33,7 +35,7 @@
     <main class="main">
         {% include 'aiohttp_admin/blocks/nav_aside.html' %}
         <div class="content">
-            {% include 'aiohttp_admin/blocks/messages.html' %}
+            {{ messages(message) }}
             {% block main %}{% endblock main %}
         </div>
     </main>

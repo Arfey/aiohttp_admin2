@@ -1,29 +1,29 @@
 <aside class="nav-aside">
     <ul>
         {%- for group_name, views in nav_groups.items() %}
-        <li
-            class="nav-aside__group-title"
-            title="{{ group_name | capitalize }}"
-        >
-            {{ group_name | capitalize }}
-        </li>
-        {%- for view in views %}
-        <li class="nav-aside__item">
-            <a
-                {%- if request.app.router[view.controller_url].url_for().path == request.rel_url.path %}
-                class="nav-aside__link nav-aside__link_active"
-                {%- else %}
-                class="nav-aside__link"
-                {%- endif %}
-                href="{{ url(view.controller_url) }}"
-                title="{{ view.title | capitalize }}"
+            <li
+                class="nav-aside__group-title"
+                title="{{ group_name | capitalize }}"
             >
-                <i class="material-icons">{{ view.icon }}</i>
-                {{ view.title | capitalize }}
-            </a>
+                {{ group_name | capitalize }}
+            </li>
+            {%- for view in views %}
+                <li class="nav-aside__item">
+                    <a
+                        {%- if request.app.router[view.controller_url].url_for().path == request.rel_url.path %}
+                        class="nav-aside__link nav-aside__link_active"
+                        {%- else %}
+                        class="nav-aside__link"
+                        {%- endif %}
+                        href="{{ url(view.controller_url) }}"
+                        title="{{ view.title | capitalize }}"
+                    >
+                        <i class="material-icons">{{ view.icon }}</i>
+                        {{ view.title | capitalize }}
+                    </a>
 
-        </li>
-        {%- endfor %}
+                </li>
+            {%- endfor %}
         {%- endfor %}
     </ul>
 </aside>
