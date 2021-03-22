@@ -1,16 +1,12 @@
-{% extends 'aiohttp_admin/layouts/base.html' %}
+{% extends 'aiohttp_admin/layouts/detail_edit_page.html' %}
 
-{% block main %}
-<div>
-    <p class="content__empty-title">{{ title }}</p>
-    {% for name, value in object.__dict__.items() %}
-    <p><b>{{ name }}</b>  {{ value }}</p>
-    {% endfor %}
-    <br>
-    {% if controller.can_delete %}
-    <form action="#" method="POST">
-        <button class="btn btn-danger" type="submit">Delete</button>
-    </form>
+{% block instance %}
+    {% if controller.can_view %}
+        <div>
+            {% for name, value in object.__dict__.items() %}
+                <p><b>{{ name }}</b>  {{ value }}</p>
+            {% endfor %}
+            <br>
+        </div>
     {% endif %}
-</div>
-{% endblock main %}
+{% endblock instance %}
