@@ -1,7 +1,9 @@
-{% if field.errors -%}
-<br>
-{% for error in field.errors -%}
-<span style="color: red">{{ error }}</span>
-<br>
-{% endfor -%}
-{% endif -%}
+{% macro errors(field) %}
+{% if field.errors %}
+    <br>
+    {% for error in field.errors %}
+        <span style="color: red">{{ error }}</span>
+        <br>
+    {% endfor %}
+{% endif %}
+{% endmacro %}

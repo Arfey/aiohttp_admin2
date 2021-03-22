@@ -1,3 +1,6 @@
+{% from "aiohttp_admin/blocks/form/field_title.html" import title %}
+{% from "aiohttp_admin/blocks/form/field_errors.html" import errors %}
+
 {% macro field(
     name,
     field,
@@ -6,7 +9,7 @@
 )
 %}
 <div class="form-group">
-    {% include 'aiohttp_admin/blocks/form/field_title.html' %}
+    {{ title(name, field) }}
     {% if field.value %}
     <a href="{{ field.value }}" target="_blank">{{ field.value }}</a>
     <input type="checkbox" class="{{ name }}__remove_image">
@@ -29,7 +32,7 @@
         id="{{ name }}_input"
         aria-describedby="inputGroup-sizing-default"
     />
-    {% include 'aiohttp_admin/blocks/form/field_errors.html' -%}
+    {{ errors(field) }}
     <script>
         function readURL(input) {
             if (input.files && input.files[0]) {

@@ -1,3 +1,6 @@
+{% from "aiohttp_admin/blocks/form/field_title.html" import title %}
+{% from "aiohttp_admin/blocks/form/field_errors.html" import errors %}
+
 {% macro field(
     name,
     field,
@@ -7,7 +10,7 @@
 )
 %}
 <div class="form-group">
-    {% include 'aiohttp_admin/blocks/form/field_title.html' -%}
+    {{ title(name, field) }}
     {% set field_value = get_field_value(field, with_defaults) -%}
     <div class='input-group date' id='{{name}}-datetime' data-target-input="nearest">
         <input
@@ -24,7 +27,7 @@
             </div>
         </div>
     </div>
-    {% include 'aiohttp_admin/blocks/form/field_errors.html' -%}
+    {{ errors(field) }}
     <script>
         $('#{{name}}-datetime').datetimepicker({
           format: "{{ format }}"
