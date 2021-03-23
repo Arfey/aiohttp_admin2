@@ -1,6 +1,6 @@
 <thead>
     <tr>
-        {% with isDesc=(request.rel_url.query.get('sortDir') == 'desc') %}
+        {% with isDesc=(url_query.get('sortDir') == 'desc') %}
         {% for field in controller.inline_fields %}
             <th scope="col">
                 {% if controller.is_field_sortable(field) %}
@@ -9,9 +9,9 @@
                         'sort': field,
                         'sortDir': 'asc' if isDesc else 'desc',
                         'page': 1,
-                    }, request.rel_url.query) }}">
+                    }, url_query) }}">
                         {{ field }}
-                        {% if request.rel_url.query.get('sort') == field %}
+                        {% if url_query.get('sort') == field %}
                             {% if isDesc %}
                             <i class="material-icons">arrow_upward</i>
                             {% else %}

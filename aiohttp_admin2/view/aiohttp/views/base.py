@@ -1,38 +1,11 @@
 import typing as t
 from aiohttp import web
 
-from aiohttp_admin2.mappers import fields
-from aiohttp_admin2 import widgets
-from aiohttp_admin2 import filters
 from aiohttp_admin2.view.aiohttp.utils import get_field_value
 from aiohttp_admin2.view.aiohttp.views.utils import ViewUtilsMixin
 
 
-__all__ = ['BaseAdminView', 'DEFAULT_TYPE_WIDGETS', 'DEFAULT_FILTER_MAP', ]
-
-
-DEFAULT_TYPE_WIDGETS = {
-    fields.StringField.type_name: widgets.StringWidget,
-    fields.ChoicesField.type_name: widgets.ChoiceWidget,
-    fields.BooleanField.type_name: widgets.BooleanWidget,
-    fields.ArrayField.type_name: widgets.ArrayWidget,
-    fields.DateTimeField.type_name: widgets.DateTimeWidget,
-    fields.DateField.type_name: widgets.DateWidget,
-    fields.JsonField.type_name: widgets.JsonWidget,
-    fields.UrlFileField.type_name: widgets.FileWidget,
-    fields.UrlImageField.type_name: widgets.ImageWidget,
-    'autocomplete': widgets.AutocompleteStringWidget,
-}
-DEFAULT_FILTER_MAP = {
-    fields.ChoicesField.type_name: filters.ChoiceFilter,
-    fields.BooleanField.type_name: filters.BooleanFilter,
-    fields.DateTimeField.type_name: filters.DateTimeFilter,
-    fields.DateField.type_name: filters.DateFilter,
-    fields.StringField.type_name: filters.SingleValueFilter,
-    fields.UrlFileField.type_name: filters.SingleValueFilter,
-    fields.UrlImageField.type_name: filters.SingleValueFilter,
-    fields.IntField.type_name: filters.SingleValueFilter,
-}
+__all__ = ['BaseAdminView', ]
 
 
 class BaseAdminView(ViewUtilsMixin):
@@ -45,15 +18,6 @@ class BaseAdminView(ViewUtilsMixin):
     icon: str = 'label'
     group_name: str = 'General'
     is_hide_view: bool = False
-
-    # todo: docs
-    fields_widgets = {}
-    default_widget = widgets.StringWidget
-    foreignkey_widget = widgets.AutocompleteStringWidget
-    type_widgets = {}
-    default_type_widgets = DEFAULT_TYPE_WIDGETS
-    default_filter_map = DEFAULT_FILTER_MAP
-    search_filter = filters.SearchFilter
 
     def __init__(self, *, params: t.Dict[str, t.Any] = None) -> None:
         default = self.__class__.__name__.lower()

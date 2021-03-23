@@ -10,14 +10,8 @@ from aiohttp_admin2.controllers.controller import (
     FOREIGNKEY_DETAIL_NAME,
 )
 from aiohttp_admin2.resources.types import Instance
-from aiohttp_admin2 import widgets
 from aiohttp_admin2.resources.types import FilterTuple
-from aiohttp_admin2 import filters
 from aiohttp_admin2.view.aiohttp.views.utils import ViewUtilsMixin
-from aiohttp_admin2.view.aiohttp.views.base import (
-    DEFAULT_FILTER_MAP,
-    DEFAULT_TYPE_WIDGETS,
-)
 from aiohttp_admin2.mappers import Mapper
 
 
@@ -30,13 +24,6 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
     template_detail_create_name = 'aiohttp_admin/layouts/create_page.html'
     template_detail_name = 'aiohttp_admin/layouts/detail_edit_page.html'
     template_name: str = 'aiohttp_admin/layouts/list_page.html'
-    fields_widgets = {}
-    default_widget = widgets.StringWidget
-    foreignkey_widget = widgets.AutocompleteStringWidget
-    type_widgets = {}
-    default_type_widgets = DEFAULT_TYPE_WIDGETS
-    default_filter_map = DEFAULT_FILTER_MAP
-    search_filter = filters.SearchFilter
     left_table_name: str
     right_table_name: str
 

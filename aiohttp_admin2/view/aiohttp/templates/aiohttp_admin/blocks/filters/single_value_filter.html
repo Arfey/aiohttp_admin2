@@ -12,7 +12,7 @@
 
         <input type="submit" class="btn btn-secondary">
 
-        {% for i, k in request.rel_url.query.items() %}
+        {% for i, k in filter.query.items() %}
             {% if i not in [filter.param_key, "page"] %}
                 <input type="hidden" name="{{i}}" value="{{k}}">
             {% endif %}
@@ -20,7 +20,7 @@
 
     </form>
     {% if filter.get_param() %}
-        <a href="{{ newParam({ filter.param_key: '', 'page': 1 }, request.rel_url.query) }}">clear</a>
+        <a href="{{ newParam({ filter.param_key: '', 'page': 1 }, filter.query) }}">clear</a>
     {% endif %}
 </div>
 {% endmacro %}

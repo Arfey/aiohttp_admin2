@@ -12,7 +12,7 @@
 
     <input type="submit" class="btn btn-secondary mx-sm-3 mb-2" value="search">
 
-    {% for i, k in request.rel_url.query.items() %}
+    {% for i, k in filter.query.items() %}
         {% if i not in [filter.param_key, 'page'] %}
             <input type="hidden" name="{{i}}" value="{{k}}">
         {% endif %}
@@ -21,7 +21,7 @@
     <input type="hidden" name="page" value="1">
 
     {% if filter.get_param() %}
-        <a href="{{ newParam({ filter.param_key: '', 'page': 1 }, request.rel_url.query) }}">
+        <a href="{{ newParam({ filter.param_key: '', 'page': 1 }, filter.query) }}">
             clear
         </a>
     {% endif %}

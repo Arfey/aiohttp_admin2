@@ -11,7 +11,7 @@
             <div class="container">
                 <div>
                     {% if controller.search_fields %}
-                        {{ search_filter(controller_view.search_filter(controller.search_fields, request.rel_url.query)) }}
+                        {{ search_filter(controller_view.search_filter(controller.search_fields, url_query)) }}
                     {% endif %}
                 </div>
                 {% include 'aiohttp_admin/blocks/list_objects_block.html' %}
@@ -25,7 +25,7 @@
                     list.has_next,
                     list.hex_prev,
                     list.per_page,
-                    request.rel_url.query,
+                    url_query,
                 )
             }}
         {% endblock list_content %}

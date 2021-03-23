@@ -28,7 +28,7 @@
         <div>
             {% for name, filter in view_filters %}
                 <p class="filter-title">By {{ name }}</p>
-                {% from filter.template_name import filter as filter_macro with context %}
+                {% from filter.template_name import filter as filter_macro %}
 
                 {{ filter_macro(filter) }}
             {% endfor %}

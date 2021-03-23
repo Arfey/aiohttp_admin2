@@ -10,7 +10,7 @@
             {%- for view in views %}
                 <li class="nav-aside__item">
                     <a
-                        {%- if request.app.router[view.controller_url].url_for().path == request.rel_url.path %}
+                        {%- if request.app.router[view.controller_url].url_for().path == url_path %}
                         class="nav-aside__link nav-aside__link_active"
                         {%- else %}
                         class="nav-aside__link"

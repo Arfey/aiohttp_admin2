@@ -57,7 +57,7 @@
 
         <input type="submit" value="submit" class="btn btn-secondary">
 
-        {% for i, k in request.rel_url.query.items() %}
+        {% for i, k in filter.query.items() %}
             {% if i not in [filter.param_key_to, filter.param_key_from, "page"] %}
                 <input type="hidden" name="{{i}}" value="{{k}}">
             {% endif %}
@@ -72,7 +72,7 @@
     </script>
 
     {% if filter.get_params()[1] or filter.get_params()[0] %}
-        <a href="{{ newParam({ filter.param_key_from: '', filter.param_key_to: '', 'page': 1 }, request.rel_url.query) }}">
+        <a href="{{ newParam({ filter.param_key_from: '', filter.param_key_to: '', 'page': 1 }, filter.query) }}">
             clear
         </a>
     {% endif %}
