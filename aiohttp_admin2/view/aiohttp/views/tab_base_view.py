@@ -22,6 +22,8 @@ class TabBaseView:
             'pk': req.match_info['pk'],
             "message": req.rel_url.query.get('message'),
             "get_field_value": get_field_value,
+            "url_query": req.rel_url.query,
+            "url_path": req.rel_url.path,
         }
 
     @abstractmethod

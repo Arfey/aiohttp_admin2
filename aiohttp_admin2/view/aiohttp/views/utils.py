@@ -32,7 +32,7 @@ def get_list_filters(
         field = controller.mapper({})._fields[f]
         filter_cls = filter_mapper.get(field.type_name)
         if filter_cls:
-            filters_list = filter_cls(f, req.rel_url.query) \
+            filters_list = filter_cls(field, req.rel_url.query) \
                 .get_filter_list()
 
             if filters_list:
@@ -67,3 +67,17 @@ class ViewUtilsMixin:
         represented as list of internal classes.
         """
         return get_list_filters(req, controller, filter_mapper)
+
+    def get_filters(self, query) -> t.List[t.Tuple[str, FilerBase]]:
+        controller = self.get_controller()
+        empty_mapper = controller.mapper({})
+
+        filters = []
+
+        for f in controller.list_filter:
+            field = empty_mapper._fields.get(f)
+            filter_cls = self.default_filter_map.get(field.type_name)
+
+            if filter_cls:
+                filters.append((f, filter_cls(field, query)))
+        return filters

@@ -232,7 +232,8 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
                 "detail_url": req.app.router[self.parent.detail_url_name]
                     .url_for(pk=req.match_info['pk']),
                 "create_url": req.app.router[self.create_url_name]
-                    .url_for(pk=req.match_info['pk'])
+                    .url_for(pk=req.match_info['pk']),
+                "view_filters": self.get_filters(req.rel_url.query),
             },
         )
 

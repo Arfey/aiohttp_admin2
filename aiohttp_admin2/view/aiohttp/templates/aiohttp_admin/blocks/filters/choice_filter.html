@@ -1,11 +1,7 @@
-{% macro filter(
-    field,
-    filter
-)
-%}
+{% macro filter(filter) %}
 <div class="form-group">
     <ul>
-        {% for name, value in field.choices %}
+        {% for name, value in filter.field.choices %}
             <li>
                 <a
                     class="{% if filter.get_param() == value %}filter-active{% endif %}"

@@ -4,6 +4,7 @@ from abc import (
     abstractmethod,
 )
 
+from aiohttp_admin2.mappers.fields.abc import AbstractField
 from aiohttp_admin2.resources.types import (
     FilterTuple,
     FilterMultiTuple
@@ -14,6 +15,7 @@ class FilerBase(ABC):
     template_name: str
     name: str
     query: dict
+    field: AbstractField
 
     js_extra: t.List[str] = []
     css_extra: t.List[str] = []
@@ -26,11 +28,13 @@ class ChoiceFilter(FilerBase):
     template_name = 'aiohttp_admin/blocks/filters/choice_filter.html'
     name: str
     query: dict
+    field: AbstractField
 
-    def __init__(self, name: str, query: dict) -> None:
-        self.name = name
+    def __init__(self, field: AbstractField, query: dict) -> None:
+        self.field = field
+        self.name = field.name
         self.query = query
-        self.param_key = f'choice_{name}'
+        self.param_key = f'choice_{field.name}'
 
     def get_param(self):
         return self.query.get(self.param_key)
@@ -48,11 +52,13 @@ class BooleanFilter(FilerBase):
     template_name = 'aiohttp_admin/blocks/filters/boolean_filter.html'
     name: str
     query: dict
+    field: AbstractField
 
-    def __init__(self, name: str, query: dict) -> None:
-        self.name = name
+    def __init__(self, field: AbstractField, query: dict) -> None:
+        self.field = field
+        self.name = field.name
         self.query = query
-        self.param_key = f'bool_{name}'
+        self.param_key = f'bool_{self.name}'
 
     def get_param(self):
         return self.query.get(self.param_key)
@@ -70,11 +76,13 @@ class SingleValueFilter(FilerBase):
     template_name = 'aiohttp_admin/blocks/filters/single_value_filter.html'
     name: str
     query: dict
+    field: AbstractField
 
-    def __init__(self, name: str, query: dict) -> None:
-        self.name = name
+    def __init__(self, field: AbstractField, query: dict) -> None:
+        self.field = field
+        self.name = field.name
         self.query = query
-        self.param_key = f'single_value_{name}'
+        self.param_key = f'single_value_{self.name}'
 
     def get_param(self):
         return self.query.get(self.param_key)
@@ -92,6 +100,7 @@ class DateTimeFilter(FilerBase):
     template_name = 'aiohttp_admin/blocks/filters/datetime_filter.html'
     name: str
     query: dict
+    field: AbstractField
     format: str = 'YYYY-MM-DD HH:mm:ss'
 
     js_extra = [
@@ -105,11 +114,12 @@ class DateTimeFilter(FilerBase):
         "https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css",
     ]
 
-    def __init__(self, name: str, query: dict) -> None:
-        self.name = name
+    def __init__(self, field: AbstractField, query: dict) -> None:
+        self.field = field
+        self.name = field.name
         self.query = query
-        self.param_key_from = f'date_from_{name}'
-        self.param_key_to = f'date_to__{name}'
+        self.param_key_from = f'date_from_{self.name}'
+        self.param_key_to = f'date_to__{self.name}'
 
     def get_params(self):
         return self.query.get(self.param_key_from), self.query.get(self.param_key_to)

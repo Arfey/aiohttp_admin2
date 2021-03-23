@@ -22,20 +22,15 @@
             </tbody>
         </table>
     </div>
-    {% if controller.list_filter %}
+    {% if view_filters %}
     <nav class="filter-nav col-3">
         <p class="filter-nav-title">Filters</p>
         <div>
-<!--            # todo: move to python -->
-            {% for f in controller.list_filter %}
-                {% set field = controller.mapper({})._fields.get(f) %}
-                {% set filter = controller_view.default_filter_map.get(field.type_name) %}
-                {% if field and filter %}
-                    <p class="filter-title">By {{ f }}</p>
-                    {% from filter.template_name import filter as filter_macro with context %}
+            {% for name, filter in view_filters %}
+                <p class="filter-title">By {{ name }}</p>
+                {% from filter.template_name import filter as filter_macro with context %}
 
-                    {{ filter_macro(field, filter(field.name, request.rel_url.query)) }}
-                {% endif %}
+                {{ filter_macro(filter) }}
             {% endfor %}
         </div>
     </nav>

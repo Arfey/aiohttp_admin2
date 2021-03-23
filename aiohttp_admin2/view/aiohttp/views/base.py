@@ -73,6 +73,8 @@ class BaseAdminView(ViewUtilsMixin):
             "controller_view": self,
             "type_of": type,
             "get_field_value": get_field_value,
+            "url_query": req.rel_url.query,
+            "url_path": req.rel_url.path,
         }
 
     def setup(self, app: web.Application) -> None:

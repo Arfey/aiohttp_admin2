@@ -169,6 +169,7 @@ class ControllerView(BaseAdminView):
                 "create_url": self.resolve_create_url(req),
                 "message": req.rel_url.query.get('message'),
                 "media": self.get_extra_media_list(),
+                "view_filters": self.get_filters(req.rel_url.query),
             }
         )
 

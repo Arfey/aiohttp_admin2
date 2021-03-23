@@ -1,28 +1,24 @@
-{% macro filter(
-    field,
-    filter
-)
-%}
+{% macro filter(filter) %}
 <div class="form-group">
     <form action="" method="get">
         <div class="form-group">
-            <label for="{{field.name}}dateFrom">date from</label>
+            <label for="{{filter.field.name}}dateFrom">date from</label>
             <div
                 class='input-group'
-                id='{{field.name}}-datetime-from'
+                id='{{filter.field.name}}-datetime-from'
                 data-target-input="nearest"
             >
                 <input
                     type="text"
                     class="form-control datetimepicker-input"
-                    id="{{field.name}}dateFrom"
+                    id="{{filter.field.name}}dateFrom"
                     name="{{ filter.param_key_from }}"
                     value="{{ filter.get_params()[0] or '' }}"
-                    data-target="#{{field.name}}-datetime-from"
+                    data-target="#{{filter.field.name}}-datetime-from"
                 />
                 <div
                     class="input-group-addon input-group-append"
-                    data-target="#{{field.name}}-datetime-from"
+                    data-target="#{{filter.field.name}}-datetime-from"
                     data-toggle="datetimepicker"
                 >
                     <div class="input-group-text">
@@ -33,23 +29,23 @@
         </div>
 
         <div class="form-group">
-            <label for="{{field.name}}dateTo">date to</label>
+            <label for="{{filter.field.name}}dateTo">date to</label>
             <div
                 class='input-group'
-                id='{{field.name}}-datetime-to'
+                id='{{filter.field.name}}-datetime-to'
                 data-target-input="nearest"
             >
                 <input
                         type="text"
                         class="form-control datetimepicker-input"
-                        id="{{field.name}}dateTo"
+                        id="{{filter.field.name}}dateTo"
                         name="{{ filter.param_key_to }}"
                         value="{{ filter.get_params()[1] or '' }}"
-                        data-target="#{{field.name}}-datetime-to"
+                        data-target="#{{filter.field.name}}-datetime-to"
                 />
                 <div
                     class="input-group-addon input-group-append"
-                    data-target="#{{field.name}}-datetime-to"
+                    data-target="#{{filter.field.name}}-datetime-to"
                     data-toggle="datetimepicker"
                 >
                     <div class="input-group-text">
@@ -70,7 +66,7 @@
     </form>
 
     <script>
-        $('#{{field.name}}-datetime-from, #{{field.name}}-datetime-to').datetimepicker({
+        $('#{{filter.field.name}}-datetime-from, #{{filter.field.name}}-datetime-to').datetimepicker({
           format: "{{ filter.format }}"
         });
     </script>
