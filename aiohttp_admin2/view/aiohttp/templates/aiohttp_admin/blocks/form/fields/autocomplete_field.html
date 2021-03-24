@@ -20,7 +20,7 @@
     <script>
         $('#{{ name }}_input').select2({
           ajax: {
-            url: "{{ autocomplete_url }}",
+            url: "{{ url(autocomplete_url_name) }}",
             dataType: 'json',
             delay: 100
           },

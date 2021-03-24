@@ -51,6 +51,12 @@ class ControllerView(BaseAdminView):
         if self.tabs:
             self.tabs_list = [Tab(self) for Tab in self.tabs]
 
+        # todo: move to base and fix super
+        self.common_type_widgets = {
+            **self.default_type_widgets,
+            **self.type_widgets
+        }
+
     def get_extra_media(self):
         css = []
         js = []

@@ -27,6 +27,13 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
     left_table_name: str
     right_table_name: str
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.common_type_widgets = {
+            **self.default_type_widgets,
+            **self.type_widgets
+        }
+
     def get_extra_media(self):
         css = []
         js = []

@@ -9,6 +9,7 @@ from aiohttp_admin2.filters import (
     FilerBase,
     SearchFilter,
 )
+from aiohttp_admin2.mappers.fields.abc import AbstractField
 from aiohttp_admin2.view.aiohttp.utils import (
     get_params_from_request,
     QueryParams,
@@ -84,6 +85,7 @@ class ViewUtilsMixin:
     default_widget = widgets.StringWidget
     foreignkey_widget = widgets.AutocompleteStringWidget
     type_widgets = {}
+    common_type_widgets = {}
     default_type_widgets = DEFAULT_TYPE_WIDGETS
     default_filter_map = DEFAULT_FILTER_MAP
     search_filter = filters.SearchFilter
@@ -117,3 +119,27 @@ class ViewUtilsMixin:
             if filter_cls:
                 filters.append((f, filter_cls(field, query)))
         return filters
+
+    def get_widget_template_for_field(
+        self,
+        name: str,
+        field_type: str,
+    ) -> str:
+        foreign_key_controller = self\
+            .get_controller()\
+            .foreign_keys_field_map.get(name)
+
+        if (
+            foreign_key_controller
+            and foreign_key_controller.controller.with_autocomplete()
+        ):
+            widget = self.foreignkey_widget
+        else:
+            widget = self.fields_widgets.get(name)
+
+            if not widget:
+                widget = self.common_type_widgets\
+                    .get(field_type, self.default_widget)
+
+        return widget.template_name
+

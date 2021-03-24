@@ -6,29 +6,8 @@
     with_defaults=False
 )
 %}
-    {% set foreign_key_controller = controller_view.get_controller().foreign_keys_field_map.get(name) -%}
-    {% if foreign_key_controller and foreign_key_controller.controller.with_autocomplete() %}
-        {% with autocomplete_url=url(controller_view.get_autocomplete_url_name(name)) %}
-            {% from controller_view.foreignkey_widget.template_name import field as field_macro with context %}
-
-            {{ field_macro(name, field, get_field_value, with_defaults) }}
-        {% endwith %}
-    {% else %}
-        {% if controller_view.fields_widgets.get(name) %}
-            {% from controller_view.fields_widgets.get(name).template_name import field as field_macro %}
-
-            {{ field_macro(name, field, get_field_value, with_defaults) }}
-
-        {% elif controller_view.type_widgets.get(field.type_name) %}
-            {% from controller_view.type_widgets.get(field.type_name).template_name import field as field_macro %}
-
-            {{ field_macro(name, field, get_field_value, with_defaults) }}
-
-        {% elif controller_view.default_type_widgets.get(field.type_name, controller_view.default_widget) %}
-            {% from controller_view.default_type_widgets.get(field.type_name, controller_view.default_widget).template_name import field as field_macro %}
-
-            {{ field_macro(name, field, get_field_value, with_defaults) }}
-        {%- endif %}
-    {% endif %}
-
+    {% from controller_view.get_widget_template_for_field(name, field.type_name) import field as field_macro with context %}
+    {% with autocomplete_url_name=controller_view.get_autocomplete_url_name(name) %}
+        {{ field_macro(name, field, get_field_value, with_defaults) }}
+    {% endwith %}
 {% endmacro %}
