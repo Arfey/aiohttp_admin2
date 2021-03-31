@@ -4,20 +4,20 @@
     <div class="col-sm">
         <table class="table table-striped">
             {% include 'aiohttp_admin/blocks/list_objects_header_block.html' %}
-            <tbody>
+            <tbody id="table-list">
                 {%- for row in list.rows %}
-                <tr>
-                    {% for cell in row %}
-                    <td>
-                        {% if loop.first %}
-                        <label>
-                            <input class="index-checkbox" type="checkbox" />
-                        </label>
-                        {% endif %}
-                        {{ list_cell(cell) }}
-                    </th>
-                    {% endfor %}
-                </tr>
+                    <tr>
+                        {% for cell in row %}
+                        <td>
+                            {% if loop.first %}
+                            <label>
+                                <input class="index-checkbox" type="checkbox" />
+                            </label>
+                            {% endif %}
+                            {{ list_cell(cell) }}
+                        </th>
+                        {% endfor %}
+                    </tr>
                 {%- endfor %}
             </tbody>
         </table>

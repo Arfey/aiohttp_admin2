@@ -69,23 +69,3 @@
         <p class="paggination__count">total count: {{ count }}</p>
     </nav>
 {%- endmacro %}
-
-<!-- pagination block -->
-{% macro cursor_pagination(prev_id, next_id, query_args={}) -%}
-    <nav class="pagination">
-        <ul class="pagination">
-            <!-- prev -->
-            <li class="page-item {% if not prev_id %}disabled{% endif %}">
-                <a class="page-link" href="{{ newParam({'cursor': page - 1}, query_args) }}">
-                    Previous
-                </a>
-            </li>
-            <!-- next -->
-            <li class="page-item {% if not next_id %}disabled{% endif %}">
-                <a class="page-link" href="{{ newParam({'page': page + 1}, query_args) }}">
-                    Next
-                </a>
-            </li>
-        </ul>
-    </nav>
-{%- endmacro %}

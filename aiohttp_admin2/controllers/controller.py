@@ -332,14 +332,22 @@ class Controller:
             }
         }
 
-    def is_field_sortable(self, name: str) -> bool:
+    def is_field_sortable(self, name: str, use_infinity: bool) -> bool:
         field_method_name = "{}_field".format(name)
         sort_method_name = "{}_field_sort".format(name)
 
-        return (
+        has_sort_method = (
             not hasattr(self, field_method_name)
             or hasattr(self, sort_method_name)
         )
+
+        if has_sort_method:
+            if not use_infinity:
+                return True
+            elif name in ['id', 'pk']:
+                return True
+
+        return False
 
     async def get_list(
         self,
@@ -409,10 +417,11 @@ class Controller:
         return ListObject(
             rows=rows,
             has_next=list_data.has_next,
-            hex_prev=list_data.hex_prev,
+            has_prev=list_data.has_prev,
             count=list_data.count,
             active_page=list_data.active_page,
             per_page=list_data.per_page,
+            next_id=list_data.next_id,
         )
 
     async def get_many(self, pks: t.List[PK], field: str = None):

@@ -1,5 +1,6 @@
 {% extends 'aiohttp_admin/layouts/base.html' %}
 {% from "aiohttp_admin/blocks/pagination.html" import pagination %}
+{% from "aiohttp_admin/blocks/cursor_pagination.html" import cursor_pagination %}
 {% from "aiohttp_admin/blocks/filters/search_filter.html" import search_filter with context %}
 
 {% block main %}
@@ -18,16 +19,25 @@
             </div>
 
             <!-- todo: order -->
-            {{
-                pagination(
-                    list.active_page,
-                    list.count,
-                    list.has_next,
-                    list.hex_prev,
-                    list.per_page,
-                    url_query,
-                )
-            }}
+            {% if controller_view.infinite_scroll %}
+                {{
+                    cursor_pagination(
+                        list.has_next,
+                        list.next_id,
+                    )
+                }}
+            {% else %}
+                {{
+                    pagination(
+                        list.active_page,
+                        list.count,
+                        list.has_next,
+                        list.has_prev,
+                        list.per_page,
+                        url_query,
+                    )
+                }}
+            {% endif %}
         {% endblock list_content %}
     </div>
 {% endblock main %}

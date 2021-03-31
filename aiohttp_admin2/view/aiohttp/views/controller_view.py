@@ -23,6 +23,7 @@ class ControllerView(BaseAdminView):
     """
     # Templates
     template_list_name = 'aiohttp_admin/layouts/list_page.html'
+    template_list_cursor_name = 'aiohttp_admin/layouts/list_cursor_page.html'
     template_detail_name = 'aiohttp_admin/layouts/detail_view_page.html'
     template_detail_edit_name = 'aiohttp_admin/layouts/detail_edit_page.html'
     template_detail_create_name = 'aiohttp_admin/layouts/create_page.html'
@@ -163,9 +164,16 @@ class ControllerView(BaseAdminView):
             url_builder=url_builder,
         )
 
+        with_infinity_scroll = bool(req.rel_url.query.get('cursor'))
+
+        if with_infinity_scroll:
+            template = self.template_list_cursor_name
+        else:
+            template = self.template_list_name
+
         # list_filter
         return aiohttp_jinja2.render_template(
-            self.template_list_name,
+            template,
             req,
             {
                 **await self.get_context(req),

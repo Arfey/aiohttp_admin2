@@ -6,4 +6,5 @@ __all__ = ["GenresPage", ]
 
 
 class GenresPage(ControllerView):
+    infinite_scroll = True
     controller = GenresController

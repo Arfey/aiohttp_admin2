@@ -81,6 +81,7 @@ class ViewUtilsMixin:
     rewrite then use monkeypatch for end user.
     """
 
+    infinite_scroll = False
     fields_widgets = {}
     default_widget = widgets.StringWidget
     foreignkey_widget = widgets.AutocompleteStringWidget

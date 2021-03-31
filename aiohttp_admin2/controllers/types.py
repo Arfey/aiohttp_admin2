@@ -13,7 +13,8 @@ class Cell(t.NamedTuple):
 class ListObject(t.NamedTuple):
     rows: t.List[t.List[Cell]]
     has_next: bool
-    hex_prev: bool
+    has_prev: bool
     count: t.Optional[int]
     active_page: t.Optional[int]
     per_page: int
+    next_id: t.Optional[int]

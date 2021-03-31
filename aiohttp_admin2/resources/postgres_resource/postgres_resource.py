@@ -128,9 +128,9 @@ class PostgresResource(AbstractResource):
 
             if cursor is not None:
                 if order_by == id_orders[0]:
-                    query = query.where(self._primary_key > cursor)
+                    query = query.where(self._primary_key >= cursor)
                 else:
-                    query = query.where(self._primary_key < cursor)
+                    query = query.where(self._primary_key <= cursor)
             else:
                 query = query.offset(offset)
 

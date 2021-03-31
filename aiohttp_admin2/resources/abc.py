@@ -120,7 +120,8 @@ class Paginator(t.NamedTuple):
     """Object for represent list of instances."""
     instances: t.List[Instance]
     has_next: bool
-    hex_prev: bool
+    has_prev: bool
+    next_id: t.Optional[int]
     count: t.Optional[int]
     active_page: t.Optional[int]
     per_page: int
@@ -210,13 +211,21 @@ class AbstractResource(ABC):
         cursor: t.Optional[int] = None,
         count: t.Optional[int] = None,
     ) -> Paginator:
+        has_next = len(instances) > limit
+        next_id = None
+
+        if has_next:
+            last_instance = instances[-1]
+            next_id = last_instance.get_pk()
+
         return Paginator(
             instances=instances[0:limit],
-            has_next=len(instances) > limit,
-            hex_prev=bool(offset) or bool(cursor),
+            has_next=has_next,
+            has_prev=bool(offset) or bool(cursor),
             active_page=int(offset/limit + 1) if offset is not None else None,
             per_page=limit,
             count=count,
+            next_id=next_id,
         )
 
     def _validate_list_params(

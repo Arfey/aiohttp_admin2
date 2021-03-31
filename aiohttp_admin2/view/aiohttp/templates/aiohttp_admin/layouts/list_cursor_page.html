@@ -1,0 +1,18 @@
+{% from 'aiohttp_admin/blocks/list_cell.html' import list_cell %}
+{% from "aiohttp_admin/blocks/cursor_pagination.html" import cursor_pagination %}
+
+{%- for row in list.rows %}
+    <tr>
+        {% for cell in row %}
+            <td>
+                {% if loop.first %}
+                    <label>
+                        <input class="index-checkbox" type="checkbox" />
+                    </label>
+                {% endif %}
+                {{ list_cell(cell) }}
+            </th>
+        {% endfor %}
+    </tr>
+{%- endfor %}
+<tr id="scroll_id" data-next-id="{{ list.next_id }}"></tr>
