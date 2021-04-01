@@ -58,6 +58,9 @@ class MoviesController(PostgresController):
         ),
     ]
 
+    async def get_object_name(self, obj):
+        return f"{obj.get_pk()} - {obj.title}"
+
 
 @postgres_injector.inject
 class ActorMovieController(PostgresController):

@@ -91,21 +91,21 @@ class ManyToManyTabView(ViewUtilsMixin, TabTemplateView):
         # autocomplete
         autocomplete_routes = []
         for name, relation in controller.foreign_keys_field_map.items():
-            inner_controller = relation.controller()
+            def autocomplete_wrapper(inner_controller):
+                async def autocomplete(req):
+                    res = await inner_controller\
+                        .get_autocomplete_items(
+                            text=req.rel_url.query.get('q'),
+                            page=int(req.rel_url.query.get('page', 1)),
+                        )
 
-            async def autocomplete(req):
+                    return web.json_response(res)
 
-                res = await inner_controller\
-                    .get_autocomplete_items(
-                        text=req.rel_url.query.get('q'),
-                        page=int(req.rel_url.query.get('page', 1)),
-                    )
-
-                return web.json_response(res)
+                return autocomplete
 
             autocomplete_routes.append(web.get(
                 self.get_autocomplete_url(name),
-                autocomplete,
+                autocomplete_wrapper(relation.controller()),
                 name=self.get_autocomplete_url_name(name)
             ))
 
