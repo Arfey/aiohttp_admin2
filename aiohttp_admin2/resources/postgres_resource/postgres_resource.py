@@ -196,7 +196,15 @@ class PostgresResource(AbstractResource):
             return self.row_to_instance(data)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
-        data = instance.__dict__
+        data = {
+            key: value
+            for key, value in instance.__dict__.items()
+            # in this place we skip update of field with None value. This need
+            # for partial update of instance when update page don't have full
+            # list of fields
+            if value is not None
+        }
+
         async with self.engine.acquire() as conn:
             query = self.table\
                 .update()\
