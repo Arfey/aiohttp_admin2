@@ -1,0 +1,19 @@
+{% from "aiohttp_admin/blocks/form/field_title.html" import title %}
+{% from "aiohttp_admin/blocks/form/field_errors.html" import errors %}
+
+{% macro field(
+    name,
+    field,
+    get_field_value,
+    with_defaults=False
+)
+%}
+<div class="form-group">
+    {{ title(name, field) }}
+    {% set field_value = get_field_value(field, with_defaults) -%}
+    <textarea class="ckeditor form-control" id="{{ name }}_input" name="{{ name }}">
+        {{ field_value }}
+    </textarea>
+    {{ errors(field) }}
+</div>
+{% endmacro %}

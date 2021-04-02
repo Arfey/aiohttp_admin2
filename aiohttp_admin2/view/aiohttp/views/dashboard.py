@@ -10,5 +10,6 @@ class DashboardView(TemplateView):
     """
     index_url = '/'
     name = 'index'
+    controller_url = 'index'
     icon = 'dashboard'
     title = 'dashboard'

@@ -1,0 +1,19 @@
+{% macro filter(filter) %}
+<div class="form-group">
+    <ul>
+        {% for value in 'True', 'False' %}
+            <li>
+                <a
+                    class="{% if filter.get_param() == value %}filter-active{% endif %}"
+                    href="{{ newParam({ filter.param_key: value, 'page': 1, }, filter.query) }}"
+                >
+                    {{ value }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+    {% if filter.get_param() %}
+        <a href="{{ newParam({ filter.param_key: '', 'page': 1 }, filter.query) }}">clear</a>
+    {% endif %}
+</div>
+{% endmacro %}

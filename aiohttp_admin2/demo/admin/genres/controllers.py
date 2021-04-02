@@ -1,15 +1,8 @@
-from aiohttp_admin2.view import ControllerView
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
-from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 
-from ...catalog.tables import genres
 from ..injectors import postgres_injector
-
-
-# todo: remove table from controller?
-
-class GenresMapper(PostgresMapperGeneric, table=genres):
-    pass
+from ...catalog.tables import genres
+from .mappers import GenresMapper
 
 
 @postgres_injector.inject
@@ -19,6 +12,8 @@ class GenresController(PostgresController):
     name = 'genres'
     per_page = 10
 
+    inline_fields = ['id', 'name', 'type', ]
+    autocomplete_search_fields = ['name', ]
 
-class GenresPage(ControllerView):
-    controller = GenresController
+    async def get_object_name(self, obj):
+        return obj.name

@@ -4,12 +4,12 @@ from abc import (
     abstractmethod,
 )
 
-from aiohttp_admin2.mappers.exceptions import ValidationError
+from aiohttp_admin2.mappers.validators import (
+    required as required_validator,
+    length,
+)
 
 __all__ = ['AbstractField', ]
-
-
-# todo: add validators
 
 
 class AbstractField(ABC):
@@ -19,18 +19,27 @@ class AbstractField(ABC):
         self,
         *,
         required: bool = False,
-        validators: t.List[t.Any] = [],
+        validators: t.List[t.Callable[[t.Any], None]] = None,
         value: t.Optional[str] = None,
         default: t.Optional[str] = None,
         **kwargs: t.Any,
     ) -> None:
-        self.name: str = None
         self.default: t.Optional[str] = default
-        self._value: t.Optional[str] = default if value is None else value
+        self._value: t.Optional[str] = value
         self.errors: t.List[t.Optional[str]] = []
         self.required = required
-        # todo: add validator
-        self.validators = validators
+        self.validators = validators or []
+        self.kwargs = kwargs
+        self.init_default_validators()
+
+    def init_default_validators(self):
+        if self.required:
+            self.validators.append(required_validator)
+
+        max_length = self.kwargs.get('max_length')
+
+        if max_length:
+            self.validators.append(length(max_value=max_length))
 
     @abstractmethod
     def to_python(self) -> t.Any:
@@ -62,6 +71,22 @@ class AbstractField(ABC):
     def raw_value(self) -> t.Any:
         return self.to_storage()
 
+    @property
+    def failure_safe_value(self) -> t.Any:
+        """
+        This method need to return value even if value is invalid. It's might
+        be helpful in case when we need to show error and show value which
+        raise current error.
+        """
+        try:
+            return self.value
+        except Exception:
+            return self.raw_value
+
+    @property
+    def is_not_none(self):
+        return self._value is not None
+
     def is_valid(self) -> bool:
         """
         In this method check is current field valid and have correct value.
@@ -71,11 +96,11 @@ class AbstractField(ABC):
             ValueError, TypeError: if type of value is wrong
 
         """
-        if self.required and not self._value:
-            raise ValidationError(F"{self.name} field is required.")
-
         self.to_python()
         self.to_storage()
+
+        for validator in self.validators:
+            validator(self.value)
 
         return True
 
@@ -89,4 +114,5 @@ class AbstractField(ABC):
 
     def __repr__(self):
         return \
-            f"{self.__class__.__name__}(name={self.name}, value={self._value})"
+            f"{self.__class__.__name__}(name={self.type_name}," \
+            f" value={self._value}), required={self.required}"

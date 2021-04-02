@@ -1,0 +1,26 @@
+{% from "aiohttp_admin/blocks/form/field_title.html" import title %}
+{% from "aiohttp_admin/blocks/form/field_errors.html" import errors %}
+
+{% macro field(
+    name,
+    field,
+    get_field_value,
+    with_defaults=False
+)
+%}
+<div class="form-group">
+    {{ title(name, field) }}
+    {% set field_value = get_field_value(field, with_defaults) -%}
+    <input
+        id="{{ name }}_input"
+        class="form-control"
+        name="{{ name }}"
+        value="{{field_value | map('string') | join(',') if field.is_not_none}}"
+        placeholder="Add tags"
+    />
+    {{ errors(field) }}
+    <script>
+        $("#{{name}}_input").tagsinput('items');
+    </script>
+</div>
+{% endmacro %}

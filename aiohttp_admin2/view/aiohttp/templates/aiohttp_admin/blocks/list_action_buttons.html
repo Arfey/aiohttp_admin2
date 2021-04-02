@@ -1,0 +1,12 @@
+<div class="container">
+    <div class="row justify-content-between list-nav">
+        <div>
+            <p class="content__empty-title">{{ title }}</p>
+        </div>
+        <div class="btn-action--list-wrapper">
+            {%- if controller.can_create %}
+            <a class="btn btn-success btn-action" href="{{ create_url }}">Create</a>
+            {%- endif %}
+        </div>
+    </div>
+</div>

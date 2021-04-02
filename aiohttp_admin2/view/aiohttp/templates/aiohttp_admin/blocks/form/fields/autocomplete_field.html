@@ -1,0 +1,30 @@
+{% from "aiohttp_admin/blocks/form/field_title.html" import title %}
+{% from "aiohttp_admin/blocks/form/field_errors.html" import errors %}
+
+{% macro field(
+    name,
+    field,
+    get_field_value,
+    with_defaults=False
+)
+%}
+<div class="form-group">
+    {{ title(name, field) }}
+    {% set field_value = get_field_value(field, with_defaults) -%}
+    <select class="form-control autocomplete-input" name="{{ name }}" id="{{ name }}_input" aria-describedby="inputGroup-sizing-default">
+        {% if field_value %}
+            <option value="{{ field_value }}">{{ field_value }}</option>
+        {% endif %}
+    </select>
+    {{ errors(field) }}
+    <script>
+        $('#{{ name }}_input').select2({
+          ajax: {
+            url: "{{ url(autocomplete_url_name) }}",
+            dataType: 'json',
+            delay: 100
+          },
+        });
+    </script>
+</div>
+{% endmacro %}

@@ -69,6 +69,8 @@ html, body {
     display: flex;
     width: 100%;
     padding-right: 24px;
+    font-size: 14px;
+    flex-direction: column;
 }
 
 .content__empty-title {
@@ -124,10 +126,6 @@ html, body {
 
 .form-control {
     font-size: 14px !important;
-}
-
-.content {
-    font-size: 14px;
 }
 
 .form-group {
@@ -229,4 +227,26 @@ html, body {
 
 .filter-active {
     font-weight: bold;
+}
+
+.select2-container--default .select2-selection--single {
+    height: calc(1.5em + .75rem + 2px);
+    border: 1px solid #ced4da;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: calc(1.5em + .75rem);
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    top: 5px;
+}
+
+.btn-action--list-wrapper {
+    display: flex;
+}
+
+.btn-action--list-wrapper .btn {
+    display: block;
+    margin: auto;
 }

@@ -1,0 +1,37 @@
+{% from "aiohttp_admin/blocks/form/field_title.html" import title %}
+{% from "aiohttp_admin/blocks/form/field_errors.html" import errors %}
+
+{% macro field(
+    name,
+    field,
+    get_field_value,
+    with_defaults=False,
+    format="YYYY-MM-DD HH:mm:ss"
+)
+%}
+<div class="form-group">
+    {{ title(name, field) }}
+    {% set field_value = get_field_value(field, with_defaults) -%}
+    <div class='input-group date' id='{{name}}-datetime' data-target-input="nearest">
+        <input
+            type="text"
+            class="form-control datetimepicker-input"
+            id="{{ name }}_input"
+            name="{{ name }}"
+            value="{{ field_value }}"
+            data-target="#{{name}}-datetime"
+        />
+        <div class="input-group-addon input-group-append" data-target="#{{name}}-datetime" data-toggle="datetimepicker">
+            <div class="input-group-text">
+                <i class="fa fa-calendar"></i>
+            </div>
+        </div>
+    </div>
+    {{ errors(field) }}
+    <script>
+        $('#{{name}}-datetime').datetimepicker({
+          format: "{{ format }}"
+        });
+    </script>
+</div>
+{% endmacro %}

@@ -1,0 +1,3 @@
+{% macro title(name, field) %}
+<label>{{ name }}:{% if field.required %}*{% endif %}</label>
+{% endmacro %}

@@ -1,0 +1,50 @@
+{% from "aiohttp_admin/blocks/form/field_title.html" import title %}
+{% from "aiohttp_admin/blocks/form/field_errors.html" import errors %}
+
+{% macro field(
+    name,
+    field,
+    get_field_value,
+    with_defaults=False
+)
+%}
+<div class="form-group">
+    {{ title(name, field) }}
+    {% set field_value = get_field_value(field, with_defaults) -%}
+    <div class="wrapper-json">
+        <div class="{{ name }} json" id="jsoneditor-{{name}}" name="{{ name }}">
+            {{ field_value }}
+        </div>
+        <textarea class="{{ name }}-json hidden" name="{{ name }}">
+            {{ field_value }}
+        </textarea>
+    </div>
+    {{ errors(field) }}
+    <script>
+        const editor{{name}} = ace.edit('jsoneditor-{{name}}', {
+          mode: 'ace/mode/json',
+          selectionStyle: 'text',
+          showPrintMargin: true,
+          theme: 'ace/theme/chrome'
+        });
+
+        $("#jsoneditor-{{name}}").keyup(function() {
+            var currentText = editor{{name}}.getValue();
+            $(".{{ name }}-json").text(currentText);
+        });
+    </script>
+    <style>
+        #jsoneditor-{{name}} {
+            position: absolute;
+            width: 100%;
+            height: 400px;
+        }
+        .wrapper-json {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</p>
+{% endmacro %}

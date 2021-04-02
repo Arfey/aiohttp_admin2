@@ -1,0 +1,13 @@
+{% macro field_generator(
+    name,
+    field,
+    controller_view,
+    get_field_value,
+    with_defaults=False
+)
+%}
+    {% with autocomplete_url_name=controller_view.get_autocomplete_url_name(name) %}
+        {% from controller_view.get_widget_template_for_field(name, field.type_name) import field as field_macro with context %}
+        {{ field_macro(name, field, get_field_value, with_defaults) }}
+    {% endwith %}
+{% endmacro %}

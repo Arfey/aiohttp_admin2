@@ -50,7 +50,7 @@ async def test_list_page_pagination(resource, ordering):
 
         1. Check of correct work page pagination
 
-        - Check of correct work has_next and hex_prev values
+        - Check of correct work has_next and has_prev values
         - Check of correct work count value
 
         2. Check of correct work page pagination with remainder
@@ -72,9 +72,9 @@ async def test_list_page_pagination(resource, ordering):
     assert len(list_objects_ids) == 3
     assert set(full_list_objects_ids[:3]) == set(list_objects_ids)
 
-    # Check of correct work has_next and hex_prev values
+    # Check of correct work has_next and has_prev values
     assert list_objects.has_next
-    assert not list_objects.hex_prev
+    assert not list_objects.has_prev
     assert list_objects.count == instance_count
 
     # page 2
@@ -84,9 +84,9 @@ async def test_list_page_pagination(resource, ordering):
     assert len(list_objects_ids) == 3
     assert set(full_list_objects_ids[3:6]) == set(list_objects_ids)
 
-    # Check of correct work has_next and hex_prev values
+    # Check of correct work has_next and has_prev values
     assert list_objects.has_next
-    assert list_objects.hex_prev
+    assert list_objects.has_prev
     assert list_objects.count == instance_count
 
     # page 3
@@ -96,9 +96,9 @@ async def test_list_page_pagination(resource, ordering):
     assert len(list_objects_ids) == 3
     assert set(full_list_objects_ids[6:9]) == set(list_objects_ids)
 
-    # Check of correct work has_next and hex_prev values
+    # Check of correct work has_next and has_prev values
     assert not list_objects.has_next
-    assert list_objects.hex_prev
+    assert list_objects.has_prev
     assert list_objects.count == instance_count
 
     # 2. Check of correct work page pagination with remainder
@@ -110,9 +110,9 @@ async def test_list_page_pagination(resource, ordering):
 
     assert len(list_objects_ids) == 1
 
-    # Check of correct work has_next and hex_prev values
+    # Check of correct work has_next and has_prev values
     assert not list_objects.has_next
-    assert list_objects.hex_prev
+    assert list_objects.has_prev
 
 
 @pytest.mark.asyncio
@@ -149,7 +149,7 @@ async def test_list_cursor_pagination(resource, ordering):
 
         1. Check of correct work cursor pagination
 
-        - Check of correct work has_next and hex_prev values
+        - Check of correct work has_next and has_prev values
         - Check of correct work count value
 
     """
@@ -175,7 +175,7 @@ async def test_list_cursor_pagination(resource, ordering):
     assert set(full_list_objects_ids[1:4]) == set(list_objects_ids)
 
     assert list_objects.has_next
-    assert list_objects.hex_prev
+    assert list_objects.has_prev
     assert list_objects.count is None
 
     # page 2
@@ -190,7 +190,7 @@ async def test_list_cursor_pagination(resource, ordering):
     assert set(full_list_objects_ids[4:7]) == set(list_objects_ids)
 
     assert not list_objects.has_next
-    assert list_objects.hex_prev
+    assert list_objects.has_prev
     assert list_objects.count is None
 
 

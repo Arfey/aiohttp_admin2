@@ -18,8 +18,8 @@ import jinja2
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from .admin.actors.controllers import ActorPage
-from .admin.genres.controllers import GenresPage
-from .admin.movies.controllers import MoviesPage
+from .admin.genres.pages import GenresPage
+from .admin.movies.pages import MoviesPage
 from .admin.shows.controllers import ShowsPage
 from .admin.users.controllers import UsersPage
 from .admin.mongo_admin import MongoPage
@@ -106,7 +106,7 @@ async def mongo(application: web.Application) -> None:
     )
 
     application['mongo'] = conn.get_database()
-    instance.init(application['mongo'])
+    instance.set_db(application['mongo'])
 
     yield
 

@@ -1,0 +1,25 @@
+{% from "aiohttp_admin/blocks/form/field_title.html" import title %}
+{% from "aiohttp_admin/blocks/form/field_errors.html" import errors %}
+
+{% macro field(
+    name,
+    field,
+    get_field_value,
+    with_defaults=False
+)
+%}
+<div class="form-group">
+    {{ title(name, field) }}
+    {% if field.value %}
+    <a href="{{ field.value }}" target="_blank">{{ field.value }}</a>
+    {% endif %}
+    <input
+        type="file"
+        class="form-control-file"
+        name="{{ name }}"
+        id="{{ name }}_input"
+        aria-describedby="inputGroup-sizing-default"
+    />
+    {{ errors(field) }}
+</div>
+{% endmacro %}

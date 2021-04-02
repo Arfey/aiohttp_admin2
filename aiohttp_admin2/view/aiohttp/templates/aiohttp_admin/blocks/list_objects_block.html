@@ -1,0 +1,38 @@
+{% from 'aiohttp_admin/blocks/list_cell.html' import list_cell %}
+
+<div class="row">
+    <div class="col-sm">
+        <table class="table table-striped">
+            {% include 'aiohttp_admin/blocks/list_objects_header_block.html' %}
+            <tbody id="table-list">
+                {%- for row in list.rows %}
+                    <tr>
+                        {% for cell in row %}
+                        <td>
+                            {% if loop.first %}
+                            <label>
+                                <input class="index-checkbox" type="checkbox" />
+                            </label>
+                            {% endif %}
+                            {{ list_cell(cell) }}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                {%- endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if view_filters %}
+    <nav class="filter-nav col-3">
+        <p class="filter-nav-title">Filters</p>
+        <div>
+            {% for name, filter in view_filters %}
+                <p class="filter-title">By {{ name }}</p>
+                {% from filter.template_name import filter as filter_macro %}
+
+                {{ filter_macro(filter) }}
+            {% endfor %}
+        </div>
+    </nav>
+    {% endif %}
+</div>

@@ -1,0 +1,16 @@
+<!-- pagination block -->
+{% macro cursor_pagination(has_next, next_id) -%}
+    <nav class="pagination">
+        <ul class="pagination">
+            <li class="page-item">
+                <button
+                    class="btn btn-lg btn-light {% if not has_next %}disabled{% endif %}"
+                    data-next-id="{{ next_id }}"
+                    onclick="loadMore(this)"
+                >
+                    Next
+                </button>
+            </li>
+        </ul>
+    </nav>
+{%- endmacro %}

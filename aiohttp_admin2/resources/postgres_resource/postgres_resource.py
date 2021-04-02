@@ -73,16 +73,30 @@ class PostgresResource(AbstractResource):
 
             return self.row_to_instance(res)
 
-    async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
+    async def get_many(self, pks: t.List[PK], field: str = None) -> InstanceMapper:
+        column = sa.column(field) if field else self._primary_key
         async with self.engine.acquire() as conn:
-            query = self.table.select().where(self._primary_key.in_(pks))
+            query = self.table.select().where(column.in_(pks))
 
             cursor = await conn.execute(query)
 
-            return {
-                r[self._primary_key.name]: self.row_to_instance(r)
-                for r in await cursor.fetchall()
-            }
+            # todo: validation for return many instance for single id
+
+            relations = {}
+            relations_list = []
+
+            for r in await cursor.fetchall():
+                instance = self.row_to_instance(r, relations_list)
+
+                if field:
+                    pk = getattr(instance, field)
+                else:
+                    pk = instance.get_pk()
+
+                relations_list.append(instance)
+                relations[pk] = instance
+
+            return {_id: relations.get(_id, None) for _id in pks}
 
     def get_list_select(self) -> sa.sql.Select:
         """
@@ -114,9 +128,9 @@ class PostgresResource(AbstractResource):
 
             if cursor is not None:
                 if order_by == id_orders[0]:
-                    query = query.where(self._primary_key > cursor)
+                    query = query.where(self._primary_key >= cursor)
                 else:
-                    query = query.where(self._primary_key < cursor)
+                    query = query.where(self._primary_key <= cursor)
             else:
                 query = query.offset(offset)
 
@@ -126,10 +140,10 @@ class PostgresResource(AbstractResource):
             cursor_query = await conn\
                 .execute(query.order_by(self.get_order(order_by)))
 
-            res = [
-                self.row_to_instance(r)
-                for r in await cursor_query.fetchall()
-            ]
+            res = []
+
+            for r in await cursor_query.fetchall():
+                res.append(self.row_to_instance(r, res))
 
             if cursor is None:
                 if filters:
@@ -182,7 +196,15 @@ class PostgresResource(AbstractResource):
             return self.row_to_instance(data)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
-        data = instance.__dict__
+        data = {
+            key: value
+            for key, value in instance.__dict__.items()
+            # in this place we skip update of field with None value. This need
+            # for partial update of instance when update page don't have full
+            # list of fields
+            if value is not None
+        }
+
         async with self.engine.acquire() as conn:
             query = self.table\
                 .update()\
@@ -260,8 +282,21 @@ class PostgresResource(AbstractResource):
 
         return query
 
-    def row_to_instance(self, row: RowProxy) -> Instance:
+    def object_name(self, row: RowProxy) -> str:
+        return f'<{self.name} id={row.id}>'
+
+    def row_to_instance(
+        self,
+        row: RowProxy,
+        prefetch_together: t.List[Instance] = None,
+    ) -> Instance:
         instance = Instance()
         instance.__dict__ = dict(row)
+        instance._name = self.object_name(row)
+
+        if prefetch_together is None:
+            instance._prefetch_together = [instance]
+
+        instance._prefetch_together = prefetch_together
 
         return instance

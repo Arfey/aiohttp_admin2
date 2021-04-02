@@ -1,0 +1,69 @@
+{% from "aiohttp_admin/blocks/form/field_title.html" import title %}
+{% from "aiohttp_admin/blocks/form/field_errors.html" import errors %}
+
+{% macro field(
+    name,
+    field,
+    get_field_value,
+    with_defaults=False
+)
+%}
+<div class="form-group">
+    {{ title(name, field) }}
+    {% if field.value %}
+    <a href="{{ field.value }}" target="_blank">{{ field.value }}</a>
+    <input type="checkbox" class="{{ name }}__remove_image">
+    <span>clean image</span>
+    {% endif %}
+    <input
+        type="hidden"
+        value="{{ field._value  }}"
+        name="{{ name }}"
+        class="{{ name }}__hidden_value"
+    >
+    <img
+        {% if field._value %}src="{{ field._value  }}"{% endif %}
+        height="200"
+        class="image-widget__image {{ name }}__image_view {% if not field._value %}hidden{% endif %}"
+    />
+    <input
+        type="file"
+        class="form-control-file"
+        id="{{ name }}_input"
+        aria-describedby="inputGroup-sizing-default"
+    />
+    {{ errors(field) }}
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('.{{ name }}__image_view').attr('src', e.target.result);
+                    $('.{{ name }}__image_view').removeClass( "hidden" );
+                    $('.{{ name }}__hidden_value').removeAttr("name");
+                    $('.{{ name }}__remove_image').removeAttr("name");
+                    $('#{{ name }}_input').attr('name', '{{ name }}');
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+              $('.{{ name }}__image_view').addClass("hidden");
+              $('.{{ name }}__hidden_value').attr('name', '{{ name }}');
+              $('.{{ name }}__remove_image').removeAttr("name");
+              $('#{{ name }}_input').removeAttr("name");
+            }
+        }
+        $("#{{ name }}_input:file").change(function(){
+            readURL(this);
+        });
+        $(".{{ name }}__remove_image").change(function() {
+            if(this.checked) {
+                $('.{{ name }}__remove_image').attr('name', '{{ name }}');
+                $('#{{ name }}_input').removeAttr("name");
+            } else {
+                $('.{{ name }}__remove_image').removeAttr("name");
+                $('#{{ name }}_input').attr('name', '{{ name }}');
+            }
+        })
+    </script>
+</div>
+{% endmacro %}

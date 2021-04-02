@@ -1,4 +1,6 @@
+import logging
 import typing as t
+from collections import defaultdict
 
 from aiohttp_admin2.resources.types import (
     PK,
@@ -9,9 +11,27 @@ from aiohttp_admin2.resources.abc import AbstractResource
 from aiohttp_admin2.controllers.exceptions import PermissionDenied
 from aiohttp_admin2.mappers import Mapper
 
+from aiohttp_admin2 import filters
 from aiohttp_admin2.mappers.fields.abc import AbstractField
+from aiohttp_admin2.controllers.types import (
+    Cell,
+    ListObject,
+)
+
+if t.TYPE_CHECKING:
+    from aiohttp_admin2.controllers.relations import (
+        ToManyRelation,
+        ToOneRelation,
+    )
+
+
+logger = logging.getLogger(__name__)
 
 # todo: test
+
+# todo: move to url type
+DETAIL_NAME = 'detail'
+FOREIGNKEY_DETAIL_NAME = 'foreignkey_detail'
 
 
 class Controller:
@@ -24,12 +44,21 @@ class Controller:
     """
     resource: AbstractResource
     mapper: Mapper = None
+    name: str
 
     read_only_fields = []
     inline_fields = ['id', ]
     search_fields: t.List[str] = []
+    autocomplete_search_fields: t.List[str] = []
     # todo: handle list of fields
     fields: t.Union[str, t.Tuple[t.Any]] = '__all__'
+    relations_to_one: t.List["ToOneRelation"] = []
+    relations_to_many: t.List["ToManyRelation"] = []
+    foreign_keys_map: t.Dict[str, "ToOneRelation"] = {}
+    foreign_keys_field_map: t.Dict[str, "ToOneRelation"] = {}
+    many_to_many = {}
+    exclude_update_fields = ['id', ]
+    exclude_create_fields = ['id', ]
 
     # CRUD access
     can_create = True
@@ -41,6 +70,33 @@ class Controller:
     order_by = 'id'
     per_page = 50
     list_filter = []
+
+    def __init__(self):
+        self.prefetch_cache = defaultdict(dict)
+        foreign_keys = [key for key in self.relations_to_one if not key.hidden]
+        self.foreign_keys_map = {
+            key.name: key
+            for key in self.relations_to_one
+        }
+        self.foreign_keys_field_map = {
+            key.field_name: key
+            for key in foreign_keys
+        }
+        # todo: relation list created a lot of instances
+        for relation_to_one in foreign_keys:
+            name = f'{relation_to_one.field_name}_field'
+
+            async def _get_foreign(obj: Instance) -> t.Any:
+                return await obj.get_relation(relation_to_one.name)
+
+            _get_foreign.is_foreignkey = True
+
+            if not hasattr(self, name):
+                setattr(
+                    self,
+                    f'{relation_to_one.field_name}_field',
+                    _get_foreign,
+                )
 
     def get_resource(self):
         return self.resource
@@ -119,33 +175,64 @@ class Controller:
         await self.get_resource().delete(pk)
         await self.post_delete(pk)
 
-    async def update(self, pk: PK, data: t.Dict[str, t.Any]):
+    async def update(
+        self,
+        pk: PK,
+        data: t.Dict[str, t.Any],
+    ) -> t.Union[Instance, Mapper]:
         await self.access_hook()
 
         if not self.can_update:
             raise PermissionDenied
 
-        data = await self.pre_update(data)
-        instance = Instance()
-        instance.__dict__ = data
-        res = await self.get_resource().update(pk, instance)
-        await self.post_update(res)
+        # todo: get_pk_name
+        data['id'] = pk
 
-    async def create(self, data: t.Dict[str, t.Any]):
+        data = await self.pre_update(data)
+
+        mapper = self.mapper(data)
+
+        if mapper.is_valid():
+            serialize_data = mapper.data
+            del serialize_data['id']
+            instance = Instance()
+            instance.__dict__ = serialize_data
+
+            instance = await self.get_resource().update(pk, instance)
+            await self.post_update(instance)
+
+            return instance
+
+        return mapper
+
+    async def create(
+        self,
+        data: t.Dict[str, t.Any],
+    ) -> t.Union[Instance, Mapper]:
         await self.access_hook()
 
         if not self.can_create:
             raise PermissionDenied
 
-        # todo: think about errors
         data = await self.pre_create(data)
-        instance = Instance()
-        instance.__dict__ = data
-        res = await self.get_resource().create(instance)
 
-        await self.post_create(res)
+        data['id'] = -1
 
-        return res
+        mapper = self.mapper(data)
+
+        if mapper.is_valid():
+            serialize_data = mapper.data
+            del serialize_data['id']
+            instance = Instance()
+            instance.__dict__ = serialize_data
+
+            instance = await self.get_resource().create(instance)
+
+            await self.post_create(instance)
+
+            return instance
+
+        return mapper
 
     async def get_detail(self, pk: PK):
         await self.access_hook()
@@ -153,10 +240,118 @@ class Controller:
         if not self.can_view:
             raise PermissionDenied
 
-        return await self.get_resource().get_one(pk)
+        data = await self.get_resource().get_one(pk)
+
+        await self.prepare_instances([data])
+
+        return data
+
+    async def prepare_instances(self, instances: t.List[Instance]):
+        controller_maps = {}
+
+        # relations to one
+        for foreignkey_name, foreignkey in self.foreign_keys_map.items():
+            controller_maps[foreignkey_name] = foreignkey.controller()
+
+        def _get_relation(instance: Instance):
+            async def get_relation(name: str) -> Instance:
+                controller = controller_maps.get(name)
+                foreign_key = self.foreign_keys_map.get(name)
+                cache = self.prefetch_cache.get(foreign_key.name)
+                relation_id = getattr(instance, foreign_key.field_name)
+
+                if cache:
+                    if relation_id in cache.keys():
+                        logger.debug(
+                            f"Get data from cache {foreign_key.field_name} "
+                            f"{relation_id}"
+                        )
+                        return cache.get(relation_id)
+
+                fetch_ids = [
+                    getattr(p, foreign_key.field_name)
+                    for p in instance.prefetch_together
+                ]
+
+                data = await controller.get_many(
+                    fetch_ids,
+                    field=foreign_key.target_field_name,
+                )
+
+                logger.debug(
+                    f"Fetch data {foreign_key.field_name} for {fetch_ids}"
+                )
+
+                self.prefetch_cache[foreign_key.name].update(data)
+
+                return self.prefetch_cache[foreign_key.name].get(relation_id)
+
+            return get_relation
+
+        for i in instances:
+            if i:
+                i.get_relation = _get_relation(i)
+                i.set_name(await self.get_object_name(i))
+
+    async def get_autocomplete_items(self, *, text: str, page: int):
+        await self.access_hook()
+
+        if not self.can_view:
+            raise PermissionDenied
+
+        search_fields = \
+            self.autocomplete_search_fields or self.search_fields
+
+        if not search_fields:
+            return {}
+
+        filters_list = [
+            filters.FilterMultiTuple(
+                search_fields,
+                text,
+                'search_multi',
+            ),
+        ]
+
+        list_data = await self.get_resource().get_list(
+            limit=self.per_page,
+            order_by=self.order_by,
+            filters=filters_list,
+            page=page,
+        )
+
+        await self.prepare_instances(list_data.instances)
+
+        return {
+            "results": [
+                {"id": i.get_pk(), "text": str(i)}
+                for i in list_data.instances
+            ],
+            "pagination": {
+                "more": list_data.has_next
+            }
+        }
+
+    def is_field_sortable(self, name: str, use_infinity: bool) -> bool:
+        field_method_name = "{}_field".format(name)
+        sort_method_name = "{}_field_sort".format(name)
+
+        has_sort_method = (
+            not hasattr(self, field_method_name)
+            or hasattr(self, sort_method_name)
+        )
+
+        if has_sort_method:
+            if not use_infinity:
+                return True
+            elif name in ['id', 'pk']:
+                return True
+
+        return False
 
     async def get_list(
         self,
+        url_builder,
         page: int = 1,
         cursor: t.Optional[int] = None,
         order_by: t.Optional[str] = None,
@@ -167,7 +362,7 @@ class Controller:
         if not self.can_view:
             raise PermissionDenied
 
-        return await self.get_resource().get_list(
+        list_data = await self.get_resource().get_list(
             page=page,
             cursor=cursor,
             limit=self.per_page,
@@ -175,13 +370,77 @@ class Controller:
             filters=filters,
         )
 
-    async def get_many(self, pks: t.List[PK]):
+        await self.prepare_instances(list_data.instances)
+
+        rows = []
+
+        for i in list_data.instances:
+            row = []
+
+            for index, field in enumerate(self.inline_fields):
+                field_method_name = "{}_field".format(field)
+                is_foreignkey = False
+                is_safe = False
+
+                if hasattr(self, field_method_name):
+                    getter = getattr(self, field_method_name)
+                    is_safe = \
+                        hasattr(getter, 'is_safe')\
+                        and getattr(getter, 'is_safe')
+                    value = await getter(i)
+                    if getattr(getter, 'is_foreignkey', False):
+                        is_foreignkey = True
+                else:
+                    value = getattr(i, field)
+
+                if index == 0 and self.can_update:
+                    # todo: can view
+                    url = url_builder(i, DETAIL_NAME)
+                elif is_foreignkey:
+                    # todo: can view, can edit
+                    url = url_builder(
+                        value,
+                        FOREIGNKEY_DETAIL_NAME,
+                        # todo: drop detail prefix
+                        # relation to one
+                        url_name=self.foreign_keys_map.get(field)
+                            .controller()
+                            .url_name()
+                    )
+                else:
+                    url = None
+
+                row.append(Cell(value=value, is_safe=is_safe, url=url))
+
+            rows.append(row)
+
+        return ListObject(
+            rows=rows,
+            has_next=list_data.has_next,
+            has_prev=list_data.has_prev,
+            count=list_data.count,
+            active_page=list_data.active_page,
+            per_page=list_data.per_page,
+            next_id=list_data.next_id,
+        )
+
+    async def get_many(self, pks: t.List[PK], field: str = None):
         await self.access_hook()
 
         if not self.can_view:
             raise PermissionDenied
 
-        return self.get_resource().get_many(pks)
+        data = await self.get_resource().get_many(pks, field=field)
+        await self.prepare_instances(data.values())
+
+        return data
+
+    async def get_object_name(self, obj: Instance) -> str:
+        return str(obj)
+
+    @classmethod
+    def with_autocomplete(cls):
+        return bool(cls.autocomplete_search_fields or cls.search_fields)
 
     @classmethod
     def builder_form_params(cls, params: t.Dict[str, t.Any]):
@@ -200,3 +459,7 @@ class Controller:
             for name, value in fields
             if name in self.fields
         }
+
+    @classmethod
+    def url_name(cls) -> str:
+        return "_".join(cls.name.lower().split(" "))

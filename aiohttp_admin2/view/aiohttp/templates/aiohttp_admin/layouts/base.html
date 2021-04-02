@@ -1,0 +1,44 @@
+{% from 'aiohttp_admin/blocks/messages.html' import messages %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    >
+    {% if media %}
+        <!--  custom css  -->
+        {% for css_url in media['css'] %}
+            <link rel="stylesheet" href="{{ css_url }}" />
+        {% endfor %}
+        <!--  end custom css  -->
+    {% endif %}
+    <link rel="stylesheet" href="{{ url('admin_static', filename='css/base.css') }}" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="{{ url('admin_static', filename='css/theme.css') }}">
+    <script src="{{ url('admin_static', filename='js/main.js') }}"></script>
+    {% if media %}
+        <!--  custom js  -->
+        {% for js_url in media['js'] %}
+            <script src="{{ js_url }}"></script>
+        {% endfor %}
+        <!--  end custom js  -->
+    {% endif %}
+    {% block extra_header %}{% endblock extra_header %}
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}{{ project_name }}{% endblock title %}</title>
+</head>
+<body>
+    {% include 'aiohttp_admin/blocks/header.html' %}
+    <main class="main">
+        {% include 'aiohttp_admin/blocks/nav_aside.html' %}
+        <div class="content">
+            {{ messages(message) }}
+            {% block main %}{% endblock main %}
+        </div>
+    </main>
+</body>
+</html>

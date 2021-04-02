@@ -12,7 +12,7 @@ class TemplateView(BaseAdminView):
     This class need for represented custom pages like dashboard or some like
     that.
     """
-    template_name: str = 'aiohttp_admin/template_view.html'
+    template_name: str = 'aiohttp_admin/layouts/custom_page.html'
 
     async def get(self, req: web.Request) -> web.Response:
         return aiohttp_jinja2.render_template(

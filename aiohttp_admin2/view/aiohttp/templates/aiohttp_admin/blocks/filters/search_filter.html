@@ -1,0 +1,29 @@
+{% macro search_filter(filter) %}
+<form class="form-inline" action="" method="get">
+    <div class="form-group mb-2">
+        <input
+          class="form-control"
+          type="text"
+          name="{{ filter.param_key }}"
+          value="{% if filter.get_param() %}{{ filter.get_param() }}{% endif %}"
+          placeholder="search text..."
+        >
+    </div>
+
+    <input type="submit" class="btn btn-secondary mx-sm-3 mb-2" value="search">
+
+    {% for i, k in filter.query.items() %}
+        {% if i not in [filter.param_key, 'page'] %}
+            <input type="hidden" name="{{i}}" value="{{k}}">
+        {% endif %}
+    {% endfor %}
+
+    <input type="hidden" name="page" value="1">
+
+    {% if filter.get_param() %}
+        <a href="{{ newParam({ filter.param_key: '', 'page': 1 }, filter.query) }}">
+            clear
+        </a>
+    {% endif %}
+</form>
+{% endmacro %}

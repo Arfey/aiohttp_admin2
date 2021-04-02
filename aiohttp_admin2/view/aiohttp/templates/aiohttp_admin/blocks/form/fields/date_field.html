@@ -1,0 +1,11 @@
+{% from 'aiohttp_admin/blocks/form/fields/datetime_field.html' import field as field_macro with context %}
+
+{% macro field(
+    name,
+    field,
+    get_field_value,
+    with_defaults=False
+)
+%}
+    {{ field_macro(name, field, get_field_value, with_defaults, format="YYYY-MM-DD") }}
+{% endmacro %}

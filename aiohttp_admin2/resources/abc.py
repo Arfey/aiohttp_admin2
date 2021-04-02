@@ -8,6 +8,7 @@ from aiohttp_admin2.resources.exceptions import (
     FilterException,
     BadParameters,
 )
+from aiohttp_admin2.exceptions import AdminException
 
 
 __all__ = [
@@ -83,16 +84,44 @@ FiltersType = t.List[FilterTuple]
 class Instance:
     """Object from represent all data connected with instance."""
     pk: PK
+    _name: str = None
+    _prefetch_together: t.List["Instance"] = []
+
+    def __init__(self, name: str = None) -> None:
+        self._name = name
 
     def __repr__(self) -> str:
-        return str(self.__dict__)
+        return self._name or str(self.__dict__)
+
+    def set_name(self, name: str) -> None:
+        self._name = name
+
+    def get_pk(self) -> PK:
+        if hasattr(self, 'pk'):
+            return self.pk
+
+        if hasattr(self, 'id'):
+            return self.id
+
+        raise AdminException("Instance must have id")
+
+    @property
+    def prefetch_together(self) -> t.List["Instance"]:
+        if self._prefetch_together:
+            return self._prefetch_together
+
+        return [self]
+
+    def get_relation(self, name: str) -> t.Optional["Instance"]:
+        return None
 
 
 class Paginator(t.NamedTuple):
     """Object for represent list of instances."""
     instances: t.List[Instance]
     has_next: bool
-    hex_prev: bool
+    has_prev: bool
+    next_id: t.Optional[int]
     count: t.Optional[int]
     active_page: t.Optional[int]
     per_page: int
@@ -120,7 +149,7 @@ class AbstractResource(ABC):
         """
 
     @abstractmethod
-    async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
+    async def get_many(self, pks: t.List[PK], field: str = None) -> InstanceMapper:
         """
         Get many instances by ids from a storage. This method will use as a
         dataloader. This method mainly will use on list page in cases when
@@ -182,13 +211,21 @@ class AbstractResource(ABC):
         cursor: t.Optional[int] = None,
         count: t.Optional[int] = None,
     ) -> Paginator:
+        has_next = len(instances) > limit
+        next_id = None
+
+        if has_next:
+            last_instance = instances[-1]
+            next_id = last_instance.get_pk()
+
         return Paginator(
             instances=instances[0:limit],
-            has_next=len(instances) > limit,
-            hex_prev=bool(offset) or bool(cursor),
+            has_next=has_next,
+            has_prev=bool(offset) or bool(cursor),
             active_page=int(offset/limit + 1) if offset is not None else None,
             per_page=limit,
             count=count,
+            next_id=next_id,
         )
 
     def _validate_list_params(

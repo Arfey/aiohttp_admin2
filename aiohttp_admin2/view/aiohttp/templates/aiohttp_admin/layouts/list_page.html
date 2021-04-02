@@ -1,0 +1,43 @@
+{% extends 'aiohttp_admin/layouts/base.html' %}
+{% from "aiohttp_admin/blocks/pagination.html" import pagination %}
+{% from "aiohttp_admin/blocks/cursor_pagination.html" import cursor_pagination %}
+{% from "aiohttp_admin/blocks/filters/search_filter.html" import search_filter with context %}
+
+{% block main %}
+    <div class="wrapper">
+        {% include 'aiohttp_admin/blocks/list_action_buttons.html' %}
+        {% include 'aiohttp_admin/blocks/tabs_bar.html' %}
+
+        {% block list_content %}
+            <div class="container">
+                <div>
+                    {% if controller.search_fields %}
+                        {{ search_filter(controller_view.search_filter(controller.search_fields, url_query)) }}
+                    {% endif %}
+                </div>
+                {% include 'aiohttp_admin/blocks/list_objects_block.html' %}
+            </div>
+
+            <!-- todo: order -->
+            {% if controller_view.infinite_scroll %}
+                {{
+                    cursor_pagination(
+                        list.has_next,
+                        list.next_id,
+                    )
+                }}
+            {% else %}
+                {{
+                    pagination(
+                        list.active_page,
+                        list.count,
+                        list.has_next,
+                        list.has_prev,
+                        list.per_page,
+                        url_query,
+                    )
+                }}
+            {% endif %}
+        {% endblock list_content %}
+    </div>
+{% endblock main %}

@@ -99,6 +99,11 @@ class Admin:
                 admin_loader,
             ])
 
-        env = aiohttp_jinja2.setup(admin, loader=admin_loader)
+        env = aiohttp_jinja2.setup(
+            admin,
+            loader=admin_loader,
+            lstrip_blocks=True,
+            trim_blocks=True,
+        )
 
         self.init_jinja_default_env(env)

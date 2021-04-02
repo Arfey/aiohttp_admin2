@@ -1,0 +1,28 @@
+{% extends 'aiohttp_admin/layouts/base.html' %}
+{% from 'aiohttp_admin/blocks/form/form.html' import form %}
+
+{% block main %}
+    <div>
+        <p class="content__empty-title">{{ title }}</p>
+        <div class="alert alert-warning" role="alert">
+          Are you sure you want to delete the current item?
+        </div>
+        <!--  delete form  -->
+        {% if controller.can_delete %}
+            {{
+                form(
+                    delete_url,
+                    get_field_value=get_field_value,
+                    submit_text='Delete',
+                    method='POST',
+                    submit_cls='btn-danger',
+                    controller_view=controller_view,
+                )
+            }}
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+              You do not have access to delete the current object.
+            </div>
+        {% endif %}
+    </div>
+{% endblock main %}

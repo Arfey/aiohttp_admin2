@@ -2,7 +2,7 @@ import typing as t
 
 from umongo.document import (
     MetaDocumentImplementation,
-    Implementation,
+    DocumentImplementation,
 )
 from bson.objectid import ObjectId
 
@@ -187,7 +187,7 @@ class MongoResource(AbstractResource):
 
         return query
 
-    def row_to_instance(self, row: Implementation) -> Instance:
+    def row_to_instance(self, row: DocumentImplementation) -> Instance:
         instance = Instance()
         instance.__dict__ = row.dump()
 

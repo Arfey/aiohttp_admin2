@@ -30,6 +30,7 @@ sqlalchemy-stubs
 aiomysql
 aiohttp_jinja2
 aiohttp
+aiofiles
 
 # docs
 sphinxcontrib-napoleon

@@ -21,7 +21,7 @@ class MongoTestMapper(MongoMapperGeneric, table=User):
 class MongoTestController(MongoController):
     mapper = MongoTestMapper
     table = User
-    name = 'user_mongo'
+    name = 'user mongo'
     per_page = 10
 
 
