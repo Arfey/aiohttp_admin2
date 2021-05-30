@@ -1,17 +1,18 @@
 import pathlib
 import typing as t
-from collections import defaultdict
+from collections import Counter
 from urllib.parse import urlencode
 
 from aiohttp import web
+from aiohttp_admin2.view.aiohttp.exceptions import NoUniqueController
 from aiohttp_jinja2 import APP_KEY
 import jinja2
 import aiohttp_jinja2
 
-from aiohttp_admin2.view import (
-    DashboardView,
-    BaseAdminView,
-)
+from aiohttp_admin2.view.aiohttp.utils import get_field_value
+from aiohttp_admin2.view.aiohttp.views.base import global_list_view
+from aiohttp_admin2.view import DashboardView
+from aiohttp_admin2.view import BaseAdminView
 
 
 __all__ = ['Admin', ]
@@ -20,6 +21,7 @@ __all__ = ['Admin', ]
 parent = pathlib.Path(__file__).resolve().parent
 templates_dir = parent / 'templates'
 static_dir = parent / 'static'
+
 
 # todo: add test add docs
 class Admin:
@@ -30,9 +32,7 @@ class Admin:
     admin_name = 'aiohttp admin'
     admin_url = '/admin/'
     dashboard_class = DashboardView
-    nav_groups: t.Dict[str, BaseAdminView] = None
     logout_path: t.Optional[str] = '/logout'
-    cursor_paging = False
 
     def __init__(
         self,
@@ -45,25 +45,17 @@ class Admin:
         self.logout_path = logout_path
         self.middleware_list = middleware_list or []
         self._views = [
-            self.dashboard_class(),
-            *[view() for view in views or []]
+            self.dashboard_class,
+            *[view for view in views or []]
         ]
-        self.generate_nav_groups()
-
-    def generate_nav_groups(self):
-        self.nav_groups = defaultdict(list)
-
-        for view in self._views:
-            if not view.is_hide_view:
-                self.nav_groups[view.group_name].append(view)
 
     def init_jinja_default_env(self, env):
         env.globals.update({
             "project_name": self.admin_name,
-            "nav_groups": self.nav_groups,
             "index_url": self.dashboard_class.name,
             "logout_path": self.logout_path,
-            "cursor_paging": self.cursor_paging,
+            "type_of": type,
+            "get_field_value": get_field_value,
             "hasattr": hasattr,
             "getattr": getattr,
             "newParam":
@@ -71,9 +63,49 @@ class Admin:
                     f'?{urlencode({**params, **new_params})}'
         })
 
-    def set_views(self, app: web.Application) -> None:
+    def _validate_views(self):
+        """
+        In this method we check all requirements for correct work of admin
+        interface related with views.
+        """
+        if not self._views:
+            return
+
+        # The admin initialize full list of views before prepare the request.
+        # It need for check access to these (for create controllers with right
+        # settings). If views have the common controller than they can
+        # initialize this controller in different way with different access
+        # settings. In this case we don't know which settings we need to use
+        # so for avoid it we need to guarantee that we use controller no more
+        # than once.
+
+        views_with_controller = [
+            v for v in self._views if hasattr(v, 'controller')
+        ]
+        counter = Counter([v.controller for v in views_with_controller])
+        most_common_controllers = counter.most_common(1)
+
+        if most_common_controllers and most_common_controllers[0][1] > 1:
+            views_with_error = [
+                v for v in views_with_controller
+                if v.controller == most_common_controllers[0][0]
+            ]
+            raise NoUniqueController(
+                f"The {most_common_controllers[0][0]} controller are used more"
+                f" than once for different views {views_with_error}"
+            )
+
+    def _set_views(self, app: web.Application) -> None:
+        self._validate_views()
+        tabs = []
+
         for view in self._views:
             view.setup(app)
+
+            for tab_view in view.get_tabs():
+                tabs.append(tab_view)
+
+        global_list_view.set([*self._views, *tabs])
 
     def setup_admin_application(
         self,
@@ -86,7 +118,7 @@ class Admin:
         admin.router\
             .add_static('/static/', path=str(static_dir), name='admin_static')
 
-        self.set_views(admin)
+        self._set_views(admin)
         self.app.add_subapp(self.admin_url, admin)
         self.app['aiohttp_admin'] = admin
 

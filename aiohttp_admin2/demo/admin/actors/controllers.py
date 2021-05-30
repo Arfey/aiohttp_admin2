@@ -43,6 +43,10 @@ class ActorController(PostgresController):
     name = 'actor'
     per_page = 10
 
+    # can_create = False
+    # can_update = False
+    # can_view = False
+
     relations_to_one = [
         ToOneRelation(
             name='profile_hash',

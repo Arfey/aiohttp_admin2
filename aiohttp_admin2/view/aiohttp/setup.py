@@ -3,10 +3,8 @@ import typing as t
 from aiohttp import web
 from aiohttp_jinja2 import APP_KEY
 
-from aiohttp_admin2.view import (
-    Admin,
-    BaseAdminView,
-)
+from aiohttp_admin2.view import Admin
+from aiohttp_admin2.view import BaseAdminView
 
 
 __all__ = ['setup_admin', ]

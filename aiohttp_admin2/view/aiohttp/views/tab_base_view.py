@@ -1,38 +1,33 @@
 import typing as t
 
 from aiohttp import web
-from abc import abstractmethod
 
-from aiohttp_admin2.view.aiohttp.utils import get_field_value
+from aiohttp_admin2.view.aiohttp.views.base import BaseAdminView
 
 __all__ = ['TabBaseView', ]
 
 
-class TabBaseView:
-    name: str
+class TabBaseView(BaseAdminView):
+    _parent = None
 
-    def __init__(self, parent):
-        self.parent = parent
+    @classmethod
+    def get_parent(cls):
+        return cls._parent
+
+    @classmethod
+    def set_parent(cls, parent):
+        cls._parent = parent
+
+    def get_pk(self, req: web.Request) -> str:
+        return req.match_info['pk']
 
     async def get_context(self, req: web.Request) -> t.Dict[str, t.Any]:
         return {
-            'request': req,
+            ** await super().get_context(req),
             'controller_view': self,
-            'parent': self.parent,
-            'pk': req.match_info['pk'],
-            "message": req.rel_url.query.get('message'),
-            "get_field_value": get_field_value,
-            "url_query": req.rel_url.query,
-            "url_path": req.rel_url.path,
+            'pk': self.get_pk(req),
         }
 
-    @abstractmethod
-    def setup(self, app: web.Application) -> None: ...
-
-    @property
-    def index_url_name(self) -> str:
-        return f'{self.__class__.name}_{self.name}'
-
-    @property
-    def index_url(self) -> str:
-        return f'{self.parent.index_url}' + r'{pk:\w+}' + f'/{self.name}'
+    @classmethod
+    def get_index_url(cls) -> str:
+        return f'{cls.get_parent().get_index_url()}' + r'{pk:\w+}' + f'/{cls.get_name()}'

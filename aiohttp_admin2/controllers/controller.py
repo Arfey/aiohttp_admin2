@@ -1,28 +1,23 @@
 import logging
 import typing as t
 from collections import defaultdict
+from contextvars import ContextVar
 
-from aiohttp_admin2.resources.types import (
-    PK,
-    Instance,
-    FiltersType,
-)
+from aiohttp_admin2.resources.types import PK
+from aiohttp_admin2.resources.types import Instance
+from aiohttp_admin2.resources.types import FiltersType
 from aiohttp_admin2.resources.abc import AbstractResource
 from aiohttp_admin2.controllers.exceptions import PermissionDenied
 from aiohttp_admin2.mappers import Mapper
 
 from aiohttp_admin2 import filters
 from aiohttp_admin2.mappers.fields.abc import AbstractField
-from aiohttp_admin2.controllers.types import (
-    Cell,
-    ListObject,
-)
+from aiohttp_admin2.controllers.types import Cell
+from aiohttp_admin2.controllers.types import ListObject
 
 if t.TYPE_CHECKING:
-    from aiohttp_admin2.controllers.relations import (
-        ToManyRelation,
-        ToOneRelation,
-    )
+    from aiohttp_admin2.controllers.relations import ToManyRelation
+    from aiohttp_admin2.controllers.relations import ToOneRelation
 
 
 logger = logging.getLogger(__name__)
@@ -32,6 +27,9 @@ logger = logging.getLogger(__name__)
 # todo: move to url type
 DETAIL_NAME = 'detail'
 FOREIGNKEY_DETAIL_NAME = 'foreignkey_detail'
+
+ControllerMap = ContextVar[t.Dict[t.Type['Controller'], 'Controller']]
+controllers_map: ControllerMap = ContextVar('controllers_map', default=None)
 
 
 class Controller:
@@ -43,8 +41,8 @@ class Controller:
         - hooks
     """
     resource: AbstractResource
-    mapper: Mapper = None
-    name: str
+    mapper: t.Type[Mapper] = None
+    name: str = ''
 
     read_only_fields = []
     inline_fields = ['id', ]
@@ -251,7 +249,7 @@ class Controller:
 
         # relations to one
         for foreignkey_name, foreignkey in self.foreign_keys_map.items():
-            controller_maps[foreignkey_name] = foreignkey.controller()
+            controller_maps[foreignkey_name] = foreignkey.controller.builder()
 
         def _get_relation(instance: Instance):
             async def get_relation(name: str) -> Instance:
@@ -393,22 +391,23 @@ class Controller:
                 else:
                     value = getattr(i, field)
 
-                if index == 0 and self.can_update:
-                    # todo: can view
+                url = None
+
+                if index == 0 and (self.can_update or self.can_view):
                     url = url_builder(i, DETAIL_NAME)
                 elif is_foreignkey:
-                    # todo: can view, can edit
-                    url = url_builder(
-                        value,
-                        FOREIGNKEY_DETAIL_NAME,
-                        # todo: drop detail prefix
-                        # relation to one
-                        url_name=self.foreign_keys_map.get(field)
-                            .controller()
-                            .url_name()
-                    )
-                else:
-                    url = None
+                    foreign_key_controller = self.foreign_keys_map.get(field)\
+                        .controller.builder()
+                    if (
+                        foreign_key_controller.can_update
+                        or foreign_key_controller.can_view
+                    ):
+                        url = url_builder(
+                            value,
+                            FOREIGNKEY_DETAIL_NAME,
+                            # todo: relation to one
+                            url_name=foreign_key_controller.url_name()
+                        )
 
                 row.append(Cell(value=value, is_safe=is_safe, url=url))
 
@@ -443,9 +442,16 @@ class Controller:
         return bool(cls.autocomplete_search_fields or cls.search_fields)
 
     @classmethod
-    def builder_form_params(cls, params: t.Dict[str, t.Any]):
-        # todo: add params
-        return cls()
+    def builder(cls):
+        ctr_map = controllers_map.get() or {}
+        controller = ctr_map.get(cls)
+
+        if not controller:
+            controller = cls()
+            ctr_map[cls] = controller
+            controllers_map.set(ctr_map)
+
+        return controller
 
     @property
     def detail_fields(self) -> t.Dict[str, AbstractField]:
@@ -462,4 +468,8 @@ class Controller:
 
     @classmethod
     def url_name(cls) -> str:
-        return "_".join(cls.name.lower().split(" "))
+        return "_".join(cls.get_name().split(" "))
+
+    @classmethod
+    def get_name(cls) -> str:
+        return cls.name.lower() or cls.__name__.lower()

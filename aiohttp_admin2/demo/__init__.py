@@ -20,6 +20,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from .admin.actors.controllers import ActorPage
 from .admin.genres.pages import GenresPage
 from .admin.movies.pages import MoviesPage
+from .admin.template_view import TemplatePage
 from .admin.shows.controllers import ShowsPage
 from .admin.users.controllers import UsersPage
 from .admin.mongo_admin import MongoPage
@@ -115,13 +116,13 @@ async def mongo(application: web.Application) -> None:
 
 async def admin(application: web.Application) -> None:
     views = [
-        # todo: add custom page
         ActorPage,
         GenresPage,
         MoviesPage,
         ShowsPage,
         UsersPage,
         MongoPage,
+        TemplatePage,
     ]
     setup_admin(
         application,
