@@ -75,8 +75,8 @@ class BaseAdminView:
     from it.
     """
 
-    def __init__(self, *args, **kwargs):
-        pass
+    def __init__(self, request, *args, **kwargs):
+        self.request = request
 
     # True if the view is frozen and we can't modified static properties
     _is_frozen: bool = False

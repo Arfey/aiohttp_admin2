@@ -17,14 +17,6 @@ Subpackages
 Submodules
 ----------
 
-aiohttp\_admin2.cli module
---------------------------
-
-.. automodule:: aiohttp_admin2.cli
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 aiohttp\_admin2.connection\_injectors module
 --------------------------------------------
 

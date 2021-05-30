@@ -1,6 +1,121 @@
 Usage
 =====
 
+
+Authorization & Permissions
+---------------------------
+
+Authorization
+.............
+
+If you need an authorization to the your admin interface then you can add
+custom middleware to achieve this goal. It might look like this:
+
+.. code-block:: python
+
+    from aiohttp import web
+    from aiohttp_security import is_anonymous
+    from aiohttp_security import permits
+    from aiohttp_admin2 import setup_admin
+
+
+    @web.middleware
+    async def admin_access_middleware(request, handler):
+        if await is_anonymous(request):
+            raise web.HTTPFound('/')
+
+        if not await permits(request, 'admin'):
+            raise web.HTTPFound('/')
+
+        return await handler(request)
+
+
+    setup_admin(
+        application,
+        # You can specify here a list of middlewares which you want to apply
+        # to each request related with admin interface
+        middleware_list=[admin_access_middleware, ],
+        ...
+    )
+
+
+In the snippet above we just check that user is not anonymous and has admin
+permissions. The logic of `is_anonymous` and `permits` you have to implement
+by yourself because admin just guarantee the for each admin route will apply
+list of middlewares which you specify in the **middleware_list** param.
+
+The `aiohhtp_admin2` don't provide any views for login/logout logic so all of
+this logic you need implement by yourself.
+
+Permissions
+...........
+
+For organization permissions in your admin interface you have to use the
+`access_hook` method in the view class. Since the `aiohhtp_admin2` instantiate
+new view for each request and after that run `access_hook` method therefore
+inside this method you can easy change any propery of the current view instance
+to restrict access.
+
+As an example you have a ActorView class and you want to show information
+related with this view only for users who have correct rights for that.
+
+
+.. code-block:: python
+
+    from aiohttp_admin2.view import ControllerView
+
+
+    class ActorView(ControllerView):
+        controller = ActorController
+
+        async def access_hook(self) -> None:
+            if not user_can_view(self.request, 'aсtors'):
+                self.has_access = False
+
+In `access_hook` method we can to get current request so we just pass it to the
+predicate function (`user_can_view`) and change property if need. If user
+without right access visit any route related with current view then he gets
+the `PermissionDenied` exception. If you want only hide view from aside menu
+than you have to use `is_hide_view` property instead.
+
+Let's consider case when you need to give only read right or give right to
+create but without edit rights.
+
+
+.. code-block:: python
+
+    from aiohttp_admin2.view import ControllerView
+
+
+    class ActorView(ControllerView):
+        controller = ActorController
+
+        async def access_hook(self) -> None:
+            # here we get controller instance of the current view
+            controller = self.get_controller()
+
+            controller.can_view = user_can_view(self.request, 'aсtors')
+            controller.can_edit = user_can_edit(self.request, 'aсtors')
+            controller.can_delete = user_can_delete(self.request, 'aсtors')
+            controller.can_create = user_can_create(self.request, 'aсtors')
+
+            if is_guest(self.request):
+              controller.inline_fields = ['id', ]
+              controller.per_page = 20
+
+We can change any property of controller even `inline_fields` or `per_page`
+if we need to do that.
+
+.. warning::
+    The `access_hook` method is async function so you actually can to do
+    request to databases inside it to check permission but it's not a good
+    idea because for each request the admin call this method for each view
+    (to check that we can show link to views in aside menu) and that can
+    produce n + 1 request. The better approach is get all rights inside
+    `middelware` and set this info to request and inside `access_hook` method
+    just check that request contain right access.
+
+
 Mappers
 -------
 
