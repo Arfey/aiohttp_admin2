@@ -5,6 +5,7 @@ __all__ = [
     'CanNotCreateUnfrozenView',
     'NoUniqueController',
     'NotRegisterView',
+    'NoUniqueControllerName',
     'UseHandlerWithoutAccess',
 ]
 
@@ -22,6 +23,10 @@ class CanNotCreateUnfrozenView(AdminException):
 
 class NoUniqueController(AdminException):
     """Register views with common controller is forbidden."""
+
+
+class NoUniqueControllerName(AdminException):
+    """Register controller with common name is forbidden."""
 
 
 class NotRegisterView(AdminException):

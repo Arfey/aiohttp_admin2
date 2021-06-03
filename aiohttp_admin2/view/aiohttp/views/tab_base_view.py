@@ -31,3 +31,11 @@ class TabBaseView(BaseAdminView):
     @classmethod
     def get_index_url(cls) -> str:
         return f'{cls.get_parent().get_index_url()}' + r'{pk:\w+}' + f'/{cls.get_name()}'
+
+    @classmethod
+    def get_index_url_name(cls):
+        """This method return the name of the index url route."""
+
+        name = super().get_index_url_name()
+
+        return cls.get_parent().get_index_url_name() + "_" + name

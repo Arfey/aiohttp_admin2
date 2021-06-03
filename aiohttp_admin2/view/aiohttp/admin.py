@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 
 from aiohttp import web
 from aiohttp_admin2.view.aiohttp.exceptions import NoUniqueController
+from aiohttp_admin2.view.aiohttp.exceptions import NoUniqueControllerName
 from aiohttp_jinja2 import APP_KEY
 import jinja2
 import aiohttp_jinja2
@@ -94,6 +95,22 @@ class Admin:
                 f"The {most_common_controllers[0][0]} controller are used more"
                 f" than once for different views {views_with_error}"
             )
+
+        # Each controller have to the unique name
+        name_counter = Counter(
+            [v.controller.name for v in views_with_controller]
+        )
+        most_common_ctr_names = name_counter.most_common(1)
+
+        if most_common_ctr_names and most_common_ctr_names[0][1] > 1:
+            controllers_with_error = [
+                v.controller for v in views_with_controller
+                if v.controller.name == most_common_ctr_names[0][0]
+            ]
+            raise NoUniqueControllerName(
+                f"You already specify controllers {controllers_with_error} "
+                f"with name {most_common_ctr_names[0][0]}. The controller "
+                f"name must be unique.")
 
     def _set_views(self, app: web.Application) -> None:
         self._validate_views()

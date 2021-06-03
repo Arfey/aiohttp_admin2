@@ -119,7 +119,10 @@ class BaseAdminView:
     @classmethod
     def get_index_url_name(cls):
         """This method return the name of the index url route."""
-        return cls.name or cls.__name__.lower()
+
+        name = cls.name or cls.__name__.lower()
+
+        return "_".join(name.split(" "))
 
     # This string will use as the pretty name of the current view in the
     # admin interface.

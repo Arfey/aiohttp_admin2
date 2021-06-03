@@ -101,6 +101,7 @@ create but without edit rights.
 
             if is_guest(self.request):
               controller.inline_fields = ['id', ]
+              self.template_detail_name = 'aiohttp_admin/detail_view_for_guest.html'
               controller.per_page = 20
 
 We can change any property of controller even `inline_fields` or `per_page`
