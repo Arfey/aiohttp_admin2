@@ -67,6 +67,10 @@ class AbstractField(ABC):
         """
         return self.to_python()
 
+    def apply_default_if_need(self) -> None:
+        if self._value is None and self.default:
+            self._value = self.default
+
     @property
     def raw_value(self) -> t.Any:
         return self.to_storage()

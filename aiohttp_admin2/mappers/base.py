@@ -100,6 +100,7 @@ class Mapper(metaclass=MapperMeta):
         is_valid = True
 
         for f in self.fields.values():
+            f.apply_default_if_need()
             try:
                 f.is_valid()
                 validator_name = f'validation_{f.name}'

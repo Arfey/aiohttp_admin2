@@ -42,6 +42,7 @@ class ChoicesField(AbstractField):
         self.empty_value = \
             self.empty_value if empty_value is None else empty_value
         self.choices = choices
+        self.default = kwargs.get('default')
         self._choice_validation(choices)
 
     def to_python(self) -> t.Optional[bool]:
@@ -70,6 +71,10 @@ class ChoicesField(AbstractField):
                 f" It must be on of {[value for value, _ in self.choices]} "
                 f"but received '{self.value}'"
             )
+
+    def apply_default_if_need(self):
+        super().apply_default_if_need()
+        self.field.apply_default_if_need()
 
     def _choice_validation(self, choices):
         try:

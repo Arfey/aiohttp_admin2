@@ -23,16 +23,11 @@ class ActorMapper(PostgresMapperGeneric, table=actors):
         ('female', "female"),
     )
 
-    name = fields.StringField(
-        default='test name',
-        # required=True,
-    )
-
     gender = fields.ChoicesField(
         field_cls=fields.StringField,
         choices=GENDER_CHOICES,
         default='male',
-        # required=True,
+        required=True,
     )
 
 
@@ -48,8 +43,6 @@ class ActorController(PostgresController):
     mapper = ActorMapper
     name = 'actor'
     per_page = 10
-
-    fields = ['url', 'name']
 
     # can_create = False
     # can_update = False
