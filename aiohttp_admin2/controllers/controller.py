@@ -1,4 +1,5 @@
 import logging
+from enum import Enum
 import typing as t
 from collections import defaultdict
 from contextvars import ContextVar
@@ -390,6 +391,9 @@ class Controller:
                         is_foreignkey = True
                 else:
                     value = getattr(i, field)
+
+                    if isinstance(value, Enum):
+                        value = value.value
 
                 url = None
 
