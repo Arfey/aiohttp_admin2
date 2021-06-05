@@ -195,7 +195,17 @@ class Controller:
             serialize_data = mapper.data
             del serialize_data['id']
             instance = Instance()
-            instance.__dict__ = serialize_data
+
+            if self.fields == '__all__':
+                instance.__dict__ = serialize_data
+            else:
+                # in this place we skip update of field which not present in
+                # fields list. This need for partial update of instance when
+                # update page don't have full list of fields
+                instance.__dict__ = {
+                    key: value for key, value in serialize_data.items()
+                    if key in self.fields
+                }
 
             instance = await self.get_resource().update(pk, instance)
             await self.post_update(instance)
@@ -456,19 +466,6 @@ class Controller:
             controllers_map.set(ctr_map)
 
         return controller
-
-    @property
-    def detail_fields(self) -> t.Dict[str, AbstractField]:
-        # todo: add for dict
-        fields = self.mapper({}).fields
-        if self.fields == "__all__":
-            return fields
-
-        return {
-            name: value
-            for name, value in fields
-            if name in self.fields
-        }
 
     @classmethod
     def url_name(cls) -> str:

@@ -43,8 +43,8 @@ shows_status_mapper = {
 
 actors = sa.Table('actors', metadata,
     sa.Column('id', sa.Integer, primary_key=True),
-    sa.Column('name', sa.String(255)),
-    sa.Column('gender', sa.String(255)),
+    sa.Column('name', sa.String(255), nullable=False),
+    sa.Column('gender', sa.String(255), nullable=False),
     sa.Column('url', sa.String(255)),
 )
 
