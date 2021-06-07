@@ -43,6 +43,7 @@ class Mapper(metaclass=MapperMeta):
     _fields: t.Dict[str, AbstractField] = None
 
     def __init__(self, data: t.Dict[str, t.Any]) -> None:
+        self.with_errors = False
         self.error: t.Optional[str] = None
         self._data = data
         self._fields = self._fields or {}
@@ -122,6 +123,8 @@ class Mapper(metaclass=MapperMeta):
             else:
                 if not self.error:
                     self.error = 'Invalid'
+
+        self.with_errors = not is_valid
 
         return is_valid
 

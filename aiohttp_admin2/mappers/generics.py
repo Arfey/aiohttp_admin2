@@ -21,6 +21,7 @@ class PostgresMapperGeneric(Mapper):
     # todo: added types
     FIELDS_MAPPER = {
         sa.Integer: fields.IntField,
+        sa.SmallInteger: fields.SmallIntField,
         sa.Text: fields.StringField,
         sa.String: fields.StringField,
         sa.Enum: fields.ChoicesField,

@@ -1,4 +1,5 @@
 {% from 'aiohttp_admin/blocks/form/fields/field.html' import field_generator %}
+{% from 'aiohttp_admin/blocks/messages.html' import messages %}
 
 {% macro form(
     action,
@@ -16,6 +17,9 @@
 <div>
     <form method="{{ method }}" action="{{ action }}" enctype="multipart/form-data">
         {% if mapper %}
+        {% if mapper.with_errors %}
+            {{ messages("Invalid form", type="danger") }}
+        {% endif %}
         {% if fields == '__all__' %}
 
         {% for name, field in mapper.fields.items() %}

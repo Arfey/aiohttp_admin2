@@ -12,7 +12,6 @@ from aiohttp_admin2.controllers.exceptions import PermissionDenied
 from aiohttp_admin2.mappers import Mapper
 
 from aiohttp_admin2 import filters
-from aiohttp_admin2.mappers.fields.abc import AbstractField
 from aiohttp_admin2.controllers.types import Cell
 from aiohttp_admin2.controllers.types import ListObject
 
@@ -193,6 +192,7 @@ class Controller:
 
         if mapper.is_valid():
             serialize_data = mapper.data
+            print(serialize_data, mapper.fields)
             del serialize_data['id']
             instance = Instance()
 
