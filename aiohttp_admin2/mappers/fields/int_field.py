@@ -11,7 +11,7 @@ class IntField(AbstractField):
 
     def to_python(self) -> t.Optional[int]:
         try:
-            return int(self._value) if self._value else self._value
+            return int(self._value) if self._value is not None else self._value
         except ValueError:
             raise ValidationError(
                 f"Incorrect value for Int field. {self._value}"
