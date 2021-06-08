@@ -187,12 +187,13 @@ class Controller:
         data['id'] = pk
 
         data = await self.pre_update(data)
+        db_instance = await self.get_resource().get_one(pk)
+        data = {**db_instance.data.to_dict(), **data}
 
         mapper = self.mapper(data)
 
         if mapper.is_valid():
             serialize_data = mapper.data
-            print(serialize_data, mapper.fields)
             del serialize_data['id']
             instance = Instance()
 

@@ -126,7 +126,7 @@ class MongoResource(AbstractResource):
             raise InstanceDoesNotExist
 
     async def create(self, instance: Instance) -> Instance:
-        res = await self.table(**instance.data.__dict__).commit()
+        res = await self.table(**instance.data.to_dict()).commit()
 
         return await self.get_one(res.inserted_id)
 
@@ -138,7 +138,7 @@ class MongoResource(AbstractResource):
             .collection\
             .update_one(
                 {"_id": ObjectId(pk)},
-                {"$set": instance.data.__dict__}
+                {"$set": instance.data.to_dict()}
             )
 
         return await self.get_one(pk)

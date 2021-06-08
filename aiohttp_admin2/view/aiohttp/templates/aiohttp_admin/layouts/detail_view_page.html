@@ -3,7 +3,7 @@
 {% block instance %}
     {% if controller.can_view %}
         <div>
-            {% for name, value in object.data.__dict__.items() %}
+            {% for name, value in object.data.to_dict().items() %}
                 <p><b>{{ name }}</b>  {{ value }}</p>
             {% endfor %}
             <br>

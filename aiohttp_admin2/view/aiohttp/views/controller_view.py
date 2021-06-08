@@ -136,7 +136,7 @@ class ControllerView(BaseControllerView):
                     .url_for(pk=pk),
                 "save_url": req.app.router[self.get_url(self.post_update).name]
                     .url_for(pk=pk),
-                "mapper": mapper or controller.mapper(instance.data.__dict__),
+                "mapper": mapper or controller.mapper(instance.data.to_dict()),
                 "fields": controller.fields,
                 "exclude_fields": self.controller.exclude_update_fields,
                 "is_common": True,

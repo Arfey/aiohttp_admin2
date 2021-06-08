@@ -82,7 +82,9 @@ FiltersType = t.List[FilterTuple]
 
 
 class Data:
-    pass
+
+    def to_dict(self):
+        return self.__dict__
 
 
 class Instance:

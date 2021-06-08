@@ -218,7 +218,7 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
                     req.app.router[self.get_url(self.post_update).name]
                         .url_for(pk=pk, nested_pk=nested_pk)
                 ),
-                "mapper": mapper or controller.mapper(instance.data.__dict__),
+                "mapper": mapper or controller.mapper(instance.data.to_dict()),
                 "fields": controller.fields,
             }
         )

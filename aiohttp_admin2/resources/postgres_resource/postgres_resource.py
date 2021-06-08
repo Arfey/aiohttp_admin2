@@ -183,7 +183,7 @@ class PostgresResource(AbstractResource):
                 raise InstanceDoesNotExist
 
     async def create(self, instance: Instance) -> Instance:
-        data = instance.data.__dict__
+        data = instance.data.to_dict()
         async with self.engine.acquire() as conn:
             query = self.table\
                 .insert()\
@@ -196,7 +196,7 @@ class PostgresResource(AbstractResource):
             return self.row_to_instance(data)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
-        data = instance.data.__dict__
+        data = instance.data.to_dict()
 
         async with self.engine.acquire() as conn:
             query = self.table\
