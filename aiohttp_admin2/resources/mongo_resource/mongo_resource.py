@@ -126,17 +126,20 @@ class MongoResource(AbstractResource):
             raise InstanceDoesNotExist
 
     async def create(self, instance: Instance) -> Instance:
-        res = await self.table(**instance.__dict__).commit()
+        res = await self.table(**instance.data.__dict__).commit()
 
         return await self.get_one(res.inserted_id)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
-        if hasattr(instance, 'id'):
-            del instance.id
+        if hasattr(instance.data, 'id'):
+            del instance.data.id
 
         await self.table\
             .collection\
-            .update_one({"_id": ObjectId(pk)}, {"$set": instance.__dict__})
+            .update_one(
+                {"_id": ObjectId(pk)},
+                {"$set": instance.data.__dict__}
+            )
 
         return await self.get_one(pk)
 
@@ -189,6 +192,6 @@ class MongoResource(AbstractResource):
 
     def row_to_instance(self, row: DocumentImplementation) -> Instance:
         instance = Instance()
-        instance.__dict__ = row.dump()
+        instance.data = row.dump()
 
         return instance

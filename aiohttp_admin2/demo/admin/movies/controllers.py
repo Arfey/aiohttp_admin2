@@ -32,7 +32,7 @@ class MoviesController(PostgresController):
 
     async def poster_field(self, obj):
         return f'<img ' \
-               f'src="https://image.tmdb.org/t/p/w200/{obj.poster_path}"' \
+               f'src="https://image.tmdb.org/t/p/w200/{obj.data.poster_path}"'\
                f'width="100">'
 
     poster_field.is_safe = True
@@ -59,7 +59,7 @@ class MoviesController(PostgresController):
     ]
 
     async def get_object_name(self, obj):
-        return f"{obj.get_pk()} - {obj.title}"
+        return f"{obj.get_pk()} - {obj.data.title}"
 
 
 @postgres_injector.inject
@@ -92,7 +92,7 @@ class ActorMovieController(PostgresController):
         actor = await obj.get_relation("actor_id")
         return f'<img ' \
                f'src="https://image.tmdb.org/t/p/w200/' \
-               f'{actor.url}"' \
+               f'{actor.data.url}"' \
                f'width="100">'
 
     photo_field.is_safe = True
@@ -100,7 +100,7 @@ class ActorMovieController(PostgresController):
     async def actor_name_field(self, obj):
         actor = await obj.get_relation('actor_id')
         movie = await obj.get_relation('movie_id')
-        return actor.name + "|" + movie.title
+        return actor.data.name + "|" + movie.data.title
 
 
 @postgres_injector.inject
@@ -111,7 +111,7 @@ class GenreMovieController(PostgresController):
 
     async def name_field(self, obj) -> str:
         genre = await obj.get_relation('genre_id')
-        return genre.name
+        return genre.data.name
 
     per_page = 10
 

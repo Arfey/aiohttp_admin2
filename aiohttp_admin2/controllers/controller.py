@@ -197,12 +197,12 @@ class Controller:
             instance = Instance()
 
             if self.fields == '__all__':
-                instance.__dict__ = serialize_data
+                instance.data = serialize_data
             else:
                 # in this place we skip update of field which not present in
                 # fields list. This need for partial update of instance when
                 # update page don't have full list of fields
-                instance.__dict__ = {
+                instance.data = {
                     key: value for key, value in serialize_data.items()
                     if key in self.fields
                 }
@@ -233,7 +233,7 @@ class Controller:
             serialize_data = mapper.data
             del serialize_data['id']
             instance = Instance()
-            instance.__dict__ = serialize_data
+            instance.data = serialize_data
 
             instance = await self.get_resource().create(instance)
 
@@ -267,7 +267,7 @@ class Controller:
                 controller = controller_maps.get(name)
                 foreign_key = self.foreign_keys_map.get(name)
                 cache = self.prefetch_cache.get(foreign_key.name)
-                relation_id = getattr(instance, foreign_key.field_name)
+                relation_id = getattr(instance.data, foreign_key.field_name)
 
                 if cache:
                     if relation_id in cache.keys():
@@ -278,7 +278,7 @@ class Controller:
                         return cache.get(relation_id)
 
                 fetch_ids = [
-                    getattr(p, foreign_key.field_name)
+                    getattr(p.data, foreign_key.field_name)
                     for p in instance.prefetch_together
                 ]
 
@@ -400,7 +400,7 @@ class Controller:
                     if getattr(getter, 'is_foreignkey', False):
                         is_foreignkey = True
                 else:
-                    value = getattr(i, field)
+                    value = getattr(i.data, field)
 
                     if isinstance(value, Enum):
                         value = value.value

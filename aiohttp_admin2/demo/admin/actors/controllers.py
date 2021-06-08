@@ -65,17 +65,17 @@ class ActorController(PostgresController):
     async def photo_field(self, obj):
         return f'<img ' \
                f'src="https://image.tmdb.org/t/p/w200/' \
-               f'{obj.url}"' \
+               f'{obj.data.url}"' \
                f'width="100">'
 
     photo_field.is_safe = True
 
     async def hash_field(self, obj):
         profile = await obj.get_relation('profile_hash')
-        return profile.hash if profile else None
+        return profile.data.hash if profile else None
 
     async def get_object_name(self, obj):
-        return f"{obj.get_pk()} - {obj.name}"
+        return f"{obj.get_pk()} - {obj.data.name}"
 
 
 class ActorPage(ControllerView):

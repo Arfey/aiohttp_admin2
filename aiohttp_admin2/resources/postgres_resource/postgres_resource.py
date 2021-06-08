@@ -183,7 +183,7 @@ class PostgresResource(AbstractResource):
                 raise InstanceDoesNotExist
 
     async def create(self, instance: Instance) -> Instance:
-        data = instance.__dict__
+        data = instance.data.__dict__
         async with self.engine.acquire() as conn:
             query = self.table\
                 .insert()\
@@ -196,7 +196,7 @@ class PostgresResource(AbstractResource):
             return self.row_to_instance(data)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
-        data = instance.__dict__
+        data = instance.data.__dict__
 
         async with self.engine.acquire() as conn:
             query = self.table\
@@ -284,8 +284,8 @@ class PostgresResource(AbstractResource):
         prefetch_together: t.List[Instance] = None,
     ) -> Instance:
         instance = Instance()
-        instance.__dict__ = dict(row)
-        instance._name = self.object_name(row)
+        instance.data = dict(row)
+        instance.set_name(self.object_name(row))
 
         if prefetch_together is None:
             instance._prefetch_together = [instance]

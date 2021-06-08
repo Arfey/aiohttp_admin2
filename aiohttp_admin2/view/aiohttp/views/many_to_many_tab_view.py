@@ -87,8 +87,9 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
                 req.app.router[self.get_index_url_name()]
                     .url_for(pk=self.get_pk(req))
                     .with_query(
-                    f'message=The {self.get_name()}#{obj.id} has been created'
-                )
+                        f'message=The {self.get_name()}#{obj.get_pk()} '
+                        f'has been created'
+                    )
             )
 
     @route(r'/update/{nested_pk:\w+}/', method='POST')
@@ -191,18 +192,18 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
         pk = self.get_pk(req)
         controller = self.get_controller()
         nested_pk = req.match_info['nested_pk']
-        data = await controller.get_detail(req.match_info['nested_pk'])
+        instance = await controller.get_detail(req.match_info['nested_pk'])
 
         return aiohttp_jinja2.render_template(
             self.template_detail_name,
             req,
             {
                 **await self.get_context(req),
-                "object": data,
+                "object": instance,
                 "media": self.get_extra_media(),
                 "exclude_fields": self.controller.exclude_update_fields,
                 "controller": controller,
-                "title": f"{self.get_name()}#{data.id}",
+                "title": f"{self.get_name()}#{pk}",
                 "pk": pk,
                 "nested_pk": req.match_info['nested_pk'],
                 "delete_url": (
@@ -217,7 +218,7 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
                     req.app.router[self.get_url(self.post_update).name]
                         .url_for(pk=pk, nested_pk=nested_pk)
                 ),
-                "mapper": mapper or controller.mapper(data.__dict__),
+                "mapper": mapper or controller.mapper(instance.data.__dict__),
                 "fields": controller.fields,
             }
         )

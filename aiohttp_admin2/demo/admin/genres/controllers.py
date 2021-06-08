@@ -16,4 +16,4 @@ class GenresController(PostgresController):
     autocomplete_search_fields = ['name', ]
 
     async def get_object_name(self, obj):
-        return obj.name
+        return obj.data.name

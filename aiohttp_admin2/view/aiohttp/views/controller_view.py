@@ -114,7 +114,7 @@ class ControllerView(BaseControllerView):
         controller = self.get_controller()
         # todo: handle str key for dict
         pk = req.match_info['pk']
-        data = await controller.get_detail(pk)
+        instance = await controller.get_detail(pk)
 
         template = self.template_detail_edit_name
 
@@ -127,16 +127,16 @@ class ControllerView(BaseControllerView):
             {
                 **await self.get_context(req),
                 "media": self.get_extra_media(),
-                "object": data,
+                "object": instance,
                 "controller": controller,
-                "title": f"{self.get_name()}#{data.id}",
+                "title": f"{self.get_name()}#{pk}",
                 "delete_url": req.app.router[self.get_url(self.get_delete).name]
                     .url_for(pk=pk),
                 "detail_url": req.app.router[self.get_url(self.get_detail).name]
                     .url_for(pk=pk),
                 "save_url": req.app.router[self.get_url(self.post_update).name]
                     .url_for(pk=pk),
-                "mapper": mapper or controller.mapper(data.__dict__),
+                "mapper": mapper or controller.mapper(instance.data.__dict__),
                 "fields": controller.fields,
                 "exclude_fields": self.controller.exclude_update_fields,
                 "is_common": True,
@@ -180,10 +180,11 @@ class ControllerView(BaseControllerView):
         else:
             raise web.HTTPFound(
                 req.app.router[self.get_url(self.get_detail).name]
-                    .url_for(pk=str(obj.id))
+                    .url_for(pk=str(obj.get_pk()))
                     .with_query(
-                    f'message=The {self.get_name()}#{obj.id} has been created'
-                )
+                        f'message=The {self.get_name()}#{obj.get_pk()} '
+                        f'has been created'
+                    )
             )
 
     # todo: concat post and get update

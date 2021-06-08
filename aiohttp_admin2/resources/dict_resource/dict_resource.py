@@ -147,8 +147,8 @@ class DictResource(AbstractResource):
 
     async def create(self, instance: Instance) -> Instance:
         pk = self._get_pk()
-        instance.id = pk
-        self.engine[pk] = {"id": pk, **instance.__dict__}
+        instance.data.id = pk
+        self.engine[pk] = {"id": pk, **instance.data}
 
         return instance
 
@@ -156,11 +156,11 @@ class DictResource(AbstractResource):
         if pk not in self.engine:
             raise InstanceDoesNotExist
 
-        self.engine[pk] = instance.__dict__
+        self.engine[pk] = instance.data
 
         return self.row_to_instance({
             "id": pk,
-            **instance.__dict__
+            **instance.data
         })
 
     def _get_pk(self) -> PK:
@@ -176,7 +176,7 @@ class DictResource(AbstractResource):
 
     def row_to_instance(self, row: t.Dict[t.Any, t.Any]) -> Instance:
         instance = Instance()
-        instance.__dict__ = row
+        instance.data = row
 
         return instance
 
