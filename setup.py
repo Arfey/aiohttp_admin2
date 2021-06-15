@@ -13,15 +13,16 @@ with open('HISTORY.rst') as history_file:
 requirements = ['Click>=7.0', ]
 
 setup_requirements = [
-    'sqlalchemy',
+    'sqlalchemy==1.3.24',
     'aiopg',
     'motor',
     'umongo',
     'sqlalchemy-stubs',
     'aiomysql',
     'aiohttp_jinja2',
-    'aiohttp',
+    'aiohttp==3.6.3',
     'aiofiles',
+    'python-dateutil',
 ]
 
 test_requirements = [ ]
