@@ -19,9 +19,12 @@ Aiohttp admin documentation
      :target: https://pyup.io/repos/github/arfey/aiohttp_admin2/
      :alt: Updates
 
-The aiohttp admin is library for generate admin interface for your data based
-on aiohttp. This interface support multiple data storages and can combine them
-together.
+The aiohttp admin is a library for build admin interface for applications based
+on the aiohttp. With this library you can ease to generate CRUD views for your
+data (for data storages which support by aiohttp admin) and flexibly customize
+representation and access to these.
+
+.. image:: /images/index.png
 
 Installation
 ============
@@ -51,7 +54,7 @@ existing aiohttp application.
     web.run_app(app)
 
 That is it. Now you can open in your browser *http://localhost:8080/admin/* and
-see home page of our awesome admin interface.
+see home page of the our awesome admin interface.
 
 .. image:: /images/simple_example.png
 

@@ -42,7 +42,7 @@ class ActorController(PostgresController):
     table = actors
     mapper = ActorMapper
     name = 'actor'
-    per_page = 10
+    per_page = 3
 
     # can_create = False
     # can_update = False

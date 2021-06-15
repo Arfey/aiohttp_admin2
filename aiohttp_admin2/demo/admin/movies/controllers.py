@@ -28,6 +28,9 @@ class MoviesController(PostgresController):
     inline_fields = [
         'poster', 'title', 'status', 'release_date', 'vote_average',
     ]
+    search_fields = ['budget', 'status']
+
+    list_filter = ['status', ]
     autocomplete_search_fields = ['title', ]
 
     async def poster_field(self, obj):

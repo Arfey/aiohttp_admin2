@@ -112,7 +112,7 @@ if we need to do that.
     request to databases inside it to check permission but it's not a good
     idea because for each request the admin call this method for each view
     (to check that we can show link to views in aside menu) and that can
-    produce n + 1 request. The better approach is get all rights inside
+    produce n + 1 requests. The better approach is get all rights inside
     `middelware` and set this info to request and inside `access_hook` method
     just check that request contain right access.
 
@@ -243,11 +243,24 @@ current field type.
 Controllers
 -----------
 
-Controller generate access to your data based on some engine.
+The controller is class that generate access to the your data based on some
+engine. Out of the box you have engines for different storages
 
-- postgres
-- mysql
-- mongodb
+- PostgreSQL
+- MySQL
+- MongoDB
+
+but you actually can easy to add your own engine (Resource).
+
+The controller is framework and database agnostic part of the admin. It's mean
+that controller have not to know any about request/response, generation of
+urls, templates and so on. Also it have not to know about how to
+get/update/delete date from some database (this logic need to allocate
+into the resource class).
+
+For the PostgreSQL, an easier way to create a controller is to use the
+`PostgresController`.
+
 
 .. code-block:: python
 

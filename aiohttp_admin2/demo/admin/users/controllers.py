@@ -67,8 +67,8 @@ class UsersController(PostgresController):
 
     # todo: rename to inline_data_field
     async def data_field(self, obj) -> str:
-        if obj.payload and isinstance(obj.payload, dict):
-            return obj.payload.get('data', '')
+        if obj.data.payload and isinstance(obj.payload, dict):
+            return obj.data.payload.get('data', '')
 
         return ''
 

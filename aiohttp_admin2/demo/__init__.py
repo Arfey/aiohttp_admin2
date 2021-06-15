@@ -121,7 +121,7 @@ async def admin(application: web.Application) -> None:
         MoviesPage,
         ShowsPage,
         UsersPage,
-        MongoPage,
+        # MongoPage,
         TemplatePage,
     ]
     setup_admin(
@@ -137,7 +137,7 @@ async def app():
     application['db_url'] = os.getenv('DATABASE_URL')
     application.cleanup_ctx.extend([
         database,
-        mongo,
+        # mongo,
         jinja,
         security,
     ])

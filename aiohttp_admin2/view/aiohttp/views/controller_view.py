@@ -1,6 +1,7 @@
+import typing as t
+
 from aiohttp import web
 import aiohttp_jinja2
-import typing as t
 
 from aiohttp_admin2.view.aiohttp.views.base import BaseControllerView
 
