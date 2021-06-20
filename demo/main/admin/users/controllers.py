@@ -7,9 +7,7 @@ from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.resources.postgres_resource.postgres_resource import \
     PostgresResource
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
-from aiohttp_admin2.widgets import (
-    CKEditorWidget,
-)
+from aiohttp_admin2.view.widgets import CKEditorWidget
 from aiohttp_admin2.mappers import fields
 
 from ...auth.tables import users

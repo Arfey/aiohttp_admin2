@@ -556,7 +556,7 @@ concretical field.
 
 .. code-block:: python
 
-    from aiohttp_admin2 import widgets
+    from aiohttp_admin2.view import widgets
 
 
     # create view for table

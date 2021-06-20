@@ -8,7 +8,7 @@ from aiohttp_admin2.view.aiohttp.views.utils import UrlInfo
 from aiohttp_admin2.view.aiohttp.views.utils import IsNotRouteAdminException
 from aiohttp_admin2.view.aiohttp.views.utils import get_list_filters
 from aiohttp_admin2.controllers.controller import Controller
-from aiohttp_admin2 import widgets
+from aiohttp_admin2.view import widgets
 from aiohttp_admin2 import filters
 from aiohttp_admin2.mappers import fields
 from aiohttp_admin2.view.aiohttp.utils import get_params_from_request

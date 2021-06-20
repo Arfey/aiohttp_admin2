@@ -2,13 +2,13 @@ import typing as t
 
 from aiohttp import web
 from aiohttp_admin2.view import DashboardView
+from aiohttp_admin2.view import widgets
 from aiohttp_admin2.view.aiohttp.views.template_view import TemplateView
 from aiohttp_admin2.view import ControllerView
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.controllers.relations import ToOneRelation
 from aiohttp_admin2.controllers.relations import ToManyRelation
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
-from aiohttp_admin2 import widgets
 from aiohttp_admin2.mappers import fields
 from aiohttp_admin2.mappers.validators import length
 
