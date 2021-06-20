@@ -1,4 +1,4 @@
-from aiohttp_admin2.view import ControllerView
+from aiohttp_admin2.views import ControllerView
 
 from .controllers import MoviesController
 

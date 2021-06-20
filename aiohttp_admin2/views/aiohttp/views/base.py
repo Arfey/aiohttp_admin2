@@ -3,27 +3,27 @@ from contextvars import ContextVar
 from collections import defaultdict
 
 from aiohttp import web
-from aiohttp_admin2.view.aiohttp.views.utils import get_route
-from aiohttp_admin2.view.aiohttp.views.utils import UrlInfo
-from aiohttp_admin2.view.aiohttp.views.utils import IsNotRouteAdminException
-from aiohttp_admin2.view.aiohttp.views.utils import get_list_filters
+from aiohttp_admin2.views.aiohttp.views.utils import get_route
+from aiohttp_admin2.views.aiohttp.views.utils import UrlInfo
+from aiohttp_admin2.views.aiohttp.views.utils import IsNotRouteAdminException
+from aiohttp_admin2.views.aiohttp.views.utils import get_list_filters
 from aiohttp_admin2.controllers.controller import Controller
-from aiohttp_admin2.view import widgets
+from aiohttp_admin2.views import widgets
 from aiohttp_admin2 import filters
 from aiohttp_admin2.mappers import fields
-from aiohttp_admin2.view.aiohttp.utils import get_params_from_request
-from aiohttp_admin2.view.aiohttp.utils import QueryParams
+from aiohttp_admin2.views.aiohttp.utils import get_params_from_request
+from aiohttp_admin2.views.aiohttp.utils import QueryParams
 from aiohttp_admin2.resources.types import FilterTuple
 from aiohttp_admin2.filters import FilerBase
-from aiohttp_admin2.view.aiohttp.exceptions import CanNotModifiedFrozenView
-from aiohttp_admin2.view.aiohttp.exceptions import CanNotCreateUnfrozenView
-from aiohttp_admin2.view.aiohttp.exceptions import UseHandlerWithoutAccess
-from aiohttp_admin2.view.aiohttp.exceptions import NotRegisterView
+from aiohttp_admin2.views.aiohttp.exceptions import CanNotModifiedFrozenView
+from aiohttp_admin2.views.aiohttp.exceptions import CanNotCreateUnfrozenView
+from aiohttp_admin2.views.aiohttp.exceptions import UseHandlerWithoutAccess
+from aiohttp_admin2.views.aiohttp.exceptions import NotRegisterView
 from aiohttp_admin2.controllers.controller import controllers_map
 from aiohttp_admin2.controllers.exceptions import PermissionDenied
 
 if t.TYPE_CHECKING:
-    from aiohttp_admin2.view.aiohttp.views.tab_base_view import TabBaseView
+    from aiohttp_admin2.views.aiohttp.views.tab_base_view import TabBaseView
 
 __all__ = [
     'BaseAdminView',
@@ -71,14 +71,14 @@ global_views_instance: ViewsInstanceMap = ContextVar(
 
 class BaseAdminView:
     """
-    The base class for views in admin interface. The each view must inherit
+    The base class for views in admin interface. The each views must inherit
     from it.
     """
 
     def __init__(self, request, *args, **kwargs):
         self.request = request
 
-    # True if the view is frozen and we can't modified static properties
+    # True if the views is frozen and we can't modified static properties
     _is_frozen: bool = False
 
     @classmethod
@@ -90,7 +90,7 @@ class BaseAdminView:
     def _raise_if_unfrozen(cls):
         if not cls._is_frozen:
             raise CanNotCreateUnfrozenView(
-                "U need setup view before instantiate it."
+                "U need setup views before instantiate it."
             )
 
     # True if the access hook have been call
@@ -100,7 +100,7 @@ class BaseAdminView:
         if not self._is_checked_access:
             raise UseHandlerWithoutAccess
 
-    # List of tabs for current view
+    # List of tabs for current views
     _tabs: t.List[t.Type['TabBaseView']] = None
 
     @classmethod
@@ -108,12 +108,12 @@ class BaseAdminView:
         cls._raise_if_frozen()
         cls._tabs.append(tab)
 
-    # The url prefix path for all routes related with the current view.
+    # The url prefix path for all routes related with the current views.
     index_url: str = None
 
     @classmethod
     def get_index_url(cls):
-        """This method return the url of the index page of the current view."""
+        """This method return the url of the index page of the current views."""
         return str(cls.index_url or f'/{cls.__name__.lower()}/')
 
     @classmethod
@@ -124,28 +124,28 @@ class BaseAdminView:
 
         return "_".join(name.split(" "))
 
-    # This string will use as the pretty name of the current view in the
+    # This string will use as the pretty name of the current views in the
     # admin interface.
     name: str = None
 
     @classmethod
     def get_name(cls):
-        """This method return the pretty name of the current view."""
+        """This method return the pretty name of the current views."""
         return str(cls.name or f'{cls.__name__.lower()}')
 
     # This string set a type of icon which will use in aside bar for the
-    # current view
+    # current views
     icon: str = 'label'
 
     # If views have the same group name then they will organize together into
     # separate block in the aside bar
     group_name: str = 'General'
 
-    # if we don't want to show link on current view in the aside bar then we
+    # if we don't want to show link on current views in the aside bar then we
     # need to set True
     is_hide_view: bool = False
 
-    # Set to True if we don't want to give access to current view
+    # Set to True if we don't want to give access to current views
     has_access: bool = True
 
     def get_nav_groups(self) -> t.Dict[str, t.List[t.Type['BaseAdminView']]]:
@@ -184,8 +184,8 @@ class BaseAdminView:
         app: web.Application,
     ) -> None:
         """
-        This method have to initialize routes related with current view. On
-        each request must create new view instance.
+        This method have to initialize routes related with current views. On
+        each request must create new views instance.
         """
         cls._raise_if_frozen()
         cls._tabs = cls._tabs or []
@@ -245,7 +245,7 @@ class BaseAdminView:
     @classmethod
     def _handler_builder(cls, fn):
         """
-        The each request have to generate new view for correction work of
+        The each request have to generate new views for correction work of
         permission access and the current method implement this requirement.
         """
         async def handler(request: web.Request) -> web.Response:

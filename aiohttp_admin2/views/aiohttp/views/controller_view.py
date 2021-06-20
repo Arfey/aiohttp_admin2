@@ -3,17 +3,17 @@ import typing as t
 from aiohttp import web
 import aiohttp_jinja2
 
-from aiohttp_admin2.view.aiohttp.views.base import BaseControllerView
+from aiohttp_admin2.views.aiohttp.views.base import BaseControllerView
 
-from aiohttp_admin2.view.aiohttp.views.many_to_many_tab_view import \
+from aiohttp_admin2.views.aiohttp.views.many_to_many_tab_view import \
     ManyToManyTabView
 from aiohttp_admin2.controllers.relations import ToManyRelation
 from aiohttp_admin2.resources.types import Instance
 from aiohttp_admin2.controllers.controller import DETAIL_NAME
 from aiohttp_admin2.controllers.controller import FOREIGNKEY_DETAIL_NAME
-from aiohttp_admin2.view.aiohttp.views.utils import route
+from aiohttp_admin2.views.aiohttp.views.utils import route
 from aiohttp_admin2.mappers import Mapper
-from aiohttp_admin2.view.aiohttp.views.base import global_views_instance
+from aiohttp_admin2.views.aiohttp.views.base import global_views_instance
 
 
 class ControllerView(BaseControllerView):
@@ -35,7 +35,7 @@ class ControllerView(BaseControllerView):
 
     @classmethod
     def get_name(cls):
-        """This method return the pretty name of the current view"""
+        """This method return the pretty name of the current views"""
         return str(cls.name or cls.controller.get_name())
 
     def tabs_list(self):

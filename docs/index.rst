@@ -74,7 +74,7 @@ dashboard's class
 .. code-block:: python
 
     from aiohttp import web
-    from aiohttp_admin2.view import DashboardView
+    from aiohttp_admin2.views import DashboardView
 
 
     class CustomDashboard(DashboardView):
@@ -92,7 +92,7 @@ setup function:
 
     from aiohttp import web
     from aiohttp_admin2 import setup_admin
-    from aiohttp_admin2.view import Admin
+    from aiohttp_admin2.views import Admin
 
 
     class CustomAdmin(Admin):
@@ -172,7 +172,7 @@ with admin interface. After that you can to see a new tab in the aside bar.
 
 .. code-block:: python
 
-    from aiohttp_admin2.view.aiohttp.views.template_view import TemplateView
+    from aiohttp_admin2.views.aiohttp.views.template_view import TemplateView
 
 
     class FirstCustomView(TemplateView):
@@ -306,7 +306,7 @@ The second thing is create registered our model for the admin.
 
 .. code-block:: python
 
-    from aiohttp_admin2.view import ControllerView
+    from aiohttp_admin2.views import ControllerView
     from aiohttp_admin2.controllers.postgres_controller import PostgresController
     from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 
@@ -556,7 +556,7 @@ concretical field.
 
 .. code-block:: python
 
-    from aiohttp_admin2.view import widgets
+    from aiohttp_admin2.views import widgets
 
 
     # create view for table

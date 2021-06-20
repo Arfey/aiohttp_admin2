@@ -1,4 +1,4 @@
-from aiohttp_admin2.view.aiohttp.views.template_view import TemplateView
+from aiohttp_admin2.views.aiohttp.views.template_view import TemplateView
 
 
 class TemplatePage(TemplateView):

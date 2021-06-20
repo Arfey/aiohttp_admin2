@@ -11,12 +11,12 @@ __all__ = [
 
 
 class CanNotModifiedFrozenView(AdminException):
-    """We can't modified static properties in the frozen view."""
+    """We can't modified static properties in the frozen views."""
 
 
 class CanNotCreateUnfrozenView(AdminException):
     """
-    We can't instantiate the unfrozen view. U need setup the view before
+    We can't instantiate the unfrozen views. U need setup the views before
     create.
     """
 

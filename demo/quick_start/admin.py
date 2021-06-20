@@ -1,10 +1,10 @@
 import typing as t
 
 from aiohttp import web
-from aiohttp_admin2.view import DashboardView
-from aiohttp_admin2.view import widgets
-from aiohttp_admin2.view.aiohttp.views.template_view import TemplateView
-from aiohttp_admin2.view import ControllerView
+from aiohttp_admin2.views import DashboardView
+from aiohttp_admin2.views import widgets
+from aiohttp_admin2.views.aiohttp.views.template_view import TemplateView
+from aiohttp_admin2.views import ControllerView
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.controllers.relations import ToOneRelation
 from aiohttp_admin2.controllers.relations import ToManyRelation
@@ -18,7 +18,7 @@ from .tables import postgres_injector
 
 
 class FirstCustomView(TemplateView):
-    name = 'Template view'
+    name = 'Template views'
 
 
 class CustomDashboard(DashboardView):
@@ -63,7 +63,7 @@ class UserController(PostgresController):
     ]
 
 
-# create view for table
+# create views for table
 class UserView(ControllerView):
     controller = UserController
 
@@ -101,7 +101,7 @@ class PostController(PostgresController):
     ]
 
 
-# create view for table
+# create views for table
 class PostView(ControllerView):
     controller = PostController
 

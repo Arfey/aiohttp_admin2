@@ -1,6 +1,6 @@
 from aiohttp_admin2.mappers.generics import MongoMapperGeneric
 from aiohttp_admin2.controllers.mongo_controller import MongoController
-from aiohttp_admin2.view import ControllerView
+from aiohttp_admin2.views import ControllerView
 from umongo import Document, fields
 
 from .injectors import instance

@@ -2,7 +2,7 @@ import typing as t
 
 from aiohttp import web
 
-from aiohttp_admin2.view.aiohttp.views.base import BaseAdminView
+from aiohttp_admin2.views.aiohttp.views.base import BaseAdminView
 
 __all__ = ['TabBaseView', ]
 

@@ -1,6 +1,6 @@
 from aiohttp import web
 from aiohttp_admin2 import setup_admin
-from aiohttp_admin2.view import Admin
+from aiohttp_admin2.views import Admin
 import aiohttp_jinja2
 import jinja2
 from pathlib import Path

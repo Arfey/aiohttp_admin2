@@ -1,6 +1,6 @@
 from aiohttp import web
 from aiohttp_admin2 import setup_admin
-from aiohttp_admin2.view import (
+from aiohttp_admin2.views import (
     Admin,
     DashboardView,
 )

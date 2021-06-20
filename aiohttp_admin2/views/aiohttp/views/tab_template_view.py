@@ -1,9 +1,9 @@
 from aiohttp import web
 import aiohttp_jinja2
 
-from aiohttp_admin2.view.aiohttp.views.tab_base_view import TabBaseView
-from aiohttp_admin2.view.aiohttp.views.base import BaseAdminView
-from aiohttp_admin2.view.aiohttp.views.utils import route
+from aiohttp_admin2.views.aiohttp.views.tab_base_view import TabBaseView
+from aiohttp_admin2.views.aiohttp.views.base import BaseAdminView
+from aiohttp_admin2.views.aiohttp.views.utils import route
 
 __all__ = ['TabTemplateView', ]
 

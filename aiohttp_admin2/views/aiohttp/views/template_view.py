@@ -1,8 +1,8 @@
 import aiohttp_jinja2
 from aiohttp import web
 
-from aiohttp_admin2.view.aiohttp.views.base import BaseAdminView
-from aiohttp_admin2.view.aiohttp.views.utils import route
+from aiohttp_admin2.views.aiohttp.views.base import BaseAdminView
+from aiohttp_admin2.views.aiohttp.views.utils import route
 
 
 __all__ = ['TemplateView', ]

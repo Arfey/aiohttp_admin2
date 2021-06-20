@@ -1,4 +1,4 @@
-from aiohttp_admin2.view import TemplateView
+from aiohttp_admin2.views import TemplateView
 
 
 __all__ = ['DashboardView', ]

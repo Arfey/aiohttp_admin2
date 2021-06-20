@@ -4,16 +4,16 @@ from collections import Counter
 from urllib.parse import urlencode
 
 from aiohttp import web
-from aiohttp_admin2.view.aiohttp.exceptions import NoUniqueController
-from aiohttp_admin2.view.aiohttp.exceptions import NoUniqueControllerName
+from aiohttp_admin2.views.aiohttp.exceptions import NoUniqueController
+from aiohttp_admin2.views.aiohttp.exceptions import NoUniqueControllerName
 from aiohttp_jinja2 import APP_KEY
 import jinja2
 import aiohttp_jinja2
 
-from aiohttp_admin2.view.aiohttp.utils import get_field_value
-from aiohttp_admin2.view.aiohttp.views.base import global_list_view
-from aiohttp_admin2.view import DashboardView
-from aiohttp_admin2.view import BaseAdminView
+from aiohttp_admin2.views.aiohttp.utils import get_field_value
+from aiohttp_admin2.views.aiohttp.views.base import global_list_view
+from aiohttp_admin2.views import DashboardView
+from aiohttp_admin2.views import BaseAdminView
 
 
 __all__ = ['Admin', ]

@@ -7,10 +7,10 @@ from aiohttp_admin2.controllers.controller import FOREIGNKEY_DETAIL_NAME
 from aiohttp_admin2.mappers import Mapper
 from aiohttp_admin2.resources.types import FilterTuple
 from aiohttp_admin2.resources.types import Instance
-from aiohttp_admin2.view.aiohttp.views.base import BaseControllerView
-from aiohttp_admin2.view.aiohttp.views.base import global_views_instance
-from aiohttp_admin2.view.aiohttp.views.tab_base_view import TabBaseView
-from aiohttp_admin2.view.aiohttp.views.utils import route
+from aiohttp_admin2.views.aiohttp.views.base import BaseControllerView
+from aiohttp_admin2.views.aiohttp.views.base import global_views_instance
+from aiohttp_admin2.views.aiohttp.views.tab_base_view import TabBaseView
+from aiohttp_admin2.views.aiohttp.views.utils import route
 
 __all__ = ['ManyToManyTabView', ]
 
@@ -34,7 +34,7 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
 
         for relation in relations:
             # if any of relations controller has not access to read than all
-            # many to many view are not available too
+            # many to many views are not available too
             relation_controller = relation.controller.builder()
 
             if not relation_controller.can_view:
