@@ -28,7 +28,7 @@ from .routes import routes
 from .auth.views import login_page
 from .auth.authorization import AuthorizationPolicy
 from .auth.middlewares import admin_access_middleware
-from aiohttp_admin2.demo.admin.injectors import (
+from .admin.injectors import (
     postgres_injector,
     instance,
 )
