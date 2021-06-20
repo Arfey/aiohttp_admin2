@@ -15,7 +15,7 @@ def setup_admin(
     *,
     admin_class=Admin,
     jinja_app_key: str = APP_KEY,
-    views: t.Optional[t.List[BaseAdminView]] = None,
+    views: t.Optional[t.List[t.Type[BaseAdminView]]] = None,
     middleware_list: t.Optional[t.List[t.Callable]] = None,
     logout_path: t.Optional[str] = None,
 ) -> None:

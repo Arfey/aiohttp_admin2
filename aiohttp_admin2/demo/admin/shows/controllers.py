@@ -1,10 +1,8 @@
 from aiohttp_admin2.view import ControllerView
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
-from aiohttp_admin2.controllers.relations import (
-    ToManyRelation,
-    ToOneRelation,
-)
+from aiohttp_admin2.controllers.relations import ToManyRelation
+from aiohttp_admin2.controllers.relations import ToOneRelation
 
 from ...catalog.tables import (
     shows,
