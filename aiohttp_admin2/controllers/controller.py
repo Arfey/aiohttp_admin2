@@ -414,8 +414,10 @@ class Controller:
                     foreign_key_controller = self.foreign_keys_map.get(field)\
                         .controller.builder()
                     if (
-                        foreign_key_controller.can_update
-                        or foreign_key_controller.can_view
+                        (
+                            foreign_key_controller.can_update or
+                            foreign_key_controller.can_view
+                        ) and value
                     ):
                         url = url_builder(
                             value,
