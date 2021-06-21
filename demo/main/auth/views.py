@@ -1,10 +1,8 @@
 from aiohttp import web
 import aiohttp_jinja2
-from aiohttp_security import (
-    remember,
-    forget,
-    is_anonymous,
-)
+from aiohttp_security import remember
+from aiohttp_security import forget
+from aiohttp_security import is_anonymous
 
 from ..routes import routes
 from .users import user_map

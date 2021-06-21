@@ -589,6 +589,160 @@ title that we'll see an error message.
 
 .. image:: /images/validation_error_example.png
 
+
+**Authorization**
+
+.................
+
+The last thing which we need to add to complete our admin interface is
+authorization. For that we'll use `aiohttp_security` and `aiohttp_session`
+libs. As a first step let's setup `aiohttp_security`.
+
+.. code-block:: python
+
+    import base64
+    from aiohttp_security import AbstractAuthorizationPolicy
+    from aiohttp_security import SessionIdentityPolicy
+    from aiohttp_security import setup as setup_security
+    from aiohttp_session.cookie_storage import EncryptedCookieStorage
+    from aiohttp_session import setup as session_setup
+    from cryptography import fernet
+
+
+    class AuthorizationPolicy(AbstractAuthorizationPolicy):
+        async def permits(self, identity, permission, context=None) -> bool:
+            if identity == 'admin' and permission == 'admin':
+                return True
+
+            return False
+
+        async def authorized_userid(self, identity) -> int:
+            return identity
+
+
+    async def security(application: web.Application) -> None:
+        fernet_key = fernet.Fernet.generate_key()
+        secret_key = base64.urlsafe_b64decode(fernet_key)
+
+        session_setup(
+            application,
+            EncryptedCookieStorage(secret_key, cookie_name='API_SESSION'),
+        )
+
+        policy = SessionIdentityPolicy()
+        setup_security(application, policy, AuthorizationPolicy())
+
+        yield
+
+
+    application = web.Application()
+    application.cleanup_ctx.extend([init_db, security])
+
+
+After that let's create a login/logut pages.
+
+
+`login.html`
+
+.. code-block:: html
+
+    <form
+        method="POST"
+        action="{{ url('login_post') }}"
+    >
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" value="admin">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" value="admin">
+        <button type="submit">Submit</button>
+    </form>
+
+
+.. code-block:: python
+
+    import aiohttp_jinja2
+    from aiohttp import web
+    from aiohttp_security import is_anonymous
+    from aiohttp_security import permits
+    from aiohttp_security import remember
+    from aiohttp_security import forget
+
+
+    @aiohttp_jinja2.template('login.html')
+    async def login_page(request: web.Request) -> None:
+        if not await is_anonymous(request):
+            raise web.HTTPFound('/admin/')
+
+
+    @aiohttp_jinja2.template('login.html')
+    async def login_post(request: web.Request) -> None:
+        data = await request.post()
+
+        if data['username'] == 'admin' and 'admin' == data['password']:
+            admin_page = web.HTTPFound('/admin/')
+            await remember(request, admin_page, 'admin')
+            raise admin_page
+
+        raise web.HTTPFound('/login')
+
+
+    async def logout_page(request: web.Request) -> None:
+        redirect_response = web.HTTPFound('/login')
+        await forget(request, redirect_response)
+        raise redirect_response
+
+
+    # added these handlers to the web application
+
+    application.add_routes([
+        web.get('/login', login_page, name='login'),
+        web.post('/login', login_post, name='login_post'),
+        web.get('/logout', logout_page, name='logout')
+    ])
+
+All these steps are not related with aiohttp admin and can be different in
+other project so we avoid to explain these (this is naive implementation of
+authorization, please not use it in production).
+
+As the last step we need to implement method for admin interface which will
+detect user with access to admin interface. For these purposes we'll use
+middleware
+
+
+.. code-block:: python
+
+    import aiohttp_jinja2
+    from aiohttp import web
+    from aiohttp_security import is_anonymous
+    from aiohttp_security import permits
+
+
+    @web.middleware
+    async def admin_access_middleware(request, handler):
+        if await is_anonymous(request):
+            raise web.HTTPFound('/')
+
+        if not await permits(request, 'admin'):
+            raise web.HTTPFound('/')
+
+        return await handler(request)
+
+    # add current middleware to the admin setup
+
+    setup_admin(
+        application,
+        admin_class=CustomAdmin,
+        views=[FirstCustomView, UserView, PostView],
+         # add middleware for admin
+        middleware_list=[admin_access_middleware, ],
+        # set logout path
+        logout_path='/logout'
+    )
+
+After that unauthorized users will not access to admin interface. If you need
+to give access only for particular model, you can use `access_hook` method in
+view class (read detail in the docs).
+
 The source code of current examples you might to find `here
 <https://github.com/Arfey/aiohttp_admin2/tree/master/demo/quick_start/>`_.
 

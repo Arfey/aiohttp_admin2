@@ -1,10 +1,8 @@
 import typing as t
 
 from aiohttp import web
-from aiohttp_security import (
-    is_anonymous,
-    permits,
-)
+from aiohttp_security import is_anonymous
+from aiohttp_security import permits
 
 
 @web.middleware
