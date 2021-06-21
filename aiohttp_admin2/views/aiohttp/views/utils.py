@@ -3,8 +3,8 @@ import typing as t
 from aiohttp import web
 from aiohttp_admin2.controllers.controller import Controller
 from aiohttp_admin2.exceptions import AdminException
-from aiohttp_admin2.filters import FilerBase
-from aiohttp_admin2.filters import SearchFilter
+from aiohttp_admin2.views.filters import FilerBase
+from aiohttp_admin2.views.filters import SearchFilter
 
 
 __all__ = [

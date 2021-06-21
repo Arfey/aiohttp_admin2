@@ -11,7 +11,7 @@ from aiohttp_admin2.resources.abc import AbstractResource
 from aiohttp_admin2.controllers.exceptions import PermissionDenied
 from aiohttp_admin2.mappers import Mapper
 
-from aiohttp_admin2 import filters
+from aiohttp_admin2.views import filters
 from aiohttp_admin2.controllers.types import Cell
 from aiohttp_admin2.controllers.types import ListObject
 

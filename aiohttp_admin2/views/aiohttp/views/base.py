@@ -9,12 +9,12 @@ from aiohttp_admin2.views.aiohttp.views.utils import IsNotRouteAdminException
 from aiohttp_admin2.views.aiohttp.views.utils import get_list_filters
 from aiohttp_admin2.controllers.controller import Controller
 from aiohttp_admin2.views import widgets
-from aiohttp_admin2 import filters
+from aiohttp_admin2.views import filters
+from aiohttp_admin2.views.filters import FilerBase
 from aiohttp_admin2.mappers import fields
 from aiohttp_admin2.views.aiohttp.utils import get_params_from_request
 from aiohttp_admin2.views.aiohttp.utils import QueryParams
 from aiohttp_admin2.resources.types import FilterTuple
-from aiohttp_admin2.filters import FilerBase
 from aiohttp_admin2.views.aiohttp.exceptions import CanNotModifiedFrozenView
 from aiohttp_admin2.views.aiohttp.exceptions import CanNotCreateUnfrozenView
 from aiohttp_admin2.views.aiohttp.exceptions import UseHandlerWithoutAccess
