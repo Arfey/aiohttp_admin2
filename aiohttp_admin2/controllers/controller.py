@@ -187,6 +187,11 @@ class Controller:
         data['id'] = pk
 
         data = await self.pre_update(data)
+
+        # in some cases when user can update instance but don't have access to
+        # all fields mapper will raise an error if inaccessible field is
+        # required, to avoid it we fetch instance from db before that and merge
+        # with data which have been provided by user
         db_instance = await self.get_resource().get_one(pk)
         data = {**db_instance.data.to_dict(), **data}
 
