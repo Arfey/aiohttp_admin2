@@ -1,6 +1,7 @@
 __all__ = [
     'BaseWidget',
     'StringWidget',
+    'LongStringWidget',
     'ChoiceWidget',
     'BooleanWidget',
     'ArrayWidget',
@@ -23,6 +24,11 @@ class BaseWidget:
 class StringWidget(BaseWidget):
     """This widget represent a field as a simple text input."""
     template_name = 'aiohttp_admin/blocks/form/fields/string_field.html'
+
+
+class LongStringWidget(BaseWidget):
+    """This widget represent a field as a simple text input."""
+    template_name = 'aiohttp_admin/blocks/form/fields/long_string_field.html'
 
 
 class ChoiceWidget(BaseWidget):

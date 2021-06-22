@@ -35,6 +35,7 @@ __all__ = [
 
 DEFAULT_TYPE_WIDGETS = {
     fields.StringField.type_name: widgets.StringWidget,
+    fields.LongStringField.type_name: widgets.LongStringWidget,
     fields.ChoicesField.type_name: widgets.ChoiceWidget,
     fields.BooleanField.type_name: widgets.BooleanWidget,
     fields.ArrayField.type_name: widgets.ArrayWidget,

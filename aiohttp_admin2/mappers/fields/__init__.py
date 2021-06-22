@@ -1,4 +1,5 @@
 from aiohttp_admin2.mappers.fields.string_field import StringField
+from aiohttp_admin2.mappers.fields.string_field import LongStringField
 from aiohttp_admin2.mappers.fields.bolean_field import BooleanField
 from aiohttp_admin2.mappers.fields.array_field import ArrayField
 from aiohttp_admin2.mappers.fields.json_field import JsonField

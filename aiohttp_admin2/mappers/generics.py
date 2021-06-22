@@ -22,8 +22,8 @@ class PostgresMapperGeneric(Mapper):
     FIELDS_MAPPER = {
         sa.Integer: fields.IntField,
         sa.SmallInteger: fields.SmallIntField,
-        sa.Text: fields.StringField,
         sa.String: fields.StringField,
+        sa.Text: fields.LongStringField,
         sa.Enum: fields.ChoicesField,
         sa.Boolean: fields.BooleanField,
         sa.ARRAY: fields.ArrayField,
