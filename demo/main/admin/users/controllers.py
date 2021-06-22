@@ -65,15 +65,15 @@ class UsersController(PostgresController):
 
     # todo: rename to inline_data_field
     async def data_field(self, obj) -> str:
-        if obj.data.payload and isinstance(obj.payload, dict):
-            return obj.data.payload.get('data', '')
+        if obj.data.payload and isinstance(obj.data.payload, dict):
+            return obj.data.data
 
         return ''
 
     def data_field_sort(self, is_reverse):
         if is_reverse:
-            return sa.desc('data')
-        return 'data'
+            return sa.text("payload ->> 'data' desc")
+        return sa.text("payload ->> 'data'")
 
 
 class UsersPage(ControllerView):
