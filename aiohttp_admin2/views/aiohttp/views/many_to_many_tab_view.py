@@ -194,8 +194,13 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
         nested_pk = req.match_info['nested_pk']
         instance = await controller.get_detail(req.match_info['nested_pk'])
 
+        template = self.template_detail_edit_name
+
+        if not controller.can_update:
+            template = self.template_detail_name
+
         return aiohttp_jinja2.render_template(
-            self.template_detail_name,
+            template,
             req,
             {
                 **await self.get_context(req),
