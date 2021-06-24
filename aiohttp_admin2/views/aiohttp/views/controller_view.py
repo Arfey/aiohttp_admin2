@@ -242,8 +242,7 @@ class ControllerView(BaseControllerView):
         kwargs = {
             "name": obj.name,
             "controller": obj.relation_controller,
-            "left_table_name": obj.left_table_pk,
-            "right_table_name": obj.right_table_pk,
+            "left_table_pk_name": obj.left_table_pk,
         }
         tab_name = f'{cls.__name__}AutogenerateManyToManyTab'
 

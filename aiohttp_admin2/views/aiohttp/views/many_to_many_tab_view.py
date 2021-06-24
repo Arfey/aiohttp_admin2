@@ -17,8 +17,7 @@ __all__ = ['ManyToManyTabView', ]
 
 class ManyToManyTabView(TabBaseView, BaseControllerView):
 
-    left_table_name: str
-    right_table_name: str
+    left_table_pk_name: str
     is_hide_view = True
 
     # we need to drop `get` method from the BaseControllerView class
@@ -56,7 +55,7 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
         controller = self.get_controller()
         create_post_url = req.app.router[self.get_url(self.post_create).name]\
             .url_for(pk=pk)
-        mapper = mapper or controller.mapper({self.left_table_name: pk})
+        mapper = mapper or controller.mapper({self.left_table_pk_name: pk})
 
         return aiohttp_jinja2.render_template(
             self.template_detail_create_name,
@@ -123,7 +122,7 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
             self.default_filter_map,
         )
         filters_list.append(FilterTuple(
-            self.left_table_name,
+            self.left_table_pk_name,
             self.get_pk(req),
             'eq',
         ))

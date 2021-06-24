@@ -56,8 +56,7 @@ class UserController(PostgresController):
     relations_to_many = [
         ToManyRelation(
             name='user posts',
-            left_table_pk='id',
-            right_table_pk='author_id',
+            left_table_pk='author_id',
             relation_controller=lambda: PostController,
         )
     ]

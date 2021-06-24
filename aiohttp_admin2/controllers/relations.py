@@ -16,7 +16,6 @@ class ToManyRelation:
     """
     name: str
     left_table_pk: str
-    right_table_pk: str
     relation_controller: t.Any
 
     def accept(self, obj: t.Type['ControllerView']) -> None:

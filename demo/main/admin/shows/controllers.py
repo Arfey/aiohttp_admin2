@@ -57,25 +57,21 @@ class ShowsController(PostgresController):
         ToManyRelation(
             name='Actors',
             left_table_pk='movie_id',
-            right_table_pk='actor_id',
             relation_controller=lambda: ActorShowController
         ),
         ToManyRelation(
             name='Genres',
             left_table_pk='show_id',
-            right_table_pk='genre_id',
             relation_controller=lambda: GenreShowController
         ),
         ToManyRelation(
             name='Seasons',
             left_table_pk='show_id',
-            right_table_pk='id',
             relation_controller=lambda: SeasonShowController
         ),
         ToManyRelation(
             name='Images',
             left_table_pk='show_id',
-            right_table_pk='id',
             relation_controller=ImageController
         ),
     ]

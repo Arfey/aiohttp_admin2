@@ -28,7 +28,7 @@ class MoviesController(PostgresController):
     inline_fields = [
         'poster', 'title', 'status', 'release_date', 'vote_average',
     ]
-    search_fields = ['budget', 'status']
+    search_fields = ['title', ]
 
     list_filter = ['status', ]
     autocomplete_search_fields = ['title', ]
@@ -44,19 +44,16 @@ class MoviesController(PostgresController):
         ToManyRelation(
             name='Actors',
             left_table_pk='movie_id',
-            right_table_pk='actor_id',
             relation_controller=lambda: ActorMovieController
         ),
         ToManyRelation(
             name='Genres',
             left_table_pk='movie_id',
-            right_table_pk='genre_id',
             relation_controller=lambda: GenreMovieController
         ),
         ToManyRelation(
             name='Images',
             left_table_pk='movie_id',
-            right_table_pk='id',
             relation_controller=ImageController
         ),
     ]
