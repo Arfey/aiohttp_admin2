@@ -50,5 +50,6 @@ class ArrayField(AbstractField):
             required=self.required,
             validators=self.validators,
             default=self.default,
+            primary_key=self.primary_key,
             value=value
         )

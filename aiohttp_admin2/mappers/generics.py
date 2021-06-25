@@ -46,7 +46,8 @@ class PostgresMapperGeneric(Mapper):
             max_length = hasattr(column.type, 'length') and column.type.length
             field_kwargs = {
                 "max_length": max_length,
-                "required": not column.nullable
+                "required": not column.nullable,
+                "primary_key": column.primary_key,
             }
 
             if field_cls is fields.ChoicesField:

@@ -99,4 +99,5 @@ class ChoicesField(AbstractField):
             default=self.default,
             field_cls=self.field_cls,
             choices=self.choices,
+            primary_key=self.primary_key,
         )

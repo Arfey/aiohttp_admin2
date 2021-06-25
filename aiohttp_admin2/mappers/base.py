@@ -2,6 +2,7 @@ import typing as t
 
 from aiohttp_admin2.mappers.fields.abc import AbstractField
 from aiohttp_admin2.mappers.exceptions import ValidationError
+from aiohttp_admin2.mappers.exceptions import MapperError
 
 
 __all__ = ['Mapper', ]
@@ -43,10 +44,12 @@ class Mapper(metaclass=MapperMeta):
     _fields: t.Dict[str, AbstractField] = None
 
     def __init__(self, data: t.Dict[str, t.Any]) -> None:
+        self.pass_validation = False
         self.with_errors = False
         self.error: t.Optional[str] = None
         self._data = data
         self._fields = self._fields or {}
+        self._fields_after_validation = []
         for field in self._fields_cls:
             new_field = field(data.get(field.name))
             new_field.name = field.name
@@ -55,12 +58,25 @@ class Mapper(metaclass=MapperMeta):
     @property
     def raw_data(self):
         """Getter for raw mapper data"""
+        if not self.pass_validation:
+            raise MapperError(
+                "Try to get data from mapper before call the `is_valid` "
+                "method."
+            )
         return self._data
 
     @property
     def data(self) -> t.Dict[str, t.Any]:
         """Return serialize data"""
-        return {f.name: f.to_python() for f in self.fields.values()}
+        if not self.pass_validation:
+            raise MapperError(
+                "Try to get data from mapper before call the `is_valid` "
+                "method."
+            )
+        return {
+            f.name: f.to_python()
+            for f in self._fields_after_validation
+        }
 
     @property
     def fields(self) -> t.Dict[str, AbstractField]:
@@ -78,7 +94,7 @@ class Mapper(metaclass=MapperMeta):
         """
         pass
 
-    def is_valid(self) -> bool:
+    def is_valid(self, skip_primary: bool = False) -> bool:
         """
         This method need to called for check if mapper data is valid. It run
         validators for each field and main validator for mapper.
@@ -97,10 +113,18 @@ class Mapper(metaclass=MapperMeta):
         This function must receive value as parameter and raise ValidationError
         if it is invalid.
 
+        If we set `skip_primary` to `True` then a mapper will not to check the
+        primary key field.
         """
         is_valid = True
 
         for f in self.fields.values():
+
+            if skip_primary and f.primary_key:
+                continue
+
+            self._fields_after_validation.append(f)
+
             f.apply_default_if_need()
             try:
                 f.is_valid()
@@ -125,6 +149,7 @@ class Mapper(metaclass=MapperMeta):
                     self.error = 'Invalid'
 
         self.with_errors = not is_valid
+        self.pass_validation = True
 
         return is_valid
 

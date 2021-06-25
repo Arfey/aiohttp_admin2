@@ -22,6 +22,7 @@ class AbstractField(ABC):
         validators: t.List[t.Callable[[t.Any], None]] = None,
         value: t.Optional[str] = None,
         default: t.Optional[str] = None,
+        primary_key: bool = False,
         **kwargs: t.Any,
     ) -> None:
         self.default: t.Optional[str] = default
@@ -30,6 +31,7 @@ class AbstractField(ABC):
         self.required = required
         self.validators = validators or []
         self.kwargs = kwargs
+        self.primary_key = primary_key
         self.init_default_validators()
 
     def init_default_validators(self):
@@ -113,10 +115,12 @@ class AbstractField(ABC):
             required=self.required,
             validators=self.validators,
             default=self.default,
+            primary_key=self.primary_key,
             value=value
         )
 
     def __repr__(self):
         return \
             f"{self.__class__.__name__}(name={self.type_name}," \
-            f" value={self._value}), required={self.required}"
+            f" value={self._value}), required={self.required}" \
+            f" primary_key={self.primary_key}"

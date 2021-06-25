@@ -183,23 +183,19 @@ class Controller:
         if not self.can_update:
             raise PermissionDenied
 
-        # todo: get_pk_name
-        data['id'] = pk
-
-        data = await self.pre_update(data)
-
         # in some cases when user can update instance but don't have access to
         # all fields mapper will raise an error if inaccessible field is
-        # required, to avoid it we fetch instance from db before that and merge
-        # with data which have been provided by user
+        # required (or pk field is hidden), to avoid it we fetch instance from
+        # db before that and merge with data which have been provided by user.
         db_instance = await self.get_resource().get_one(pk)
         data = {**db_instance.data.to_dict(), **data}
+
+        data = await self.pre_update(data)
 
         mapper = self.mapper(data)
 
         if mapper.is_valid():
             serialize_data = mapper.data
-            del serialize_data['id']
             instance = Instance()
 
             if self.fields == '__all__':
@@ -231,13 +227,10 @@ class Controller:
 
         data = await self.pre_create(data)
 
-        data['id'] = -1
-
         mapper = self.mapper(data)
 
-        if mapper.is_valid():
+        if mapper.is_valid(skip_primary=True):
             serialize_data = mapper.data
-            del serialize_data['id']
             instance = Instance()
             instance.data = serialize_data
 
