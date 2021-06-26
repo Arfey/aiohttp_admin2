@@ -27,7 +27,7 @@ class MySqlResource(PostgresResource):
 
             await conn.execute('commit;')
 
-            return self.row_to_instance(data)
+            return self._row_to_instance(data)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
         data = instance.data
@@ -48,4 +48,4 @@ class MySqlResource(PostgresResource):
 
             await conn.execute('commit;')
 
-            return self.row_to_instance(data)
+            return self._row_to_instance(data)

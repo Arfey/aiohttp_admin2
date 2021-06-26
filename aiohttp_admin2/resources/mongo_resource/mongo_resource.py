@@ -46,7 +46,7 @@ class MongoResource(AbstractResource):
         if not data:
             raise InstanceDoesNotExist
 
-        return self.row_to_instance(data)
+        return self._row_to_instance(data)
 
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
         data = await self.table\
@@ -54,7 +54,7 @@ class MongoResource(AbstractResource):
             .to_list(length=len(pks))
 
         return {
-            str(r["id"]): self.row_to_instance(r)
+            str(r["id"]): self._row_to_instance(r)
             for r in data
         }
 
@@ -102,7 +102,7 @@ class MongoResource(AbstractResource):
                 .sort(sort)\
                 .to_list(length=limit + 1)
 
-        data = [self.row_to_instance(i) for i in data]
+        data = [self._row_to_instance(i) for i in data]
 
         if cursor:
             return self.create_paginator(
@@ -190,7 +190,7 @@ class MongoResource(AbstractResource):
 
         return query
 
-    def row_to_instance(self, row: DocumentImplementation) -> Instance:
+    def _row_to_instance(self, row: DocumentImplementation) -> Instance:
         instance = Instance()
         instance.data = row.dump()
 

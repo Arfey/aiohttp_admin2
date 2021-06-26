@@ -28,31 +28,19 @@ PK = t.Union[str, int]
 
 # todo: docs
 class ABCFilter(ABC):
-    """
-
-    """
     field_name: str
     value: t.Any
     name: str
 
     @abstractmethod
     def apply(self) -> t.Any:
-        """
-
-        """
         pass
 
     def validate(self):
-        """
-
-        """
         pass
 
     @property
     def query(self) -> t.Any:
-        """
-
-        """
         try:
             self.validate()
         except Exception as e:

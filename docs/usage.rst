@@ -1,9 +1,7 @@
 Usage
 =====
 
-
-Overview
---------
+.. image:: /images/overview_header.png
 
 For the beginning let's make a simple overview of architecture and main
 components. The `aiohttp_admin` has small list of main components which
@@ -613,3 +611,29 @@ You also can specify template for some special `ControllerView`.
 
 Resources
 ---------
+
+So, we already told that `Resources` is a class which implement method to work
+with some particular database.  If you want to implement your own `Resources`
+you need just inherit from `AbstractResource` and implement methods which
+described below:
+
+- **get_one** - Get one an instance from a storage. This method receive primary
+  key of an database's object and return the `Instance` if object exist else
+  raise the `InstanceDoesNotExist` exception.
+- **get_many** - Get many instances by ids from a storage. This method will
+  use as a dataloader. This method mainly will use on list page in cases when
+  need to show field with data from related model for prevent N + 1. This
+  method receive list of primary keys of an database's objects and name of
+  primary key after that return dict where keys are primary keys and as a
+  values corresponding Instance objects (InstanceMapper).
+- **delete** -  Delete instance. This method receive primary key of instance
+  and delete it or raise the `InstanceDoesNotExist` exception if object
+  doesn't exist.
+- **create** - Create instance. This method receive `Instance` object and
+  return it from databases after create.
+- **update** - Update instance. This method receive primary key and `Instance`
+  object after that update an object in databases and return corresponding
+  `Instance` object.
+- **get_list** - Get list of instances. This method will use for show list of
+  instances. The current method have to implement possible to pagination,
+  filtering and sorting.

@@ -1,31 +1,25 @@
 import typing as t
 
 import sqlalchemy as sa
-from sqlalchemy.engine.result import RowProxy
-from aiopg.sa import Engine
-from sqlalchemy.sql.elements import UnaryExpression
 from sqlalchemy import func
+from sqlalchemy.engine.result import RowProxy
+from sqlalchemy.sql.elements import UnaryExpression
+from aiopg.sa import Engine
 
-from aiohttp_admin2.resources.abc import (
-    AbstractResource,
-    Instance,
-    InstanceMapper,
-    Paginator,
-    FilterMultiTuple,
-)
-from aiohttp_admin2.resources.exceptions import (
-    InstanceDoesNotExist,
-    FilterException,
-    CURSOR_PAGINATION_ERROR_MESSAGE,
-    ClientException,
-)
+from aiohttp_admin2.resources.abc import AbstractResource
+from aiohttp_admin2.resources.abc import Instance
+from aiohttp_admin2.resources.abc import InstanceMapper
+from aiohttp_admin2.resources.abc import Paginator
+from aiohttp_admin2.resources.abc import FilterMultiTuple
+from aiohttp_admin2.resources.exceptions import InstanceDoesNotExist
+from aiohttp_admin2.resources.exceptions import FilterException
+from aiohttp_admin2.resources.exceptions import CURSOR_PAGINATION_ERROR_MESSAGE
+from aiohttp_admin2.resources.exceptions import ClientException
 from aiohttp_admin2.resources.types import PK
 from aiohttp_admin2.resources.postgres_resource.utils import to_column
 from aiohttp_admin2.resources.types import FiltersType
-from aiohttp_admin2.resources.postgres_resource.filters import (
-    SQLAlchemyBaseFilter,
-    default_filter_mapper,
-)
+from aiohttp_admin2.resources.postgres_resource.filters import SQLAlchemyBaseFilter  # noqa
+from aiohttp_admin2.resources.postgres_resource.filters import default_filter_mapper  # noqa
 
 
 __all__ = ['PostgresResource', 'SortType', ]
@@ -71,7 +65,7 @@ class PostgresResource(AbstractResource):
             if not res:
                 raise InstanceDoesNotExist
 
-            return self.row_to_instance(res)
+            return self._row_to_instance(res)
 
     async def get_many(self, pks: t.List[PK], field: str = None) -> InstanceMapper:
         column = sa.column(field) if field else self._primary_key
@@ -86,7 +80,7 @@ class PostgresResource(AbstractResource):
             relations_list = []
 
             for r in await cursor.fetchall():
-                instance = self.row_to_instance(r, relations_list)
+                instance = self._row_to_instance(r, relations_list)
 
                 if field:
                     pk = getattr(instance, field)
@@ -143,7 +137,7 @@ class PostgresResource(AbstractResource):
             res = []
 
             for r in await cursor_query.fetchall():
-                res.append(self.row_to_instance(r, res))
+                res.append(self._row_to_instance(r, res))
 
             if cursor is None:
                 if filters:
@@ -193,7 +187,7 @@ class PostgresResource(AbstractResource):
             cursor = await conn.execute(query)
             data = await cursor.fetchone()
 
-            return self.row_to_instance(data)
+            return self._row_to_instance(data)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
         data = instance.data.to_dict()
@@ -208,7 +202,7 @@ class PostgresResource(AbstractResource):
             cursor = await conn.execute(query)
             data = await cursor.fetchone()
 
-            return self.row_to_instance(data)
+            return self._row_to_instance(data)
 
     @property
     def _primary_key(self) -> sa.Column:
@@ -278,7 +272,7 @@ class PostgresResource(AbstractResource):
     def object_name(self, row: RowProxy) -> str:
         return f'<{self.name} id={row.id}>'
 
-    def row_to_instance(
+    def _row_to_instance(
         self,
         row: RowProxy,
         prefetch_together: t.List[Instance] = None,

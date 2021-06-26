@@ -53,11 +53,11 @@ class DictResource(AbstractResource):
         if not instance:
             raise InstanceDoesNotExist
 
-        return self.row_to_instance(instance)
+        return self._row_to_instance(instance)
 
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
         return {
-            pk: self.row_to_instance(self.engine.get(pk))
+            pk: self._row_to_instance(self.engine.get(pk))
             for pk in pks
             if pk in self.engine
         }
@@ -104,7 +104,7 @@ class DictResource(AbstractResource):
         if cursor is not None:
             if is_desc:
                 instances = [
-                    self.row_to_instance(i)
+                    self._row_to_instance(i)
                     for i in objects_list
                     if i['id'] < cursor
                 ]
@@ -116,7 +116,7 @@ class DictResource(AbstractResource):
                 )
 
             instances = [
-                self.row_to_instance(i)
+                self._row_to_instance(i)
                 for i in objects_list
                 if i['id'] > cursor
             ]
@@ -128,7 +128,7 @@ class DictResource(AbstractResource):
             )
 
         instances = [
-            self.row_to_instance(i)
+            self._row_to_instance(i)
             for i in objects_list
         ]
 
@@ -158,7 +158,7 @@ class DictResource(AbstractResource):
 
         self.engine[pk] = instance.data
 
-        return self.row_to_instance({
+        return self._row_to_instance({
             "id": pk,
             **instance.data
         })
@@ -174,7 +174,7 @@ class DictResource(AbstractResource):
 
         return pk
 
-    def row_to_instance(self, row: t.Dict[t.Any, t.Any]) -> Instance:
+    def _row_to_instance(self, row: t.Dict[t.Any, t.Any]) -> Instance:
         instance = Instance()
         instance.data = row
 
