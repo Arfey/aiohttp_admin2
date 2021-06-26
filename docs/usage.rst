@@ -303,6 +303,33 @@ Now, try to check corrected data
 `user_data.data` return converting data in right type. We can see that string
 '38' have been successful converting to int value 38.
 
+.. note::
+    The primary key is required fields for any models when we wanna update
+    instance but when we need to create instance we don't know it (when a
+    storage autoincrement it). For these purposes fields have `primary_key`
+    property. If this property set to True and we try to create instance then
+    mapper will ignore `required` errors related with current field. For that
+    we need just specify `skip_primary` to `True` into `is_valid` method.
+
+    .. code-block:: python
+
+        from aiohttp_admin2.mappers import Mapper
+        from aiohttp_admin2.mappers import fields
+
+
+        class UserMapper(Mapper):
+            """Mapper for user instance."""
+            id =  fields.IntField(primary_key=True, required=True)
+            name = fields.StringField(required=True)
+
+        # False
+        UserMapper({"name": "Mike", "id": None}).is_valid()
+
+        # True
+        UserMapper({"name": "Mike", "id": None}).is_valid(skip_primary=True)
+
+    So when you don't use generators for your models or rewrite primary key
+    fields then don't forget to specify `primary key` property.
 
 Validators
 ..........
