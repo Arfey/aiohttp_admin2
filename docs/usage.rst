@@ -525,18 +525,30 @@ and create your template with name of template witch you want to rewrite.
 
 The full list of templates you can see below:
 
-- aiohttp_admin/base.html - base layout
-- aiohttp_admin/create.html - content for create page
-- aiohttp_admin/delete.html - content for confirm delete page
-- aiohttp_admin/detail.html - content for view detail page
-- aiohttp_admin/detail_edit.html - content for edit page
-- aiohttp_admin/form.html - main form for create and update
-- aiohttp_admin/header.html - header for base layout
-- aiohttp_admin/list.html - content for list page
-- aiohttp_admin/list_action_buttons.html - list actions for list page
-- aiohttp_admin/nav_aside.html - aside with pages
-- aiohttp_admin/pagination.html - pagination block
-- aiohttp_admin/template_view.html - content template for custom page
+- aiohttp_admin/blocks/header.html - the header for base layout
+- aiohttp_admin/layouts/base.html - the base layout
+- aiohttp_admin/layouts/create_page.html - the content for create page
+- aiohttp_admin/layouts/delete_page.html - the content for confirm delete page
+- aiohttp_admin/layouts/detail_view_page.html - the content for detail page in read only mode
+- aiohttp_admin/layouts/detail_edit_page.html - the content for edit page
+- aiohttp_admin/layouts/custom_page.html - the content for custom page
+- aiohttp_admin/layouts/custom_tab_page.html - the content for custom tab
+- aiohttp_admin/layouts/list_page.html - the content for list page (with a simple pagination)
+- aiohttp_admin/layouts/list_cursor_page.html - the content for list page (with an infinite scroll)
+- aiohttp_admin/blocks/from/form.html - the main form for create and update
+- aiohttp_admin/blocks/from/field_errors.html - the macro for form's errors
+- aiohttp_admin/blocks/from/field_title.html - the macro for form's title
+- aiohttp_admin/blocks/from/fields/* - the macros for different types of fields
+- aiohttp_admin/blocks/filters/* - the macros for different types of filters (in the left aside bar)
+- aiohttp_admin/blocks/pagination.html - the pagination block
+- aiohttp_admin/blocks/cursor_pagination.html - the infinity scroll pagination block
+- aiohttp_admin/blocks/list_action_buttons.html - the list actions for list page
+- aiohttp_admin/blocks/list_cell.html - the macro for table cell
+- aiohttp_admin/blocks/list_objects_block.html - the table for list page
+- aiohttp_admin/blocks/list_objects_header_block.html - the header of table for list page
+- aiohttp_admin/blocks/messages.html - the macro for message's notification bar
+- aiohttp_admin/blocks/nav_aside.html - the aside with pages links
+- aiohttp_admin/blocks/tabs_bar.html - the template for tabs
 
 
 Overriding view templates
@@ -550,11 +562,12 @@ You also can specify template for some special `ControllerView`.
     class UserPage(ControllerView):
         controller = UserController
 
-        template_list_name = 'aiohttp_admin/list.html'
-        template_detail_name = 'aiohttp_admin/detail.html'
-        template_detail_edit_name = 'aiohttp_admin/detail_edit.html'
-        template_detail_create_name = 'aiohttp_admin/create.html'
-        template_delete_name = 'aiohttp_admin/delete.html'
+        template_list_name = 'aiohttp_admin/layouts/list_page.html'
+        template_list_cursor_name = 'aiohttp_admin/layouts/list_cursor_page.html'
+        template_detail_name = 'aiohttp_admin/layouts/detail_view_page.html'
+        template_detail_edit_name = 'aiohttp_admin/layouts/detail_edit_page.html'
+        template_detail_create_name = 'aiohttp_admin/layouts/create_page.html'
+        template_delete_name = 'aiohttp_admin/layouts/delete_page.html'
 
 
 Resources
