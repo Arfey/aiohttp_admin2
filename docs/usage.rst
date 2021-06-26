@@ -2,6 +2,47 @@ Usage
 =====
 
 
+Overview
+--------
+
+For the beginning let's make a simple overview of architecture and main
+components. The `aiohttp_admin` has small list of main components which
+responsible for different function of admin interface:
+
+- **resource** - this component implement all method (get/delete/update etc)
+  that need to communicate with databases. So, if you want to add support of
+  database which is not exist right now on `aiohttp_admin` then can just create
+  your resource object for that and all other components of admin interface will
+  work with it togather without any problems
+
+- **controller** - in this component allocate business logic related with some
+  model. What are fields we need to show on list view? How many items do we need
+  to show on each list page? What is order we need to use by default? What do
+  we need to do before/after create/update instance? How do models related? All
+  these question about controller. Controller use `resource` to get access
+  to database and `mapper` for validate input data from user.
+
+- **mapper** - this component responsible for validation and convert input
+  data from user which will use for update or create instance.
+
+- **view** - this component responsible for represent result for user via some
+  async web framework (now we use aiohttp but you can to implement views for
+  other web framework and use other all components of aiohttp admin without
+  any problems).
+
+
+Let's consider a simple example of books library. We have table of authors and
+books. Each book has one or more authors. Each author has one or more books.
+Relation between author and books is many to many and implement via a separate
+table. All these tables stores in the PostgreSQL but large book's files
+allocated in the MongoDB.
+
+.. image:: /images/overview.png
+
+We can to see that relation between models implement on controller level and we
+can to bind models from different storages together.
+
+
 Authorization & Permissions
 ---------------------------
 
