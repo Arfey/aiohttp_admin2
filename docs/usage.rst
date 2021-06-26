@@ -120,7 +120,8 @@ if we need to do that.
 Mappers
 -------
 
-Mapper need for describe data which use for create or update instances. You can create mapper in two ways.
+Mapper is schema for validation and converting data which income from user and
+use for create or update instances. You can create mapper in two ways.
 
 Custom mappers
 ..............
@@ -136,7 +137,7 @@ You can create your own mapper with custom fields:
     class UserMapper(Mapper):
         """Mapper for user instance."""
         name = fields.StringField(required=True)
-        age =  field.IntField(default=18)
+        age =  fields.IntField(default=18)
 
 Mappers generator
 .................
@@ -175,34 +176,36 @@ but if you want to rewrite some field you can do it some like that
 In this case generic will generate all fields for you but will use age field
 which you specify.
 
-# todo: validation
-
 Fields
 ......
 
-**StringField** - field for represented string data.
+**StringField, LongStringField, UrlImageField, UrlFileField, UrlField** - field for represented string data.
 
 - *required* - add validation for empty value if set to `True`
 - *default* - replace empty value if specify
 - *validators* - list of validators
+- *primary_key* - `True` if current field is a primary key
 
-**IntField** - field for represented integer data.
+**IntField, SmallIntField** - field for represented integer data.
 
 - *required* - add validation for empty value if set to `True`
 - *default* - replace empty value if specify
 - *validators* - list of validators
+- *primary_key* - `True` if current field is a primary key
 
 **FloatField** - field for represented float data.
 
 - *required* - add validation for empty value if set to `True`
 - *default* - replace empty value if specify
 - *validators* - list of validators
+- *primary_key* - `True` if current field is a primary key
 
 **DateTimeField** - field for represented datetime data.
 
 - *required* - add validation for empty value if set to `True`
 - *default* - replace empty value if specify
 - *validators* - list of validators
+- *primary_key* - `True` if current field is a primary key
 
 **BooleanField** - field for represented boolean data. If value contains '0',
 'false' or 'f' than value will be parse as `False` in other case as `True`.
@@ -210,6 +213,7 @@ Fields
 - *required* - add validation for empty value if set to `True`
 - *default* - replace empty value if specify
 - *validators* - list of validators
+- *primary_key* - `True` if current field is a primary key
 
 **ChoicesField** - add predefined values. If you have some finite list of values
 and want that this list will represented like select tag you need to use
@@ -220,6 +224,25 @@ current field type.
 - *validators* - list of validators
 - *field_cls* - field type which will represent selected value
 - *choices* - tuple of tuple with values.
+- *primary_key* - `True` if current field is a primary key
+
+
+**ArrayField** - field for represented array data. Instances inside array must
+to have the same type. To specify this type you have to provide `field_cls`
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+- *field_cls* - field type which will represent data type of items inside array
+- *primary_key* - `True` if current field is a primary key
+
+**JsonField** - field for represented data in json type format.
+
+- *required* - add validation for empty value if set to `True`
+- *default* - replace empty value if specify
+- *validators* - list of validators
+- *primary_key* - `True` if current field is a primary key
+
 
 .. code-block:: python
 
@@ -239,6 +262,97 @@ current field type.
             choices=GENDER_CHOICES,
             default='male'
         )
+
+In common you do not use mappers you need to create these only for internal
+usage for aiohttp admin but for a better understanding of why they are needed,
+let's take a look at how they are used.
+
+
+.. code-block:: python
+
+    from aiohttp_admin2.mappers import Mapper
+    from aiohttp_admin2.mappers import fields
+
+
+    class UserMapper(Mapper):
+        """Mapper for user instance."""
+        name = fields.StringField(required=True)
+        age =  fields.IntField(default=18)
+
+Let's try to validate wrong data
+
+.. code-block:: python
+
+    user_data = UserMapper({"age": '38'})
+
+    # return False because name is required
+    user_data.is_valid()
+
+Now, try to check corrected data
+
+.. code-block:: python
+
+    user_data = UserMapper({"age": '38', "name": "mike"})
+
+    # return True because all is fine
+    user_data.is_valid()
+
+    print(user_data.data)
+    # {'name': 'mike', 'age': 38}
+
+`user_data.data` return converting data in right type. We can see that string
+'38' have been successful converting to int value 38.
+
+
+Validators
+..........
+
+We also can add custom validators for some particular field. Let's consider
+case when we need to validate string value and check that this value has
+valid format for phone number. To do this we need to create validation function
+which raise exception if value is not corrected.
+
+
+.. code-block:: python
+
+    import re
+
+    from aiohttp_admin2.mappers import Mapper
+    from aiohttp_admin2.mappers import fields
+    from aiohttp_admin2.mappers.exceptions import ValidationError
+
+
+    def phone_validator(value):
+        rule = re.compile(r'/^[0-9]{10,14}$/')
+
+        if not rule.search(value):
+            raise ValidationError("wrong phone format")
+
+
+    class UserMapper(Mapper):
+        """Mapper for user instance."""
+        name = fields.StringField(required=True)
+        phone =  fields.StringField(validators=[phone_validator])
+
+
+    # return False because '1234' is not valid format for a phone number
+    UserMapper({'name': 'Mike', 'phone': '1234'}).is_valid()
+
+
+You also can to use standard validators from the `aiohttp_admin2.mappers.validators` module.
+
+
+.. code-block:: python
+
+    from aiohttp_admin2.mappers import Mapper
+    from aiohttp_admin2.mappers import fields
+    from aiohttp_admin2.mappers.validators import length
+
+
+    class UserMapper(Mapper):
+        """Mapper for user instance."""
+        name = fields.StringField(validators=[length(max_value=10, min_value=3)])
+
 
 Controllers
 -----------

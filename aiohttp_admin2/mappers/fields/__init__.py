@@ -12,8 +12,3 @@ from aiohttp_admin2.mappers.fields.url_field import UrlFileField
 from aiohttp_admin2.mappers.fields.url_field import UrlField
 from aiohttp_admin2.mappers.fields.date_field import DateField
 from aiohttp_admin2.mappers.fields.date_field import DateTimeField
-
-
-# Todo: add other types
-# Todo: add validators
-# File

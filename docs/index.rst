@@ -527,9 +527,6 @@ attribute.
                 # the name of field which responsible for relation in the
                 # current table
                 left_table_pk='id',
-                # the name of field which responsible for relation in the
-                # other table
-                right_table_pk='author_id',
                 # controller of the relation model (we can use controller
                 # class or callable function which return it).
                 relation_controller=lambda: PostController,
@@ -538,11 +535,10 @@ attribute.
 
 
 In `ToManyRelation` we put `name` which will use as title of the current
-relation, left_table_pk and right_table_pk which describe fields which
-responsible for relation between tables and `relation_controller` which
-receive the controller class of related model. After that we'll have a tab bar
-on detail page of author model. On this tab we see all post of the current
-user.
+relation, left_table_pk which describe field which responsible for relation
+between tables and `relation_controller` which receive the controller class of
+related model. After that we'll have a tab bar on detail page of author model.
+On this tab we see all post of the current user.
 
 
 .. image:: /images/one_to_one_example.png

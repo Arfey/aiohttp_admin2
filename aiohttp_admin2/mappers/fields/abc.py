@@ -1,13 +1,9 @@
 import typing as t
-from abc import (
-    ABC,
-    abstractmethod,
-)
+from abc import ABC
+from abc import abstractmethod
 
-from aiohttp_admin2.mappers.validators import (
-    required as required_validator,
-    length,
-)
+from aiohttp_admin2.mappers.validators import required as required_validator
+from aiohttp_admin2.mappers.validators import length
 
 __all__ = ['AbstractField', ]
 
