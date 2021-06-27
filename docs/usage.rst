@@ -510,24 +510,8 @@ use hooks:
 Views
 -----
 
-This class use for represent data on admin interface.
-
-ControllerView
-..............
-
-.. code-block:: python
-
-    from aiohttp_admin2.view import ControllerView
-
-
-    class UserPage(ControllerView):
-        controller = UserController
-
-
-- is_hide_view - if False page will not to show in admin interface
-- title - title for page
-- group_name - name of group
-
+This class use for represent data on the admin interface. The simples view
+which you can to create is `TemplateView`.
 
 TemplateView
 ............
@@ -539,8 +523,98 @@ TemplateView
 
     class NewPage(TemplateView):
         title = 'new page'
+        template_name = 'aiohttp_admin/my_template.html'
+
+You can change specify template for you custom view as in example above or
+specify `content` variable in jinja's context.
+
+.. code-block:: python
+
+    from aiohttp_admin2.view import TemplateView
+
+
+    class NewPage(TemplateView):
+        title = 'new page'
+
+        async def get_context(self, req):
+            return {
+                **await super().get_context(req=req),
+                "content": "My custom content"
+            }
+
 
 - template_name - path to template for current page
+
+*Dashboards* view is just subclass of `TemplateView` which you can to customize
+in the same way.
+
+Common settings
+...............
+
+All view has properties which describe below:
+
+- *is_hide_view* - if we don't want to show link on current views in the aside
+  bar then we need to set True
+- *group_name* - If views have the same group name then they will organize
+  together into separate block in the aside bar
+- *name* - This string will use as the pretty name of the current views in the
+  admin interface.
+- *index_url* - The url prefix path for all routes related with the current views
+- *icon* - This string set a type of icon which will use in aside bar for the
+  current views (full list of available icons you can
+  to find `here <https://fonts.google.com/icons>`_)
+
+
+ControllerView
+..............
+
+Controller view is view for representation information related with your
+models.
+
+.. code-block:: python
+
+    from aiohttp_admin2.view import ControllerView
+
+
+    class UserView(ControllerView):
+        controller = UserController
+
+
+You can specify templates which you wanna use for instead of default:
+
+- *template_list_name* - the template for list page (with a simple pagination)
+- *template_list_cursor_name* - the template for list page (with an infinite
+  scroll)
+- *template_detail_name* - the template for detail page in read only mode
+- *template_detail_edit_name* - the template for detail page in edit mode
+- *template_detail_create_name* - the template for create page
+- *template_delete_name* - the template for delete page
+
+also you can to specify:
+
+- *infinite_scroll* (True/False default False) - if set to `True` then will use
+  infinite scroll instead of standard pagination. It can be very helpful when
+  table is so large and count query (which need to generate standard pagination
+  bar) is so cost.
+- *search_filter* (default `SearchFilter`) - filter which will use for search
+  (for search input at the top of list page)
+- *fields_widgets* (default empty dict) - a map of field names and coresponding
+  widngets. It's helpful if you want to specify a some special widget for the
+  particular field.
+- *type_widgets* (default empty dict) - a map of field type and coresponding
+  widngets. It's helpful if you want to specify a some special widget for the
+  particular type of field.
+- *foreignkey_widget* (default `AutocompleteStringWidget`) - a widget which
+  will use for the autocomplete
+
+
+View's Widgets and Filters
+..........................
+
+The widgets and filters class need only to allocated path to the template and
+extra `.css` and `.js` files which need to corrected render of it. Custom widget
+have to inherit from `BaseWidget`. Custom filter have to inherit from
+`FilerBase`.
 
 
 Templates
@@ -637,3 +711,11 @@ described below:
 - **get_list** - Get list of instances. This method will use for show list of
   instances. The current method have to implement possible to pagination,
   filtering and sorting.
+
+
+Filters
+.......
+
+For filtering data resources use Filters objects. Filter object can apply
+condition expressions to query. Each filter inherit from `ABCFilter` class and
+provide `apply` method which will apply to query conditions.

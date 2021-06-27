@@ -9,6 +9,7 @@ __all__ = ['TabBaseView', ]
 
 class TabBaseView(BaseAdminView):
     _parent = None
+    is_hide_view = True
 
     @classmethod
     def get_parent(cls):

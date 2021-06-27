@@ -18,7 +18,6 @@ __all__ = ['ManyToManyTabView', ]
 class ManyToManyTabView(TabBaseView, BaseControllerView):
 
     left_table_pk_name: str
-    is_hide_view = True
 
     # we need to drop `get` method from the BaseControllerView class
     get = None

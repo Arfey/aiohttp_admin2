@@ -78,7 +78,7 @@ dashboard's class
 
 
     class CustomDashboard(DashboardView):
-        async def get_context(self, req: web.Request):
+        async def get_context(self, req):
             return {
                 **await super().get_context(req=req),
                 "content": "My custom content"

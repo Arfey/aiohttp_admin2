@@ -34,6 +34,7 @@ class PostgresResource(AbstractResource):
     limit: int = 50
     name: str
     custom_sort_list: t.Dict[str, t.Callable] = {}
+    filter_map = default_filter_mapper
 
     # todo: *
     def __init__(
@@ -245,7 +246,7 @@ class PostgresResource(AbstractResource):
                 isinstance(filter_type_cls, str) or
                 not issubclass(filter_type_cls, SQLAlchemyBaseFilter)
             ):
-                filter_type_cls = default_filter_mapper.get(filter_type_cls)
+                filter_type_cls = self.filter_map.get(filter_type_cls)
 
                 if not filter_type_cls:
                     raise FilterException(

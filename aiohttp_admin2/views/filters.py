@@ -1,14 +1,10 @@
 import typing as t
-from abc import (
-    ABC,
-    abstractmethod,
-)
+from abc import ABC
+from abc import abstractmethod
 
 from aiohttp_admin2.mappers.fields.abc import AbstractField
-from aiohttp_admin2.resources.types import (
-    FilterTuple,
-    FilterMultiTuple
-)
+from aiohttp_admin2.resources.types import FilterTuple
+from aiohttp_admin2.resources.types import FilterMultiTuple
 
 
 class FilerBase(ABC):
