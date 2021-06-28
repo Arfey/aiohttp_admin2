@@ -38,7 +38,7 @@ class UsersController(PostgresController):
     resource = UserPostgresResource
     name = 'users'
     per_page = 10
-    upload_to = './aiohttp_admin2/demo/static'
+    upload_to = './demo/main/static'
     inline_fields = ['id', 'create_at', 'is_superuser', 'array_c', 'data', ]
     list_filter = ['create_at', 'is_superuser', 'id']
 
