@@ -4,8 +4,7 @@ import sqlalchemy as sa
 import aiofiles
 from aiohttp_admin2.views import ControllerView
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
-from aiohttp_admin2.resources.postgres_resource.postgres_resource import \
-    PostgresResource
+from aiohttp_admin2.resources.postgres_resource.postgres_resource import PostgresResource  # noqa
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 from aiohttp_admin2.views.widgets import CKEditorWidget
 from aiohttp_admin2.mappers import fields

@@ -1,19 +1,19 @@
 import sqlalchemy as sa
 
 from aiohttp_admin2.controllers.controller import Controller
-from aiohttp_admin2.resources.postgres_resource.postgres_resource import PostgresResource  # noqa
+from aiohttp_admin2.resources.mysql_resource.mysql_resource import MySqlResource  # noqa
 from aiohttp_admin2.connection_injectors import ConnectionInjector
 
 
-__all__ = ["PostgresController", ]
+__all__ = ["MySQLController", ]
 
 
-class PostgresController(Controller):
+class MySQLController(Controller):
     table: sa.Table
-    resource = PostgresResource
+    resource = MySqlResource
     connection_injector: ConnectionInjector
 
-    def get_resource(self) -> PostgresResource:
+    def get_resource(self) -> MySqlResource:
         return self.resource(
             self.connection_injector.connection,
             self.table,
