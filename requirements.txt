@@ -31,4 +31,5 @@ python-dateutil
 
 # build
 bandit==1.6.2
-poetry
+colorama
+importlib-metadata
