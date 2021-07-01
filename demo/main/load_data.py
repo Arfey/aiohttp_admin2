@@ -272,7 +272,7 @@ async def load_data(db_url_text):
                 'id': actor.get('id'),
                 'name': actor.get('name'),
                 'url': actor.get('url'),
-                'gender': "male" if actor.get('gender') == 1 else 'female',
+                'gender': "female" if actor.get('gender') == 1 else 'male',
             } for actor in actors_dict.values()
         ])
 
