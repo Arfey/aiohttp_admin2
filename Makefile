@@ -114,7 +114,7 @@ publish:
 	cat README.rst > README_BUILD.rst
 	echo '\n' >> README_BUILD.rst
 	cat HISTORY.rst >> README_BUILD.rst
-	poetry publish --build --username $PYPI_USERNAME --password $PYPI_PASSWORD
+	poetry publish --build --username ${PYPI_USERNAME} --password ${PYPI_PASSWORD}
 	rm README_BUILD.rst
 
 twine_check: build
