@@ -38,6 +38,10 @@ jobs:
         cat HISTORY.rst >> README_BUILD.rst
     - name: Publish
       run: |
+        cat README_BUILD.rst
+        echo '\n' >> README_BUILD.rst
+        cat HISTORY.rst >> README_BUILD.rst
+        cat README_BUILD.rst
         source $HOME/.poetry/env
         poetry build
         python -m twine check --strict dist/*

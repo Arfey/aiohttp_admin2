@@ -104,7 +104,7 @@ bandit:
 	bandit -r ./aiohttp_admin2
 
 build:
-	cat README.rst > README_BUILD.rst
+	cat README.rst > README_BUILD.rst && echo '\n' >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst
 	poetry build
 	rm README_BUILD.rst
 
