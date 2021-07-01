@@ -23,17 +23,15 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
-    - name: Install dependencies
+    - name: Publish
       run: |
         python -m pip install --upgrade pip
         curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
         source $HOME/.poetry/env
         pip install poetry-dynamic-versioning
         pip install -r requirements.txt
-    - name: Linter
-      run: make build_lint
-    - name: Publish package
-      run: make publish
+        make build_lint
+        make publish
       env:
           PYPI_USERNAME: __token__
           PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
