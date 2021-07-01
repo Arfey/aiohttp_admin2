@@ -104,9 +104,11 @@ bandit:
 	bandit -r ./aiohttp_admin2
 
 build:
-	cat README.rst > README_BUILD.rst && echo '\n' >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst
+	cat README.rst > README_BUILD.rst && echo >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst
 	poetry build
+	python -m twine check --strict dist/*
 	rm README_BUILD.rst
+	rm -rf dist
 
 twine_check: build
 	python -m twine check --strict dist/*
