@@ -35,7 +35,6 @@ pytest = "^5.2"
 
 [tool.poetry-version-plugin]
 enable = true
-source = "git-tag"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
