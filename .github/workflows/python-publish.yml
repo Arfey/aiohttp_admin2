@@ -36,11 +36,10 @@ jobs:
         cat README.rst > README_BUILD.rst && echo >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst
     - name: Publish
       run: |
-        cat README_BUILD.rst
         source $HOME/.poetry/env
         poetry build
         python -m twine check --strict dist/*
-        poetry publish --build --username ${PYPI_USERNAME} --password ${PYPI_PASSWORD}
+        poetry publish --username ${PYPI_USERNAME} --password ${PYPI_PASSWORD}
       env:
           PYPI_USERNAME: __token__
           PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
