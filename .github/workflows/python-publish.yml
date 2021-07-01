@@ -31,7 +31,7 @@ jobs:
         pip install poetry-dynamic-versioning
         pip install -r requirements.txt
     - name: Linter
-      run: build_lint
+      run: make build_lint
     - name: Publish package
       run: make publish
       env:
