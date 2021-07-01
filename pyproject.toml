@@ -33,7 +33,7 @@ poetry = "^1.1.7"
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 
-[tool.poetry-version-plugin]
+[tool.poetry-dynamic-versioning]
 enable = true
 
 [build-system]
