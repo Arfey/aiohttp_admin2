@@ -1,0 +1,28 @@
+{% extends 'aiohttp_admin/layouts/base.html' %}
+{% from 'aiohttp_admin/blocks/form/form.html' import form %}
+
+{% block main %}
+    <div class="wrapper">
+        <p class="content__empty-title">{{ title }}</p>
+        <!--  create form  -->
+        {% if controller.can_create %}
+            {{
+                form(
+                    create_post_url,
+                    get_field_value=get_field_value,
+                    submit_text='Create',
+                    mapper=mapper,
+                    exclude=exclude_fields,
+                    fields=fields,
+                    controller_view=controller_view,
+                    with_defaults=True,
+                )
+            }}
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+              You do not have access to create a new {{ title }} object.
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock main %}

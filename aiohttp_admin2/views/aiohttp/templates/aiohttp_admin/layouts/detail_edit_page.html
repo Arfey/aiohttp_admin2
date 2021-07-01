@@ -1,0 +1,51 @@
+{% extends 'aiohttp_admin/layouts/base.html' %}
+{% from 'aiohttp_admin/blocks/form/form.html' import form %}
+
+{% block main %}
+    <div class="wrapper">
+        <div class="container">
+        <div class="row justify-content-between list-nav">
+            <div>
+                <p class="content__empty-title">{{ title }}</p>
+            </div>
+        </div>
+    </div>
+
+    {% include 'aiohttp_admin/blocks/tabs_bar.html' %}
+
+    {% block instance %}
+        <!--  update form  -->
+        {% if controller.can_update %}
+            {{
+                form(
+                    save_url,
+                    get_field_value=get_field_value,
+                    submit_text='Update',
+                    mapper=mapper,
+                    exclude=exclude_fields,
+                    fields=fields,
+                    controller_view=controller_view,
+                )
+            }}
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+              You do not have access to update the {{ title }}.
+            </div>
+        {% endif %}
+    {% endblock instance %}
+
+    <!--  delete form  -->
+    {% if controller.can_delete %}
+        {{
+            form(
+                delete_url,
+                get_field_value=get_field_value,
+                submit_text='Delete',
+                method='GET',
+                submit_cls='btn-danger',
+                controller_view=controller_view,
+            )
+        }}
+    {% endif %}
+</div>
+{% endblock main %}

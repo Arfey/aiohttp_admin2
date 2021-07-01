@@ -1,0 +1,12 @@
+{% extends 'aiohttp_admin/layouts/detail_edit_page.html' %}
+
+{% block instance %}
+    {% if controller.can_view %}
+        <div>
+            {% for name, value in object.data.to_dict().items() %}
+                <p><b>{{ name }}</b>  {{ value }}</p>
+            {% endfor %}
+            <br>
+        </div>
+    {% endif %}
+{% endblock instance %}

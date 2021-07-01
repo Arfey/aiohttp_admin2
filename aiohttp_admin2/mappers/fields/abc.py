@@ -1,13 +1,9 @@
 import typing as t
-from abc import (
-    ABC,
-    abstractmethod,
-)
+from abc import ABC
+from abc import abstractmethod
 
-from aiohttp_admin2.mappers.validators import (
-    required as required_validator,
-    length,
-)
+from aiohttp_admin2.mappers.validators import required as required_validator
+from aiohttp_admin2.mappers.validators import length
 
 __all__ = ['AbstractField', ]
 
@@ -22,6 +18,7 @@ class AbstractField(ABC):
         validators: t.List[t.Callable[[t.Any], None]] = None,
         value: t.Optional[str] = None,
         default: t.Optional[str] = None,
+        primary_key: bool = False,
         **kwargs: t.Any,
     ) -> None:
         self.default: t.Optional[str] = default
@@ -30,6 +27,7 @@ class AbstractField(ABC):
         self.required = required
         self.validators = validators or []
         self.kwargs = kwargs
+        self.primary_key = primary_key
         self.init_default_validators()
 
     def init_default_validators(self):
@@ -66,6 +64,10 @@ class AbstractField(ABC):
             ValueError: if type of value is wrong
         """
         return self.to_python()
+
+    def apply_default_if_need(self) -> None:
+        if self._value is None and self.default:
+            self._value = self.default
 
     @property
     def raw_value(self) -> t.Any:
@@ -109,10 +111,12 @@ class AbstractField(ABC):
             required=self.required,
             validators=self.validators,
             default=self.default,
+            primary_key=self.primary_key,
             value=value
         )
 
     def __repr__(self):
         return \
             f"{self.__class__.__name__}(name={self.type_name}," \
-            f" value={self._value}), required={self.required}"
+            f" value={self._value}), required={self.required}" \
+            f" primary_key={self.primary_key}"

@@ -91,9 +91,36 @@ test:
 	@docker stop $(docker ps | grep pytest | awk '{ print $1 }') | true
 	pytest --slow -v -s -p no:warnings
 
-demo:
-	WITHOUT_UPDATE_DB=1 DATABASE_URL=postgres://postgres:postgres@0.0.0.0:5432/postgres adev runserver aiohttp_admin2/demo/__init__.py
+demo_main:
+	WITHOUT_UPDATE_DB=1 DATABASE_URL=postgres://postgres:postgres@0.0.0.0:5432/postgres adev runserver demo/main/__init__.py
+
+demo_quick:
+	DATABASE_URL=postgres://postgres:postgres@0.0.0.0:5432/postgres adev runserver demo/quick_start/app.py
 
 deploy_demo:
-	heroku container:push web
-	heroku container:release web
+	git push heroku develop:master
+
+bandit:
+	bandit -r ./aiohttp_admin2
+
+build:
+	cat README.rst > README_BUILD.rst
+	echo '\n' >> README_BUILD.rst
+	cat HISTORY.rst >> README_BUILD.rst
+	poetry build
+	rm README_BUILD.rst
+
+publish:
+	cat README.rst > README_BUILD.rst
+	echo '\n' >> README_BUILD.rst
+	cat HISTORY.rst >> README_BUILD.rst
+	poetry publish --build --username $PYPI_USERNAME --password $PYPI_PASSWORD
+	rm README_BUILD.rst
+
+twine_check: build
+	python -m twine check --strict dist/*
+
+lint: bandit twine_check
+	flake8 aiohttp_admin2 --exclude views/aiohttp/templates
+
+build_lint: bandit twine_check

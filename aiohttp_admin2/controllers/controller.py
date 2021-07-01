@@ -1,28 +1,23 @@
 import logging
+from enum import Enum
 import typing as t
 from collections import defaultdict
+from contextvars import ContextVar
 
-from aiohttp_admin2.resources.types import (
-    PK,
-    Instance,
-    FiltersType,
-)
+from aiohttp_admin2.resources.types import PK
+from aiohttp_admin2.resources.types import Instance
+from aiohttp_admin2.resources.types import FiltersType
 from aiohttp_admin2.resources.abc import AbstractResource
 from aiohttp_admin2.controllers.exceptions import PermissionDenied
 from aiohttp_admin2.mappers import Mapper
 
-from aiohttp_admin2 import filters
-from aiohttp_admin2.mappers.fields.abc import AbstractField
-from aiohttp_admin2.controllers.types import (
-    Cell,
-    ListObject,
-)
+from aiohttp_admin2.views import filters
+from aiohttp_admin2.controllers.types import Cell
+from aiohttp_admin2.controllers.types import ListObject
 
 if t.TYPE_CHECKING:
-    from aiohttp_admin2.controllers.relations import (
-        ToManyRelation,
-        ToOneRelation,
-    )
+    from aiohttp_admin2.controllers.relations import ToManyRelation
+    from aiohttp_admin2.controllers.relations import ToOneRelation
 
 
 logger = logging.getLogger(__name__)
@@ -32,6 +27,9 @@ logger = logging.getLogger(__name__)
 # todo: move to url type
 DETAIL_NAME = 'detail'
 FOREIGNKEY_DETAIL_NAME = 'foreignkey_detail'
+
+ControllerMap = ContextVar[t.Dict[t.Type['Controller'], 'Controller']]
+controllers_map: ControllerMap = ContextVar('controllers_map', default=None)
 
 
 class Controller:
@@ -43,8 +41,8 @@ class Controller:
         - hooks
     """
     resource: AbstractResource
-    mapper: Mapper = None
-    name: str
+    mapper: t.Type[Mapper] = None
+    name: str = ''
 
     read_only_fields = []
     inline_fields = ['id', ]
@@ -185,8 +183,12 @@ class Controller:
         if not self.can_update:
             raise PermissionDenied
 
-        # todo: get_pk_name
-        data['id'] = pk
+        # in some cases when user can update instance but don't have access to
+        # all fields mapper will raise an error if inaccessible field is
+        # required (or pk field is hidden), to avoid it we fetch instance from
+        # db before that and merge with data which have been provided by user.
+        db_instance = await self.get_resource().get_one(pk)
+        data = {**db_instance.data.to_dict(), **data}
 
         data = await self.pre_update(data)
 
@@ -194,9 +196,18 @@ class Controller:
 
         if mapper.is_valid():
             serialize_data = mapper.data
-            del serialize_data['id']
             instance = Instance()
-            instance.__dict__ = serialize_data
+
+            if self.fields == '__all__':
+                instance.data = serialize_data
+            else:
+                # in this place we skip update of field which not present in
+                # fields list. This need for partial update of instance when
+                # update page don't have full list of fields
+                instance.data = {
+                    key: value for key, value in serialize_data.items()
+                    if key in self.fields
+                }
 
             instance = await self.get_resource().update(pk, instance)
             await self.post_update(instance)
@@ -216,15 +227,12 @@ class Controller:
 
         data = await self.pre_create(data)
 
-        data['id'] = -1
-
         mapper = self.mapper(data)
 
-        if mapper.is_valid():
+        if mapper.is_valid(skip_primary=True):
             serialize_data = mapper.data
-            del serialize_data['id']
             instance = Instance()
-            instance.__dict__ = serialize_data
+            instance.data = serialize_data
 
             instance = await self.get_resource().create(instance)
 
@@ -251,14 +259,14 @@ class Controller:
 
         # relations to one
         for foreignkey_name, foreignkey in self.foreign_keys_map.items():
-            controller_maps[foreignkey_name] = foreignkey.controller()
+            controller_maps[foreignkey_name] = foreignkey.controller.builder()
 
         def _get_relation(instance: Instance):
             async def get_relation(name: str) -> Instance:
                 controller = controller_maps.get(name)
                 foreign_key = self.foreign_keys_map.get(name)
                 cache = self.prefetch_cache.get(foreign_key.name)
-                relation_id = getattr(instance, foreign_key.field_name)
+                relation_id = getattr(instance.data, foreign_key.field_name)
 
                 if cache:
                     if relation_id in cache.keys():
@@ -269,7 +277,7 @@ class Controller:
                         return cache.get(relation_id)
 
                 fetch_ids = [
-                    getattr(p, foreign_key.field_name)
+                    getattr(p.data, foreign_key.field_name)
                     for p in instance.prefetch_together
                 ]
 
@@ -391,24 +399,30 @@ class Controller:
                     if getattr(getter, 'is_foreignkey', False):
                         is_foreignkey = True
                 else:
-                    value = getattr(i, field)
+                    value = getattr(i.data, field)
 
-                if index == 0 and self.can_update:
-                    # todo: can view
+                    if isinstance(value, Enum):
+                        value = value.value
+
+                url = None
+
+                if index == 0 and (self.can_update or self.can_view):
                     url = url_builder(i, DETAIL_NAME)
                 elif is_foreignkey:
-                    # todo: can view, can edit
-                    url = url_builder(
-                        value,
-                        FOREIGNKEY_DETAIL_NAME,
-                        # todo: drop detail prefix
-                        # relation to one
-                        url_name=self.foreign_keys_map.get(field)
-                            .controller()
-                            .url_name()
-                    )
-                else:
-                    url = None
+                    foreign_key_controller = self.foreign_keys_map.get(field)\
+                        .controller.builder()
+                    if (
+                        (
+                            foreign_key_controller.can_update or
+                            foreign_key_controller.can_view
+                        ) and value
+                    ):
+                        url = url_builder(
+                            value,
+                            FOREIGNKEY_DETAIL_NAME,
+                            # todo: relation to one
+                            url_name=foreign_key_controller.url_name()
+                        )
 
                 row.append(Cell(value=value, is_safe=is_safe, url=url))
 
@@ -443,23 +457,21 @@ class Controller:
         return bool(cls.autocomplete_search_fields or cls.search_fields)
 
     @classmethod
-    def builder_form_params(cls, params: t.Dict[str, t.Any]):
-        # todo: add params
-        return cls()
+    def builder(cls):
+        ctr_map = controllers_map.get() or {}
+        controller = ctr_map.get(cls)
 
-    @property
-    def detail_fields(self) -> t.Dict[str, AbstractField]:
-        # todo: add for dict
-        fields = self.mapper({}).fields
-        if self.fields == "__all__":
-            return fields
+        if not controller:
+            controller = cls()
+            ctr_map[cls] = controller
+            controllers_map.set(ctr_map)
 
-        return {
-            name: value
-            for name, value in fields
-            if name in self.fields
-        }
+        return controller
 
     @classmethod
     def url_name(cls) -> str:
-        return "_".join(cls.name.lower().split(" "))
+        return "_".join(cls.get_name().split(" "))
+
+    @classmethod
+    def get_name(cls) -> str:
+        return cls.name.lower() or cls.__name__.lower()

@@ -1,8 +1,7 @@
 import sqlalchemy as sa
 
 from aiohttp_admin2.controllers.controller import Controller
-from aiohttp_admin2.resources.postgres_resource.postgres_resource import \
-    PostgresResource
+from aiohttp_admin2.resources.postgres_resource.postgres_resource import PostgresResource  # noqa
 from aiohttp_admin2.connection_injectors import ConnectionInjector
 
 

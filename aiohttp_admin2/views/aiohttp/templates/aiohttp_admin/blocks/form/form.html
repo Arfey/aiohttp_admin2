@@ -1,0 +1,58 @@
+{% from 'aiohttp_admin/blocks/form/fields/field.html' import field_generator %}
+{% from 'aiohttp_admin/blocks/messages.html' import messages %}
+
+{% macro form(
+    action,
+    controller_view,
+    get_field_value,
+    mapper=None,
+    fields=None,
+    method='POST',
+    submit_text='submit',
+    submit_cls='',
+    exclude=[],
+    with_defaults=False
+)
+%}
+<div>
+    <form method="{{ method }}" action="{{ action }}" enctype="multipart/form-data">
+        {% if mapper %}
+        {% if mapper.with_errors %}
+            {{ messages("Invalid form", type="danger") }}
+        {% endif %}
+        {% if fields == '__all__' %}
+
+        {% for name, field in mapper.fields.items() %}
+            {% if name not in exclude %}
+                {{ field_generator(name, field, controller_view, get_field_value, with_defaults) }}
+            {% endif %}
+        {% endfor %}
+
+        {% else%}
+
+        {% for name, field in mapper.fields.items() %}
+            {% if name not in exclude and name in fields %}
+                {{ field_generator(name, field, controller_view, get_field_value, with_defaults) }}
+            {% endif %}
+        {% endfor %}
+
+        {% endif %}
+        {% endif %}
+        {% if mapper.error %}
+        <br>
+        <span style="color: red">{{ mapper.error }}</span>
+        <br>
+        {%- endif %}
+        {% if mapper %}
+        {% for name, field in mapper.fields.items() %}
+        {% if fields != '__all__' and (name not in fields or name in exclude) and field.errors %}
+        <br>
+        <span style="color: red">{{ name }} - {{ field.errors|join(',') }}</span>
+        <br>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        <button class="btn {{ submit_cls }}" type="submit">{{ submit_text }}</button>
+    </form>
+</div>
+{% endmacro %}

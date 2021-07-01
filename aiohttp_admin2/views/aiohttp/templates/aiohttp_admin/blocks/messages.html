@@ -1,0 +1,5 @@
+{% macro messages(message, type="dark") %}
+{% if message %}
+    <p class="alert alert-{{type}}">{{ message }}</p>
+{% endif %}
+{% endmacro %}

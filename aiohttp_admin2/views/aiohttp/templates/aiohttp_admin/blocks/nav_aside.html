@@ -1,0 +1,29 @@
+<aside class="nav-aside">
+    <ul>
+        {%- for group_name, views in nav_groups.items() %}
+            <li
+                class="nav-aside__group-title"
+                title="{{ group_name | capitalize }}"
+            >
+                {{ group_name | capitalize }}
+            </li>
+            {%- for view in views %}
+                <li class="nav-aside__item">
+                    <a
+                        {%- if request.app.router[view.get_index_url_name()].url_for().path == url_path %}
+                        class="nav-aside__link nav-aside__link_active"
+                        {%- else %}
+                        class="nav-aside__link"
+                        {%- endif %}
+                        href="{{ url(view.get_index_url_name()) }}"
+                        title="{{ view.get_name() | capitalize }}"
+                    >
+                        <i class="material-icons">{{ view.icon }}</i>
+                        {{ view.get_name() | capitalize }}
+                    </a>
+
+                </li>
+            {%- endfor %}
+        {%- endfor %}
+    </ul>
+</aside>

@@ -2,7 +2,7 @@ import typing as t
 from dataclasses import dataclass
 
 if t.TYPE_CHECKING:
-    from aiohttp_admin2.view import ControllerView
+    from aiohttp_admin2.views import ControllerView
 
 
 __all__ = ['ToManyRelation', 'ToOneRelation', ]
@@ -16,10 +16,9 @@ class ToManyRelation:
     """
     name: str
     left_table_pk: str
-    right_table_pk: str
     relation_controller: t.Any
 
-    def accept(self, obj: 'ControllerView') -> None:
+    def accept(self, obj: t.Type['ControllerView']) -> None:
         if callable(self.relation_controller):
             self.relation_controller = self.relation_controller()
 

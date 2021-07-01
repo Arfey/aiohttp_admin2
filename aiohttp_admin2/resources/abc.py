@@ -28,31 +28,19 @@ PK = t.Union[str, int]
 
 # todo: docs
 class ABCFilter(ABC):
-    """
-
-    """
     field_name: str
     value: t.Any
     name: str
 
     @abstractmethod
     def apply(self) -> t.Any:
-        """
-
-        """
         pass
 
     def validate(self):
-        """
-
-        """
         pass
 
     @property
     def query(self) -> t.Any:
-        """
-
-        """
         try:
             self.validate()
         except Exception as e:
@@ -81,27 +69,44 @@ class FilterMultiTuple(t.NamedTuple):
 FiltersType = t.List[FilterTuple]
 
 
+class Data:
+
+    def to_dict(self):
+        return self.__dict__
+
+
 class Instance:
     """Object from represent all data connected with instance."""
     pk: PK
     _name: str = None
     _prefetch_together: t.List["Instance"] = []
+    _data = None
 
     def __init__(self, name: str = None) -> None:
         self._name = name
 
+    @property
+    def data(self) -> t.Optional[object]:
+        return self._data
+
+    @data.setter
+    def data(self, data: t.Dict[str, t.Any]) -> None:
+        obj = Data()
+        obj.__dict__ = data
+        self._data = obj
+
     def __repr__(self) -> str:
-        return self._name or str(self.__dict__)
+        return self._name or str(self.data)
 
     def set_name(self, name: str) -> None:
         self._name = name
 
     def get_pk(self) -> PK:
-        if hasattr(self, 'pk'):
-            return self.pk
+        if hasattr(self.data, 'pk'):
+            return self.data.pk
 
-        if hasattr(self, 'id'):
-            return self.id
+        if hasattr(self.data, 'id'):
+            return self.data.id
 
         raise AdminException("Instance must have id")
 

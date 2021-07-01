@@ -1,29 +1,21 @@
 import typing as t
 
-from umongo.document import (
-    MetaDocumentImplementation,
-    DocumentImplementation,
-)
+from umongo.document import MetaDocumentImplementation
+from umongo.document import DocumentImplementation
 from bson.objectid import ObjectId
 
-from aiohttp_admin2.resources.abc import (
-    AbstractResource,
-    Instance,
-    InstanceMapper,
-    Paginator,
-)
+from aiohttp_admin2.resources.abc import AbstractResource
+from aiohttp_admin2.resources.abc import Instance
+from aiohttp_admin2.resources.abc import InstanceMapper
+from aiohttp_admin2.resources.abc import Paginator
 from aiohttp_admin2.resources.types import PK
-from aiohttp_admin2.resources.mongo_resource.filters import (
-    MongoQuery,
-    MongoBaseFilter,
-    default_filter_mapper,
-)
+from aiohttp_admin2.resources.mongo_resource.filters import MongoQuery
+from aiohttp_admin2.resources.mongo_resource.filters import MongoBaseFilter
+from aiohttp_admin2.resources.mongo_resource.filters import default_filter_mapper  # noqa
 from aiohttp_admin2.resources.types import FiltersType
-from aiohttp_admin2.resources.exceptions import (
-    ClientException,
-    CURSOR_PAGINATION_ERROR_MESSAGE,
-    InstanceDoesNotExist,
-)
+from aiohttp_admin2.resources.exceptions import ClientException
+from aiohttp_admin2.resources.exceptions import CURSOR_PAGINATION_ERROR_MESSAGE
+from aiohttp_admin2.resources.exceptions import InstanceDoesNotExist
 from aiohttp_admin2.resources.exceptions import FilterException
 
 
@@ -35,6 +27,7 @@ SortType = t.List[t.Tuple[str, int]]
 
 class MongoResource(AbstractResource):
     table: MetaDocumentImplementation
+    filter_mapper = default_filter_mapper
 
     def __init__(self, table: MetaDocumentImplementation) -> None:
         self.table = table
@@ -46,7 +39,7 @@ class MongoResource(AbstractResource):
         if not data:
             raise InstanceDoesNotExist
 
-        return self.row_to_instance(data)
+        return self._row_to_instance(data)
 
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
         data = await self.table\
@@ -54,7 +47,7 @@ class MongoResource(AbstractResource):
             .to_list(length=len(pks))
 
         return {
-            str(r["id"]): self.row_to_instance(r)
+            str(r["id"]): self._row_to_instance(r)
             for r in data
         }
 
@@ -102,7 +95,7 @@ class MongoResource(AbstractResource):
                 .sort(sort)\
                 .to_list(length=limit + 1)
 
-        data = [self.row_to_instance(i) for i in data]
+        data = [self._row_to_instance(i) for i in data]
 
         if cursor:
             return self.create_paginator(
@@ -126,17 +119,20 @@ class MongoResource(AbstractResource):
             raise InstanceDoesNotExist
 
     async def create(self, instance: Instance) -> Instance:
-        res = await self.table(**instance.__dict__).commit()
+        res = await self.table(**instance.data.to_dict()).commit()
 
         return await self.get_one(res.inserted_id)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
-        if hasattr(instance, 'id'):
-            del instance.id
+        if hasattr(instance.data, 'id'):
+            del instance.data.id
 
         await self.table\
             .collection\
-            .update_one({"_id": ObjectId(pk)}, {"$set": instance.__dict__})
+            .update_one(
+                {"_id": ObjectId(pk)},
+                {"$set": instance.data.to_dict()}
+            )
 
         return await self.get_one(pk)
 
@@ -173,7 +169,7 @@ class MongoResource(AbstractResource):
             filter_type_cls = i.filter
 
             if not isinstance(filters, MongoBaseFilter):
-                filter_type_cls = default_filter_mapper.get(filter_type_cls)
+                filter_type_cls = self.filter_mapper.get(filter_type_cls)
 
                 if not filter_type_cls:
                     raise FilterException(
@@ -187,8 +183,8 @@ class MongoResource(AbstractResource):
 
         return query
 
-    def row_to_instance(self, row: DocumentImplementation) -> Instance:
+    def _row_to_instance(self, row: DocumentImplementation) -> Instance:
         instance = Instance()
-        instance.__dict__ = row.dump()
+        instance.data = row.dump()
 
         return instance

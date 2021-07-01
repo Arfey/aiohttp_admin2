@@ -35,3 +35,4 @@
 - tabs
 - permission for tabs
 - todo: pagination in tabs
+- TabTemplateView

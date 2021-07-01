@@ -53,11 +53,11 @@ class DictResource(AbstractResource):
         if not instance:
             raise InstanceDoesNotExist
 
-        return self.row_to_instance(instance)
+        return self._row_to_instance(instance)
 
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
         return {
-            pk: self.row_to_instance(self.engine.get(pk))
+            pk: self._row_to_instance(self.engine.get(pk))
             for pk in pks
             if pk in self.engine
         }
@@ -104,7 +104,7 @@ class DictResource(AbstractResource):
         if cursor is not None:
             if is_desc:
                 instances = [
-                    self.row_to_instance(i)
+                    self._row_to_instance(i)
                     for i in objects_list
                     if i['id'] < cursor
                 ]
@@ -116,7 +116,7 @@ class DictResource(AbstractResource):
                 )
 
             instances = [
-                self.row_to_instance(i)
+                self._row_to_instance(i)
                 for i in objects_list
                 if i['id'] > cursor
             ]
@@ -128,7 +128,7 @@ class DictResource(AbstractResource):
             )
 
         instances = [
-            self.row_to_instance(i)
+            self._row_to_instance(i)
             for i in objects_list
         ]
 
@@ -147,8 +147,8 @@ class DictResource(AbstractResource):
 
     async def create(self, instance: Instance) -> Instance:
         pk = self._get_pk()
-        instance.id = pk
-        self.engine[pk] = {"id": pk, **instance.__dict__}
+        instance.data.id = pk
+        self.engine[pk] = {"id": pk, **instance.data}
 
         return instance
 
@@ -156,11 +156,11 @@ class DictResource(AbstractResource):
         if pk not in self.engine:
             raise InstanceDoesNotExist
 
-        self.engine[pk] = instance.__dict__
+        self.engine[pk] = instance.data
 
-        return self.row_to_instance({
+        return self._row_to_instance({
             "id": pk,
-            **instance.__dict__
+            **instance.data
         })
 
     def _get_pk(self) -> PK:
@@ -174,9 +174,9 @@ class DictResource(AbstractResource):
 
         return pk
 
-    def row_to_instance(self, row: t.Dict[t.Any, t.Any]) -> Instance:
+    def _row_to_instance(self, row: t.Dict[t.Any, t.Any]) -> Instance:
         instance = Instance()
-        instance.__dict__ = row
+        instance.data = row
 
         return instance
 

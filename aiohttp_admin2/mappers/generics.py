@@ -21,8 +21,9 @@ class PostgresMapperGeneric(Mapper):
     # todo: added types
     FIELDS_MAPPER = {
         sa.Integer: fields.IntField,
-        sa.Text: fields.StringField,
+        sa.SmallInteger: fields.SmallIntField,
         sa.String: fields.StringField,
+        sa.Text: fields.LongStringField,
         sa.Enum: fields.ChoicesField,
         sa.Boolean: fields.BooleanField,
         sa.ARRAY: fields.ArrayField,
@@ -45,7 +46,8 @@ class PostgresMapperGeneric(Mapper):
             max_length = hasattr(column.type, 'length') and column.type.length
             field_kwargs = {
                 "max_length": max_length,
-                "required": not column.nullable
+                "required": not column.nullable,
+                "primary_key": column.primary_key,
             }
 
             if field_cls is fields.ChoicesField:

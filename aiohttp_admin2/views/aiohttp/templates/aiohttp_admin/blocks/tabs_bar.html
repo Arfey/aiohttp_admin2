@@ -1,0 +1,23 @@
+{% if tabs %}
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a
+      class="nav-link {% if is_common %}active{% endif %}"
+      href="{{ detail_url }}"
+    >
+        Common
+    </a>
+  </li>
+  {% for tab in tabs %}
+    <li class="nav-item">
+      <a
+        class="nav-link {% if controller_view.name == tab.name %}active{% endif %}"
+        href="{{ url(tab.get_index_url_name(), pk=pk) }}"
+      >
+          {{ tab.name }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+<br>
+{% endif %}
