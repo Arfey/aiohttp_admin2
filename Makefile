@@ -124,3 +124,4 @@ lint: bandit twine_check
 	flake8 aiohttp_admin2 --exclude views/aiohttp/templates
 
 build_lint: bandit twine_check
+	rm -rf dist
