@@ -98,5 +98,20 @@ demo_quick:
 	DATABASE_URL=postgres://postgres:postgres@0.0.0.0:5432/postgres adev runserver demo/quick_start/app.py
 
 deploy_demo:
-	heroku container:push web
-	heroku container:release web
+	git push heroku develop:master
+
+bandit:
+	bandit -r ./aiohttp_admin2
+
+build:
+	cat README.rst > README_BUILD.rst
+	echo '\n' >> README_BUILD.rst
+	cat HISTORY.rst >> README_BUILD.rst
+	poetry build
+	rm README_BUILD.rst
+
+twine_check: build
+	python -m twine check --strict dist/*
+
+lint: bandit twine_check
+	flake8 aiohttp_admin2 --exclude views/aiohttp/templates
