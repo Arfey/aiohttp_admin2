@@ -8,8 +8,8 @@ Aiohttp admin documentation
 .. image:: https://img.shields.io/pypi/v/aiohttp_admin2.svg
         :target: https://pypi.python.org/pypi/aiohttp_admin2
 
-.. image:: https://img.shields.io/travis/arfey/aiohttp_admin2.svg
-        :target: https://travis-ci.com/arfey/aiohttp_admin2
+.. image:: https://github.com/Arfey/aiohttp_admin2/actions/workflows/tests.yaml/badge.svg?branch=master
+        :target: https://github.com/Arfey/aiohttp_admin2/actions/workflows/tests.yaml
 
 .. image:: https://readthedocs.org/projects/aiohttp-admin2/badge/?version=latest
         :target: https://aiohttp-admin2.readthedocs.io/en/latest/?badge=latest
@@ -18,6 +18,10 @@ Aiohttp admin documentation
 .. image:: https://pyup.io/repos/github/arfey/aiohttp_admin2/shield.svg
      :target: https://pyup.io/repos/github/arfey/aiohttp_admin2/
      :alt: Updates
+
+.. image:: https://img.shields.io/badge/PRs-welcome-green.svg
+     :target: https://github.com/Arfey/aiohttp_admin2/issues
+     :alt: PRs Welcome
 
 The aiohttp admin is a library for build admin interface for applications based
 on the aiohttp. With this library you can ease to generate CRUD views for your
