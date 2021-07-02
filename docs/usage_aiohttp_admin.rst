@@ -1,4 +1,8 @@
-Usage
+.. meta::
+   :description: The aiohttp admin for sqlalchemy and umongo.
+   :keywords: admin, aiohttp, admin-dashboard, admin-panel, aiohttp-admin, umongo, python, sqlalchemy, asyncio
+
+Usage aiohttp admin
 =====
 
 .. image:: /images/overview_header.png

@@ -1,3 +1,7 @@
+.. meta::
+   :description: The aiohttp admin.
+   :keywords: admin, aiohttp, admin-dashboard, admin-panel, aiohttp-admin, umongo, python, sqlalchemy, asyncio
+
 Aiohttp admin documentation
 ===========================
 
@@ -751,12 +755,7 @@ The source code of current examples you might to find `here
    :caption: Contents:
 
    installation
-   usage
-   controllers
-   mappers
-   views
-   resources
-   templates
+   usage_aiohttp_admin
    modules
    contributing
    authors
