@@ -77,10 +77,6 @@ movies = sa.Table('movies', metadata,
     sa.Column('vote_average', sa.SmallInteger),
     sa.Column('vote_count', sa.SmallInteger),
     sa.Column('poster_path', sa.String),
-                  # media video
-                  # media postgres
-                  # media Backdrops
-                  # score ???
 )
 
 movies_genres = sa.Table('movies_genres', metadata,
@@ -140,6 +136,6 @@ images_links = sa.Table('images_links', metadata,
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('movie_id', sa.ForeignKey('movies.id')),
     sa.Column('show_id', sa.ForeignKey('shows.id')),
-    sa.Column('url', sa.Text),
+    sa.Column('url', sa.String(255)),
     sa.Column('type', sa.Enum(ImagesEnum)),
 )
