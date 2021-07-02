@@ -13,8 +13,8 @@ together.
 .. image:: https://img.shields.io/pypi/v/aiohttp_admin2.svg
         :target: https://pypi.python.org/pypi/aiohttp_admin2
 
-.. image:: https://img.shields.io/travis/arfey/aiohttp_admin2.svg
-        :target: https://travis-ci.com/arfey/aiohttp_admin2
+.. image:: https://github.com/Arfey/aiohttp_admin2/actions/workflows/tests.yaml/badge.svg?branch=master
+        :target: https://github.com/Arfey/aiohttp_admin2/actions/workflows/tests.yaml
 
 .. image:: https://readthedocs.org/projects/aiohttp-admin2/badge/?version=latest
         :target: https://aiohttp-admin2.readthedocs.io/en/latest/?badge=latest
