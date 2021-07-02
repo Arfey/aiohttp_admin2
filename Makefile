@@ -103,7 +103,7 @@ deploy_demo:
 bandit:
 	bandit -r ./aiohttp_admin2
 
-build:
+build_lint:
 	cat README.rst > README_BUILD.rst && echo >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst
 	poetry build
 	python -m twine check --strict dist/*
@@ -116,5 +116,3 @@ twine_check: build
 lint: bandit twine_check
 	flake8 aiohttp_admin2 --exclude views/aiohttp/templates
 
-build_lint: bandit twine_check
-	rm -rf dist
