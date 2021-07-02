@@ -4,6 +4,7 @@ import asyncio
 import os
 
 from cryptography import fernet
+import aiohttp
 from aiohttp import web
 from aiohttp_admin2 import setup_admin
 from aiohttp_security import (
@@ -52,6 +53,18 @@ async def load_data_cron(db_url_text: str) -> None:
 
         # we need to sync data each 24 hours
         await asyncio.sleep(60 * 60 * 24)
+
+
+async def ping_website() -> None:
+    """
+    if have not been any request then heroku will shot down pod. to prevent it
+    we'll ping website each 10 minutes
+    """
+    website_url = 'https://shrouded-stream-28595.herokuapp.com'
+    while True:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(website_url):
+                await asyncio.sleep(60 * 10)
 
 
 async def jinja(application: web.Application) -> None:
@@ -150,5 +163,6 @@ async def app():
     await admin(application)
 
     asyncio.create_task(load_data_cron(application['db_url']))
+    asyncio.create_task(ping_website())
 
     return application
