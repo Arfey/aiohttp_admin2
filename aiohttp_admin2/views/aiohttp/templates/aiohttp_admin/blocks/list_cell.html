@@ -1,9 +1,9 @@
 {% macro list_cell(cell) %}
     {% if cell.url %}
         <a href="{{ cell.url }}">
-            {{ cell.value|safe if cell.is_safe else cell.value }}
+            {{ cell.value }}
         </a>
     {% else %}
-        {{ cell.value|safe if cell.is_safe else cell.value }}
+        {{ cell.value }}
     {% endif %}
 {% endmacro %}

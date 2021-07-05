@@ -697,6 +697,8 @@ a picture url but on list page view want to show image block.
 
 .. code-block:: python
 
+    from markupsafe import Markup
+
     class MoviesController(PostgresController):
         table = movies
         mapper = MoviesMapper
@@ -704,36 +706,16 @@ a picture url but on list page view want to show image block.
         inline_fields = ['poster', 'title', ]
 
         async def poster_field(self, obj):
-            return f'<img ' \
-                   f'src="https://image.tmdb.org/t/p/w200/{obj.data.poster_path}"'\
-                   f'width="100">'
-
-        photo_field.is_safe = True
+            return Markup('<img src="{path}" width="100">')\
+                .format(path=obj.data.poster_path)
 
 For that into `inline_fields` we add new field `poster` and create a function
 `poster_field` (<field_name>_field) which receive as second argument the
 current `Instance` object. Also for give access use html in field without
-escaping we need to set attribyte `is_safe` to `True` for `poster_field`
-method.
+escaping we need to wrap our html in a `Markup` object.
 
 To get the field value from the `Instance` object, we need to get the data
 property and try to get the field which we need.
-
-.. code-block:: python
-
-    class MoviesController(PostgresController):
-        table = movies
-        mapper = MoviesMapper
-        name = 'movies'
-        inline_fields = ['poster', 'title', ]
-
-        async def poster_field(self, obj):
-            return f'<img ' \
-                   f'src="https://image.tmdb.org/t/p/w200/{obj.data.poster_path}"'\
-                   f'width="100">'
-
-        photo_field.is_safe = True
-
 
 .. code-block:: python
 

@@ -1,16 +1,14 @@
+from markupsafe import Markup
 from aiohttp_admin2.views import ControllerView
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 from aiohttp_admin2.controllers.relations import ToManyRelation
 from aiohttp_admin2.controllers.relations import ToOneRelation
 
-from ...catalog.tables import (
-    shows,
-    shows_actors,
-    shows_genres,
-    shows_seasons,
-
-)
+from ...catalog.tables import shows
+from ...catalog.tables import shows_actors
+from ...catalog.tables import shows_genres
+from ...catalog.tables import shows_seasons
 from ..actors.controllers import ActorController
 from ..genres.controllers import GenresController
 from ..images.controller import ImageController
@@ -47,11 +45,13 @@ class ShowsController(PostgresController):
     ]
 
     async def poster_field(self, obj):
-        return f'<img ' \
-               f'src="https://image.tmdb.org/t/p/w200/{obj.data.poster_path}"'\
-               f'width="100">'
-
-    poster_field.is_safe = True
+        return Markup(
+                '<img'
+                '   src="https://image.tmdb.org/t/p/w200/{path}"'
+                '   width="100"'
+                ' />'
+            )\
+            .format(path=obj.data.poster_path)
 
     relations_to_many = [
         ToManyRelation(
@@ -108,12 +108,14 @@ class ActorShowController(PostgresController):
 
     async def poster_field(self, obj):
         actor = await obj.get_relation("actor_id")
-        return f'<img ' \
-               f'src="https://image.tmdb.org/t/p/w200/' \
-               f'{actor.data.url}"' \
-               f'width="100">'
 
-    poster_field.is_safe = True
+        return Markup(
+                '<img'
+                '   src="https://image.tmdb.org/t/p/w200/{path}"'
+                '   width="100"'
+                ' />'
+            )\
+            .format(path=actor.data.url)
 
 
 @postgres_injector.inject
@@ -163,11 +165,13 @@ class SeasonShowController(PostgresController):
         return genre.data.name
 
     async def poster_field(self, obj):
-        return f'<img ' \
-               f'src="https://image.tmdb.org/t/p/w200/{obj.data.poster_path}"'\
-               f'width="100">'
-
-    poster_field.is_safe = True
+        return Markup(
+                '<img'
+                '   src="https://image.tmdb.org/t/p/w200/{path}"'
+                '   width="100"'
+                ' />'
+            )\
+            .format(path=obj.data.poster_path)
 
 
 class ShowsPage(ControllerView):

@@ -1,13 +1,12 @@
+from markupsafe import Markup
 from aiohttp_admin2.views import ControllerView
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 from aiohttp_admin2.controllers.relations import ToOneRelation
 from aiohttp_admin2.mappers import fields
 
-from ...catalog.tables import (
-    actors,
-    actors_hash,
-)
+from ...catalog.tables import actors
+from ...catalog.tables import actors_hash
 from ..injectors import postgres_injector
 
 
@@ -63,12 +62,13 @@ class ActorController(PostgresController):
     inline_fields = ['photo', 'name', 'hash']
 
     async def photo_field(self, obj):
-        return f'<img ' \
-               f'src="https://image.tmdb.org/t/p/w200/' \
-               f'{obj.data.url}"' \
-               f'width="100">'
-
-    photo_field.is_safe = True
+        return Markup(
+                '<img'
+                '   src="https://image.tmdb.org/t/p/w200/{path}"'
+                '   width="100"'
+                ' />'
+            )\
+            .format(path=obj.data.url)
 
     async def hash_field(self, obj):
         profile = await obj.get_relation('profile_hash')

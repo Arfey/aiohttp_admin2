@@ -1,20 +1,18 @@
+from markupsafe import Markup
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.controllers.relations import ToManyRelation
 from aiohttp_admin2.controllers.relations import ToOneRelation
-from .mappers import (
-    ActorMoviesMapper,
-    MoviesMapper,
-    GenreMoviesMapper,
-)
+
+from .mappers import ActorMoviesMapper
+from .mappers import MoviesMapper
+from .mappers import GenreMoviesMapper
 from ..actors.controllers import ActorController
 from ..genres.controllers import GenresController
 from ..images.controller import ImageController
 from ..injectors import postgres_injector
-from ...catalog.tables import (
-    movies,
-    movies_actors,
-    movies_genres,
-)
+from ...catalog.tables import movies
+from ...catalog.tables import movies_actors
+from ...catalog.tables import movies_genres
 
 __all__ = ['MoviesController', 'ActorMovieController', 'GenreMovieController', ]
 
@@ -34,11 +32,13 @@ class MoviesController(PostgresController):
     autocomplete_search_fields = ['title', ]
 
     async def poster_field(self, obj):
-        return f'<img ' \
-               f'src="https://image.tmdb.org/t/p/w200/{obj.data.poster_path}"'\
-               f'width="100">'
-
-    poster_field.is_safe = True
+        return Markup(
+                '<img'
+                '   src="https://image.tmdb.org/t/p/w200/{path}"'
+                '   width="100"'
+                ' />'
+            )\
+            .format(path=obj.data.poster_path)
 
     relations_to_many = [
         ToManyRelation(
@@ -90,12 +90,13 @@ class ActorMovieController(PostgresController):
 
     async def photo_field(self, obj):
         actor = await obj.get_relation("actor_id")
-        return f'<img ' \
-               f'src="https://image.tmdb.org/t/p/w200/' \
-               f'{actor.data.url}"' \
-               f'width="100">'
-
-    photo_field.is_safe = True
+        return Markup(
+                '<img'
+                '   src="https://image.tmdb.org/t/p/w200/{path}"'
+                '   width="100"'
+                ' />'
+            )\
+            .format(path=actor.data.url)
 
     async def actor_name_field(self, obj):
         actor = await obj.get_relation('actor_id')

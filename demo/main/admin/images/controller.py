@@ -1,3 +1,4 @@
+from markupsafe import Markup
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 
@@ -19,9 +20,10 @@ class ImageController(PostgresController):
     inline_fields = ['photo', 'type', ]
 
     async def photo_field(self, obj):
-        return f'<img ' \
-               f'src="https://image.tmdb.org/t/p/w200/' \
-               f'{obj.data.url}"' \
-               f'width="100">'
-
-    photo_field.is_safe = True
+        return Markup(
+                '<img'
+                '   src="https://image.tmdb.org/t/p/w200/{path}"'
+                '   width="100"'
+                ' />'
+            )\
+            .format(path=obj.data.url)
