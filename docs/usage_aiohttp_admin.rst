@@ -392,10 +392,11 @@ which raise exception if value is not corrected.
     from aiohttp_admin2.mappers.exceptions import ValidationError
 
 
-    def phone_validator(value):
-        rule = re.compile(r'/^[0-9]{10,14}$/')
+    PHONE_REG = re.compile(r'^[0-9]{10,14}$')
 
-        if not rule.search(value):
+
+    def phone_validator(value):
+        if not PHONE_REG.match(value):
             raise ValidationError("wrong phone format")
 
 
