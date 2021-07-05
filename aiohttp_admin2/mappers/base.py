@@ -44,7 +44,7 @@ class Mapper(metaclass=MapperMeta):
     _fields: t.Dict[str, AbstractField] = None
 
     def __init__(self, data: t.Dict[str, t.Any]) -> None:
-        self.pass_validation = False
+        self._pass_validation = False
         self.with_errors = False
         self.error: t.Optional[str] = None
         self._data = data
@@ -58,7 +58,7 @@ class Mapper(metaclass=MapperMeta):
     @property
     def raw_data(self):
         """Getter for raw mapper data"""
-        if not self.pass_validation:
+        if not self._pass_validation:
             raise MapperError(
                 "Try to get data from mapper before call the `is_valid` "
                 "method."
@@ -68,7 +68,7 @@ class Mapper(metaclass=MapperMeta):
     @property
     def data(self) -> t.Dict[str, t.Any]:
         """Return serialize data"""
-        if not self.pass_validation:
+        if not self._pass_validation:
             raise MapperError(
                 "Try to get data from mapper before call the `is_valid` "
                 "method."
@@ -118,6 +118,14 @@ class Mapper(metaclass=MapperMeta):
         """
         is_valid = True
 
+        if self._pass_validation:
+            # if we'll call is_valid method more than once with wrong data
+            # than errors will duplicate
+            raise MapperError(
+                "`is_valid` method have to call only once per life cycle of "
+                "the mapper object"
+            )
+
         for f in self.fields.values():
 
             if skip_primary and f.primary_key:
@@ -149,7 +157,7 @@ class Mapper(metaclass=MapperMeta):
                     self.error = 'Invalid'
 
         self.with_errors = not is_valid
-        self.pass_validation = True
+        self._pass_validation = True
 
         return is_valid
 
