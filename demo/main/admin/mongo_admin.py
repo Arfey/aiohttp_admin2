@@ -18,9 +18,8 @@ class MongoTestMapper(MongoMapperGeneric, table=User):
     pass
 
 
-class MongoTestController(MongoController):
+class MongoTestController(MongoController, table=User):
     mapper = MongoTestMapper
-    table = User
     name = 'user mongo'
     per_page = 10
 

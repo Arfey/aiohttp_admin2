@@ -13,8 +13,6 @@ from ...auth.tables import users
 from ..injectors import postgres_injector
 
 
-# todo: remove table from controller?
-
 class UsersMapper(PostgresMapperGeneric, table=users):
     avatar = fields.UrlImageField()
 
@@ -32,8 +30,7 @@ class UserPostgresResource(PostgresResource):
 
 
 @postgres_injector.inject
-class UsersController(PostgresController):
-    table = users
+class UsersController(PostgresController, table=users):
     mapper = UsersMapper
     resource = UserPostgresResource
     name = 'users'

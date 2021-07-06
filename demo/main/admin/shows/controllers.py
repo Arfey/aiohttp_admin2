@@ -32,8 +32,7 @@ class SeasonShowsMapper(PostgresMapperGeneric, table=shows_seasons):
 
 
 @postgres_injector.inject
-class ShowsController(PostgresController):
-    table = shows
+class ShowsController(PostgresController, table=shows):
     mapper = ShowsMapper
     name = 'shows'
     per_page = 10
@@ -78,8 +77,7 @@ class ShowsController(PostgresController):
 
 
 @postgres_injector.inject
-class ActorShowController(PostgresController):
-    table = shows_actors
+class ActorShowController(PostgresController, table=shows_actors):
     mapper = ActorShowMapper
     inline_fields = [
         'id', 'poster', 'actor_id', 'actor', 'character', 'order'
@@ -119,8 +117,7 @@ class ActorShowController(PostgresController):
 
 
 @postgres_injector.inject
-class GenreShowController(PostgresController):
-    table = shows_genres
+class GenreShowController(PostgresController, table=shows_genres):
     mapper = GenreShowsMapper
     inline_fields = ['id', 'name', ]
 
@@ -145,8 +142,7 @@ class GenreShowController(PostgresController):
 
 
 @postgres_injector.inject
-class SeasonShowController(PostgresController):
-    table = shows_seasons
+class SeasonShowController(PostgresController, table=shows_seasons):
     mapper = SeasonShowsMapper
     inline_fields = ['poster', 'season_number', 'episode_count', 'air_date', ]
 

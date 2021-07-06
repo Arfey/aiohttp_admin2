@@ -326,8 +326,7 @@ The second thing is create registered our model for the admin.
 
     # create controller for table with UserMapper
     @postgres_injector.inject
-    class UserController(PostgresController):
-        table = users
+    class UserController(PostgresController, table=users):
         mapper = UserMapper
         name = 'user'
 
@@ -378,8 +377,7 @@ class.
 .. code-block:: python
 
     @postgres_injector.inject
-    class UserController(PostgresController):
-        table = users
+    class UserController(PostgresController, table=users):
         mapper = UserMapper
         name = 'user'
 
@@ -441,8 +439,7 @@ Let's make the same for the post model
 
     # create controller for table with UserMapper
     @postgres_injector.inject
-    class PostController(PostgresController):
-        table = post
+    class PostController(PostgresController, table=post):
         mapper = PostMapper
         name = 'post'
 

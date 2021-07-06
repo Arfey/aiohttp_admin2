@@ -18,8 +18,7 @@ __all__ = ['MoviesController', 'ActorMovieController', 'GenreMovieController', ]
 
 
 @postgres_injector.inject
-class MoviesController(PostgresController):
-    table = movies
+class MoviesController(PostgresController, table=movies):
     mapper = MoviesMapper
     name = 'movies'
     per_page = 10
@@ -63,8 +62,7 @@ class MoviesController(PostgresController):
 
 
 @postgres_injector.inject
-class ActorMovieController(PostgresController):
-    table = movies_actors
+class ActorMovieController(PostgresController, table=movies_actors):
     mapper = ActorMoviesMapper
     inline_fields = [
         'id', 'photo', 'actor_id', 'actor_name', 'character', 'order'
@@ -105,8 +103,7 @@ class ActorMovieController(PostgresController):
 
 
 @postgres_injector.inject
-class GenreMovieController(PostgresController):
-    table = movies_genres
+class GenreMovieController(PostgresController, table=movies_genres):
     mapper = GenreMoviesMapper
     inline_fields = ['id', 'name', ]
 

@@ -6,8 +6,7 @@ from .mappers import GenresMapper
 
 
 @postgres_injector.inject
-class GenresController(PostgresController):
-    table = genres
+class GenresController(PostgresController, table=genres):
     mapper = GenresMapper
     name = 'genres'
     per_page = 10

@@ -13,6 +13,12 @@ class PostgresController(Controller):
     resource = PostgresResource
     connection_injector: ConnectionInjector
 
+    def __init_subclass__(cls, table: sa.Table = None) -> None:
+        # it only requires that the initialization of generic mappers and
+        # controllers looks the same
+        if table is not None:
+            cls.table = table
+
     def get_resource(self) -> PostgresResource:
         return self.resource(
             self.connection_injector.connection,

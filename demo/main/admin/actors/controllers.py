@@ -10,8 +10,6 @@ from ...catalog.tables import actors_hash
 from ..injectors import postgres_injector
 
 
-# todo: remove table from controller?
-
 class ActorHashMapper(PostgresMapperGeneric, table=actors_hash):
     pass
 
@@ -31,14 +29,12 @@ class ActorMapper(PostgresMapperGeneric, table=actors):
 
 
 @postgres_injector.inject
-class ActorHashController(PostgresController):
-    table = actors_hash
+class ActorHashController(PostgresController, table=actors_hash):
     mapper = ActorHashMapper
 
 
 @postgres_injector.inject
-class ActorController(PostgresController):
-    table = actors
+class ActorController(PostgresController, table=actors):
     mapper = ActorMapper
     name = 'actor'
     per_page = 3

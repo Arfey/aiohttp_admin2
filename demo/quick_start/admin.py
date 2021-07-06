@@ -38,8 +38,7 @@ class UserMapper(PostgresMapperGeneric, table=users):
 
 # create controller for table with UserMapper
 @postgres_injector.inject
-class UserController(PostgresController):
-    table = users
+class UserController(PostgresController, table=users):
     mapper = UserMapper
     name = 'user'
 
@@ -77,8 +76,7 @@ class PostMapper(PostgresMapperGeneric, table=post):
 
 # create controller for table with UserMapper
 @postgres_injector.inject
-class PostController(PostgresController):
-    table = post
+class PostController(PostgresController, table=post):
     mapper = PostMapper
     name = 'post'
 

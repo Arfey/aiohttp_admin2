@@ -11,8 +11,7 @@ class ImageMapper(PostgresMapperGeneric, table=images_links):
 
 
 @postgres_injector.inject
-class ImageController(PostgresController):
-    table = images_links
+class ImageController(PostgresController, table=images_links):
     mapper = ImageMapper
     name = 'images'
     per_page = 10

@@ -453,8 +453,7 @@ For the PostgreSQL, an easier way to create a controller is to use the
 
 
     @postgres_injector.inject
-    class UserController(PostgresController):
-        table = user
+    class UserController(PostgresController, table=user):
         mapper = UserMapper
         name = 'user'
         per_page = 10
@@ -508,8 +507,7 @@ current page directly then admin show error message.
 
 .. code-block:: python
 
-    class ActorController(PostgresController):
-        table = actors
+    class ActorController(PostgresController, table=actors):
         mapper = ActorMapper
 
         can_create = False
@@ -525,8 +523,7 @@ current page directly then admin show error message.
 
 .. code-block:: python
 
-    class ActorController(PostgresController):
-        table = actors
+    class ActorController(PostgresController, table=actors):
         mapper = ActorMapper
 
         inline_fields = ['id', 'name', 'hash', ]
@@ -540,8 +537,7 @@ For user on the list page we show only three fields.
 
 .. code-block:: python
 
-    class ActorController(PostgresController):
-        table = actors
+    class ActorController(PostgresController, table=actors):
         mapper = ActorMapper
 
         search_fields = ['name', ]
@@ -558,8 +554,7 @@ After specify current settings into admin interface you can see search input.
 
 .. code-block:: python
 
-    class ActorController(PostgresController):
-        table = actors
+    class ActorController(PostgresController, table=actors):
         mapper = ActorMapper
 
         inline_fields = ['name', 'gender', ]
@@ -616,8 +611,7 @@ PostgeSQL. It might look like this
 
 
     @postgres_injector.inject
-    class UserController(PostgresController):
-        table = user
+    class UserController(PostgresController, table=user):
         mapper = UserMapper
         name = 'user'
 
@@ -637,8 +631,7 @@ object you need to add to `relations_to_one` list in apropriate controller.
 
 .. code-block:: python
 
-    class ActorMovieController(PostgresController):
-        table = movies_actors
+    class ActorMovieController(PostgresController, table=movies_actors):
         mapper = ActorMoviesMapper
 
         relations_to_one = [
@@ -666,8 +659,7 @@ controller.
 
 .. code-block:: python
 
-    class MoviesController(PostgresController):
-        table = movies
+    class MoviesController(PostgresController, table=movies):
         mapper = MoviesMapper
         name = 'movies'
 
@@ -700,8 +692,7 @@ a picture url but on list page view want to show image block.
 
     from markupsafe import Markup
 
-    class MoviesController(PostgresController):
-        table = movies
+    class MoviesController(PostgresController, table=movies):
         mapper = MoviesMapper
         name = 'movies'
         inline_fields = ['poster', 'title', ]
@@ -735,8 +726,7 @@ from other controller.
     from aiohttp_admin2.controllers.relations import ToOneRelation
 
 
-    class ActorMovieController(PostgresController):
-        table = movies_actors
+    class ActorMovieController(PostgresController, table=movies_actors):
         mapper = ActorMoviesMapper
         inline_fields = ['id', 'title', ]
 
@@ -778,8 +768,7 @@ implement sorting for this field in the `data_field_sort` method.
 .. code-block:: python
 
     @postgres_injector.inject
-    class UsersController(PostgresController):
-        table = users
+    class UsersController(PostgresController, table=users):
         mapper = UsersMapper
 
         inline_fields = ['id', 'data', ]
