@@ -10,10 +10,6 @@ from ...catalog.tables import actors_hash
 from ..injectors import postgres_injector
 
 
-class ActorHashMapper(PostgresMapperGeneric, table=actors_hash):
-    pass
-
-
 class ActorMapper(PostgresMapperGeneric, table=actors):
     GENDER_CHOICES = (
         ('male', "male"),
@@ -30,7 +26,7 @@ class ActorMapper(PostgresMapperGeneric, table=actors):
 
 @postgres_injector.inject
 class ActorHashController(PostgresController, table=actors_hash):
-    mapper = ActorHashMapper
+    pass
 
 
 @postgres_injector.inject

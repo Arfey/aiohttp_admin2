@@ -3,9 +3,6 @@ from aiohttp_admin2.controllers.postgres_controller import PostgresController
 from aiohttp_admin2.controllers.relations import ToManyRelation
 from aiohttp_admin2.controllers.relations import ToOneRelation
 
-from .mappers import ActorMoviesMapper
-from .mappers import MoviesMapper
-from .mappers import GenreMoviesMapper
 from ..actors.controllers import ActorController
 from ..genres.controllers import GenresController
 from ..images.controller import ImageController
@@ -19,7 +16,6 @@ __all__ = ['MoviesController', 'ActorMovieController', 'GenreMovieController', ]
 
 @postgres_injector.inject
 class MoviesController(PostgresController, table=movies):
-    mapper = MoviesMapper
     name = 'movies'
     per_page = 10
     inline_fields = [
@@ -63,7 +59,6 @@ class MoviesController(PostgresController, table=movies):
 
 @postgres_injector.inject
 class ActorMovieController(PostgresController, table=movies_actors):
-    mapper = ActorMoviesMapper
     inline_fields = [
         'id', 'photo', 'actor_id', 'actor_name', 'character', 'order'
     ]
@@ -104,7 +99,6 @@ class ActorMovieController(PostgresController, table=movies_actors):
 
 @postgres_injector.inject
 class GenreMovieController(PostgresController, table=movies_genres):
-    mapper = GenreMoviesMapper
     inline_fields = ['id', 'name', ]
 
     async def name_field(self, obj) -> str:

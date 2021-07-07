@@ -34,6 +34,7 @@ class PostgresMapperGeneric(Mapper):
     DEFAULT_FIELD = fields.StringField
 
     def __init_subclass__(cls, table: sa.Table) -> None:
+        super().__init_subclass__()
         cls._fields = {}
 
         existing_fields = [field.name for field in cls._fields_cls]

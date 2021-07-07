@@ -1,23 +1,11 @@
-import sqlalchemy as sa
-
-from aiohttp_admin2.controllers.controller import Controller
 from aiohttp_admin2.resources.mysql_resource.mysql_resource import MySqlResource  # noqa
-from aiohttp_admin2.connection_injectors import ConnectionInjector
-
+from aiohttp_admin2.controllers.postgres_controller import PostgresController
 
 __all__ = ["MySQLController", ]
 
 
-class MySQLController(Controller):
-    table: sa.Table
+class MySQLController(PostgresController):
     resource = MySqlResource
-    connection_injector: ConnectionInjector
-
-    def __init_subclass__(cls, table: sa.Table = None) -> None:
-        # it only requires that the initialization of generic mappers and
-        # controllers looks the same
-        if table is not None:
-            cls.table = table
 
     def get_resource(self) -> MySqlResource:
         return self.resource(

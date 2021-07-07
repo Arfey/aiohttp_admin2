@@ -1,7 +1,6 @@
 from markupsafe import Markup
 from aiohttp_admin2.views import ControllerView
 from aiohttp_admin2.controllers.postgres_controller import PostgresController
-from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
 from aiohttp_admin2.controllers.relations import ToManyRelation
 from aiohttp_admin2.controllers.relations import ToOneRelation
 
@@ -15,25 +14,8 @@ from ..images.controller import ImageController
 from ..injectors import postgres_injector
 
 
-class ShowsMapper(PostgresMapperGeneric, table=shows):
-    pass
-
-
-class ActorShowMapper(PostgresMapperGeneric, table=shows_actors):
-    pass
-
-
-class GenreShowsMapper(PostgresMapperGeneric, table=shows_genres):
-    pass
-
-
-class SeasonShowsMapper(PostgresMapperGeneric, table=shows_seasons):
-    pass
-
-
 @postgres_injector.inject
 class ShowsController(PostgresController, table=shows):
-    mapper = ShowsMapper
     name = 'shows'
     per_page = 10
 
@@ -78,7 +60,6 @@ class ShowsController(PostgresController, table=shows):
 
 @postgres_injector.inject
 class ActorShowController(PostgresController, table=shows_actors):
-    mapper = ActorShowMapper
     inline_fields = [
         'id', 'poster', 'actor_id', 'actor', 'character', 'order'
     ]
@@ -118,7 +99,6 @@ class ActorShowController(PostgresController, table=shows_actors):
 
 @postgres_injector.inject
 class GenreShowController(PostgresController, table=shows_genres):
-    mapper = GenreShowsMapper
     inline_fields = ['id', 'name', ]
 
     per_page = 10
@@ -143,7 +123,6 @@ class GenreShowController(PostgresController, table=shows_genres):
 
 @postgres_injector.inject
 class SeasonShowController(PostgresController, table=shows_seasons):
-    mapper = SeasonShowsMapper
     inline_fields = ['poster', 'season_number', 'episode_count', 'air_date', ]
 
     per_page = 10

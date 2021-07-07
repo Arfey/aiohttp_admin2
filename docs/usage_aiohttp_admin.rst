@@ -489,6 +489,40 @@ After that you can user `postgres_injector` to decorate your controllers. For
 `MongoController` you don't need to use `ConnectionInjector` because connection
 to db exist in table instance.
 
+.. note::
+
+    If you don't need to customize some field or add new field in mapper that
+    based on you model then you may don't put mapper in the controller class.
+    In this case controller will generate this mapper instead of you. Examples
+    which represented below are equals:
+
+        .. code-block:: python
+
+            from aiohttp_admin2.controllers.postgres_controller import PostgresController
+
+            from aiohttp_admin2.mappers.generics import PostgresMapperGeneric
+            from aiohttp_admin2.mappers import fields
+
+
+            class UserMapper(PostgresMapperGeneric, table=user):
+                """Mapper for user instance."""
+
+            @postgres_injector.inject
+            class UserController(PostgresController, table=user):
+                # implicit specify a mapper
+                mapper = UserMapper
+                name = 'user'
+                per_page = 10
+
+        .. code-block:: python
+
+            @postgres_injector.inject
+            class UserController(PostgresController, table=user):
+                name = 'user'
+                per_page = 10
+
+
+
 Common settings
 ...............
 
