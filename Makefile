@@ -42,19 +42,9 @@ clean-pyc: ## remove Python file artifacts
 	find . -name '__pycache__' -exec rm -fr {} +
 
 clean-test: ## remove test and coverage artifacts
-	rm -fr .tox/
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
-
-lint: ## check style with flake8
-	flake8 aiohttp_admin2 tests
-
-test_: ## run tests quickly with the default Python
-	python setup.py test
-
-test-all: ## run tests on every Python version with tox
-	tox
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source aiohttp_admin2 setup.py test
@@ -110,6 +100,6 @@ build_lint:
 twine_check: build
 	python -m twine check --strict dist/*
 
-lint: bandit twine_check
+lint: bandit twine_check  ## check style
 	flake8 aiohttp_admin2 --exclude views/aiohttp/templates
 
