@@ -1,8 +1,8 @@
 from enum import Enum
 
 import sqlalchemy as sa
+from umongo.frameworks import MotorAsyncIOInstance
 from umongo import (
-    MotorAsyncIOInstance,
     Document,
     fields as mongo_fields,
 )

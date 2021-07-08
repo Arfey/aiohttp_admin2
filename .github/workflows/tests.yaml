@@ -44,3 +44,13 @@ jobs:
           cat README.rst > README_BUILD.rst && echo >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst
           poetry build
           python -m twine check --strict dist/*
+
+  run-tests:
+    name: Run pytest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - name: Pytest
+        run: make test
