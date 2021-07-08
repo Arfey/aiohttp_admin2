@@ -58,12 +58,12 @@ jobs:
         with:
           python-version: '3.x'
 
-          - name: Install Python dependencies
-            run: |
-              python -m pip install --upgrade pip
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
 
-              # install deps
-              pip install -r requirements/develop.txt
+          # install deps
+          pip install -r requirements/develop.txt
 
       - name: Pytest
         run: make test
