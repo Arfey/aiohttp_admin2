@@ -36,7 +36,7 @@ async def login_page(request: web.Request) -> None:
 
 @routes.post('/login', name='login_post')
 @aiohttp_jinja2.template('login.html')
-async def login_post(request: web.Request) -> None:
+async def login_post(request: web.Request) -> web.Response:
     """
     This handler check if user type a correct credential and do login for him
     in another case we'll redirect him to login page.
@@ -47,16 +47,21 @@ async def login_post(request: web.Request) -> None:
     if user and user.password == data['password']:
         admin_page = web.HTTPFound('/admin/')
         await remember(request, admin_page, user.username)
-        raise admin_page
+
+        # return instead raise an error to set cookies
+        # https://github.com/aio-libs/aiohttp/issues/5181
+        return admin_page
 
     raise web.HTTPFound('/login')
 
 
 @routes.get('/logout')
-async def logout_page(request: web.Request) -> None:
+async def logout_page(request: web.Request) -> web.Response:
     """
     This handler need for logout user and redirect him to login page.
     """
     redirect_response = web.HTTPFound('/login')
     await forget(request, redirect_response)
-    raise redirect_response
+    # return instead raise an error to set cookies
+    # https://github.com/aio-libs/aiohttp/issues/5181
+    return redirect_response

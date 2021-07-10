@@ -7,10 +7,8 @@ from cryptography import fernet
 import aiohttp
 from aiohttp import web
 from aiohttp_admin2 import setup_admin
-from aiohttp_security import (
-    SessionIdentityPolicy,
-    setup as setup_security,
-)
+from aiohttp_security import SessionIdentityPolicy
+from aiohttp_security import setup as setup_security
 from aiohttp_session import setup as session_setup
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
 import aiopg.sa
@@ -29,14 +27,10 @@ from .routes import routes
 from .auth.views import login_page
 from .auth.authorization import AuthorizationPolicy
 from .auth.middlewares import admin_access_middleware
-from .admin.injectors import (
-    postgres_injector,
-    instance,
-)
-from .load_data import (
-    load_data,
-    get_config_from_db_url,
-)
+from .admin.injectors import postgres_injector
+from .admin.injectors import instance
+from .load_data import load_data
+from .load_data import get_config_from_db_url
 
 
 THIS_DIR = Path(__file__).parent
