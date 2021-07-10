@@ -16,9 +16,9 @@
      :target: https://github.com/Arfey/aiohttp_admin2/issues
      :alt: PRs Welcome
 
-===============
-Aiohttp admin 2
-===============
+=============
+Aiohttp admin
+=============
 
 `Demo site
 <https://shrouded-stream-28595.herokuapp.com/>`_ | `Demo source code
