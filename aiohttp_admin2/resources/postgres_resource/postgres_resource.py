@@ -2,7 +2,7 @@ import typing as t
 
 import sqlalchemy as sa
 from sqlalchemy import func
-from sqlalchemy.engine.result import RowProxy
+from sqlalchemy.engine.row import RowProxy
 from sqlalchemy.sql.elements import UnaryExpression
 from aiopg.sa import Engine
 
