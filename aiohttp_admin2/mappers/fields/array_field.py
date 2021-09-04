@@ -8,6 +8,17 @@ __all__ = ["ArrayField", ]
 
 
 class ArrayField(AbstractField):
+    """
+    A field for represent an array type:
+
+    >>> from aiohttp_admin2.mappers import fields
+    >>>
+    >>> class Mapper(Mapper):
+    >>>     field = fields.ArrayField(field_cls=fields.IntField)
+
+    you need to specify `field_cls` which describe type of elements inside an
+    array.
+    """
     type_name: str = 'array'
     # todo: min, max
 
@@ -19,7 +30,14 @@ class ArrayField(AbstractField):
     def to_python(self) -> t.Optional[t.List[t.Any]]:
         if self._value:
             if isinstance(self._value, list):
-                return self._value
+                return [
+                    self.field(i).to_python()
+                    for i in self._value
+                ]
+
+            if not isinstance(self._value, str):
+                raise ValidationError("Incorrect format for array field.")
+
             if self._value.startswith('[') and self._value.endswith(']'):
                 try:
                     return [
@@ -53,3 +71,10 @@ class ArrayField(AbstractField):
             primary_key=self.primary_key,
             value=value
         )
+
+    def __repr__(self):
+        return \
+            f"{self.__class__.__name__}(name={self.type_name}," \
+            f" value={self._value}), required={self.required}" \
+            f" primary_key={self.primary_key}"\
+            f" type={self.field_cls.__name__ })"

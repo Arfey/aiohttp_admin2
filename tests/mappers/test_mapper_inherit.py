@@ -1,7 +1,5 @@
-from aiohttp_admin2.mappers import (
-    Mapper,
-    fields,
-)
+from aiohttp_admin2.mappers import Mapper
+from aiohttp_admin2.mappers import fields
 
 
 def test_mapper_inherit():

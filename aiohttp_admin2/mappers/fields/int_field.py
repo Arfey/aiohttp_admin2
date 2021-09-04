@@ -7,6 +7,9 @@ __all__ = ["IntField", "SmallIntField", ]
 
 
 class IntField(AbstractField):
+    """
+    Simple representation of float type.
+    """
     type_name: str = 'int'
 
     def to_python(self) -> t.Optional[int]:
@@ -21,6 +24,10 @@ class IntField(AbstractField):
 
 
 class SmallIntField(IntField):
+    """
+    Simple representation of float type but with additional validation related
+    with long of integer (only for int from MIN_INT to MAX_INT).
+    """
     type_name: str = 'small_int'
     MAX_INT = 32_767
     MIN_INT = -32_768

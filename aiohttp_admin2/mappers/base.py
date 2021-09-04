@@ -58,11 +58,6 @@ class Mapper(metaclass=MapperMeta):
     @property
     def raw_data(self):
         """Getter for raw mapper data"""
-        if not self._pass_validation:
-            raise MapperError(
-                "Try to get data from mapper before call the `is_valid` "
-                "method."
-            )
         return self._data
 
     @property

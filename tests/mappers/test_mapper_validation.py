@@ -1,8 +1,28 @@
-from aiohttp_admin2.mappers import (
-    fields,
-    Mapper,
-)
+import datetime
+
+import pytest
+
+from aiohttp_admin2.mappers import fields
+from aiohttp_admin2.mappers import Mapper
 from aiohttp_admin2.mappers.exceptions import ValidationError
+
+
+FIELDS = [
+    fields.FloatField,
+    fields.ArrayField,
+    fields.BooleanField,
+    fields.ChoicesField,
+    fields.DateTimeField,
+    fields.DateField,
+    fields.IntField,
+    fields.SmallIntField,
+    fields.LongStringField,
+    fields.JsonField,
+    fields.StringField,
+    fields.UrlField,
+    fields.UrlFileField,
+    fields.UrlImageField,
+]
 
 
 def test_success_mapper():
@@ -43,8 +63,6 @@ def test_success_mapper():
     assert book.fields["created_at"].raw_value == "Aug 28 1999 12:00AM"
 
 
-# todo: multiple class with fields
-
 def test_required_validation():
     """
     In this test we check correct work of required parameter in field object.
@@ -79,6 +97,72 @@ def test_required_validation():
 
     assert not book.fields["title"].errors
     assert not book.fields["description"].errors
+
+
+@pytest.mark.parametrize('field_cls', FIELDS)
+def test_empty_value_for_required_field(field_cls):
+    """
+    In this test we check corrected work of `required` parameter for full list
+    of fields. If value is empty and field is required we need to raise an
+    error.
+    """
+    kwargs = {}
+
+    if field_cls == fields.ArrayField:
+        kwargs = {"field_cls": fields.IntField}
+
+    if field_cls == fields.ChoicesField:
+        kwargs = {"field_cls": fields.IntField, "choices": []}
+
+    class FieldMapper(Mapper):
+        field = field_cls(required=True, **kwargs)
+
+    assert FieldMapper({}).is_valid() is False
+
+
+@pytest.mark.parametrize('field_cls', FIELDS)
+def test_empty_value_for_required_field_with_default(field_cls):
+    """
+    In this test we check corrected work of `required` parameter for full list
+    of fields. If value is empty and field is required but field has default
+    value then we need to use default.
+    """
+    default_values_map = {
+        fields.FloatField: 1.,
+        fields.IntField: 1,
+        fields.SmallIntField: 1,
+        fields.StringField: 'string',
+        fields.LongStringField: 'string',
+        fields.BooleanField: True,
+        fields.UrlImageField: 'http://foo.com',
+        fields.UrlField: 'http://foo.com',
+        fields.UrlFileField: 'http://foo.com',
+        fields.JsonField: '{"foo": "bar"}',
+        fields.ArrayField: [1, 2],
+        fields.ChoicesField: 'value',
+        fields.DateTimeField: datetime.datetime.now(),
+        fields.DateField: datetime.date.today(),
+    }
+
+    kwargs = {"default": default_values_map[field_cls]}
+
+    if field_cls == fields.ArrayField:
+        kwargs = {"field_cls": fields.IntField, **kwargs}
+
+    if field_cls == fields.ChoicesField:
+        kwargs = {
+            "field_cls": fields.StringField,
+            "choices": [('value', 'value')],
+            **kwargs,
+        }
+
+    class FieldMapper(Mapper):
+        field = field_cls(required=True, **kwargs)
+
+    mapper = FieldMapper({})
+    mapper.is_valid()
+
+    assert FieldMapper({}).is_valid() is True
 
 
 def test_main_mapper_validation():

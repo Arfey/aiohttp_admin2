@@ -7,6 +7,9 @@ __all__ = ["ObjectIdField", ]
 
 
 class ObjectIdField(AbstractField):
+    """
+    Represent type of id in mongo db.
+    """
     type_name: str = 'string'
 
     def to_python(self) -> str:

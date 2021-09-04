@@ -13,6 +13,10 @@ __all__ = [
 
 
 class UrlField(StringField):
+    """
+    This class is wrapper on `StringField` that can validate correct url
+    address.
+    """
     type_name: str = 'url'
 
     URL_REGEXP = re.compile(
@@ -37,7 +41,11 @@ class UrlField(StringField):
         return is_valid
 
 
-class UrlFileField(StringField):
+class UrlFileField(UrlField):
+    """
+    This class just need to change visual representation in admin interface of
+    field which contains url to the file.
+    """
     type_name: str = 'url_file'
 
     def to_python(self) -> t.Optional[str]:
@@ -47,7 +55,11 @@ class UrlFileField(StringField):
         return self._value
 
 
-class UrlImageField(UrlFileField):
+class UrlImageField(UrlField):
+    """
+    This class just need to change visual representation in admin interface of
+    field which contains url to the image.
+    """
     type_name: str = 'url_file_image'
 
     def to_python(self) -> t.Optional[str]:

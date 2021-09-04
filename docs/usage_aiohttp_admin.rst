@@ -243,10 +243,11 @@ Fields
 - *validators* - list of validators
 - *primary_key* - `True` if current field is a primary key
 
-**DateTimeField** - field for represented datetime data.
+**DateTimeField, DateField** - field for represented datetime data.
 
 - *required* - add validation for empty value if set to `True`
-- *default* - replace empty value if specify
+- *default* - replace empty value if specify (you can specify str or
+  datetime/date object)
 - *validators* - list of validators
 - *primary_key* - `True` if current field is a primary key
 
@@ -266,8 +267,11 @@ current field type.
 - *default* - replace empty value if specify
 - *validators* - list of validators
 - *field_cls* - field type which will represent selected value
-- *choices* - tuple of tuple with values.
+- *choices* - tuple of tuple with values. It might look like this
+  `[('admin title of value1', 'value1'), ('admin title of value1', 'value2')])`
 - *primary_key* - `True` if current field is a primary key
+- *empty_value* - need to to specify string which will show if a value is not
+  set. By default it's `-- empty --`.
 
 
 **ArrayField** - field for represented array data. Instances inside array must

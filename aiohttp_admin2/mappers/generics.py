@@ -1,6 +1,8 @@
 import sqlalchemy as sa
 import umongo
 
+from marshmallow import EXCLUDE
+from marshmallow.exceptions import ValidationError as MarshmallowValidationErr
 from aiohttp_admin2.mappers.base import Mapper
 from aiohttp_admin2.mappers import fields
 from aiohttp_admin2.mappers.fields import mongo_fields
@@ -18,10 +20,11 @@ class PostgresMapperGeneric(Mapper):
     This class need for generate Mapper from sqlAlchemy's model.
     """
 
-    # todo: added types
     FIELDS_MAPPER = {
         sa.Integer: fields.IntField,
+        sa.BigInteger: fields.IntField,
         sa.SmallInteger: fields.SmallIntField,
+        sa.Float: fields.FloatField,
         sa.String: fields.StringField,
         sa.Text: fields.LongStringField,
         sa.Enum: fields.ChoicesField,
@@ -39,7 +42,6 @@ class PostgresMapperGeneric(Mapper):
 
         existing_fields = [field.name for field in cls._fields_cls]
 
-        # todo: add tests
         for name, column in table.columns.items():
             field_cls = \
                 cls.FIELDS_MAPPER.get(type(column.type), cls.DEFAULT_FIELD)
@@ -103,15 +105,25 @@ class MongoMapperGeneric(Mapper):
 
     def validation(self):
         """
-        In current method we cover marshmallow validation.
+        In the current method we cover marshmallow validation. We create/update
+        instances via umongo which use marshmallow validation for it. We can't
+        to copy all validation from marshmallow to our mapper because user can
+        to set custom validation. So we just check twice that data is valid for
+        the our mapper and for the marshmallow schema.
         """
         is_valid = True
+        errors = {}
 
-        errors = self.table\
-            .schema\
-            .as_marshmallow_schema()()\
-            .load(self.raw_data)\
-            .errors
+        try:
+            # mapper may have additional fields which are not specify in the
+            # schema so we need to skip validation of fields which are not
+            # exist in the schema
+            self.table.schema.as_marshmallow_schema()().load(
+                self.raw_data,
+                unknown=EXCLUDE,
+            )
+        except MarshmallowValidationErr as e:
+            errors = e.messages
 
         # validation for each field
         for f in self.fields.values():

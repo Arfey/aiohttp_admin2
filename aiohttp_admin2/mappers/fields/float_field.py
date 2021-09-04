@@ -7,6 +7,9 @@ __all__ = ["FloatField", ]
 
 
 class FloatField(AbstractField):
+    """
+    Simple representation of float type.
+    """
     type_name: str = 'float'
 
     def to_python(self) -> t.Optional[float]:

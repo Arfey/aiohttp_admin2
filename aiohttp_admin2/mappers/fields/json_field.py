@@ -11,7 +11,7 @@ class JsonField(AbstractField):
     type_name: str = 'json'
 
     def to_python(self) -> t.Optional[t.Dict[str, t.Any]]:
-        if self._value.strip():
+        if self._value and self._value.strip():
             try:
                 return json.loads(self._value)
             except json.decoder.JSONDecodeError:

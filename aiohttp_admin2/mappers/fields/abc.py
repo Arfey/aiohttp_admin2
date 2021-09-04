@@ -17,7 +17,7 @@ class AbstractField(ABC):
         required: bool = False,
         validators: t.List[t.Callable[[t.Any], None]] = None,
         value: t.Optional[str] = None,
-        default: t.Optional[str] = None,
+        default: t.Optional[t.Any] = None,
         primary_key: bool = False,
         **kwargs: t.Any,
     ) -> None:
@@ -119,4 +119,4 @@ class AbstractField(ABC):
         return \
             f"{self.__class__.__name__}(name={self.type_name}," \
             f" value={self._value}), required={self.required}" \
-            f" primary_key={self.primary_key}"
+            f" primary_key={self.primary_key})"

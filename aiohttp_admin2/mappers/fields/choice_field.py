@@ -22,6 +22,18 @@ class ChoicesField(AbstractField):
         (3, 'delete'),
     ]
 
+    >>> from aiohttp_admin2.mappers import fields
+    >>>
+    >>> choices = [(1, 'select'), (2, 'unselect'), ]
+    >>>
+    >>> class Mapper(Mapper):
+    >>>     field = type = fields.ChoicesField(
+    >>>         field_cls=fields.StringField,
+    >>>         choices=choices,
+    >>>     )
+
+    you need to specify `field_cls` which describe type of field. By default
+    it's a `StringField`.
     """
     type_name: str = 'choice'
     empty_value: str = '-- empty --'
