@@ -59,3 +59,33 @@ def test_error_with_wrong_type():
     assert not ArrayMapper({'field': 1}).is_valid()
     assert not ArrayMapper({'field': '["str", "str"]'}).is_valid()
     assert not ArrayMapper({'field': ['str', 'str']}).is_valid()
+
+
+def test_length_validation():
+    """
+    Test corrected work of mix/max_length validation. If array less than
+    min_length or greater than max_length then we must to receive an error.
+    """
+
+    class InnerArrayMapperWithMax(Mapper):
+        field = fields.ArrayField(field_cls=fields.IntField, max_length=1)
+
+    assert InnerArrayMapperWithMax({"field": []}).is_valid()
+    assert InnerArrayMapperWithMax({"field": [1]}).is_valid()
+    assert not InnerArrayMapperWithMax({"field": [1, 2]}).is_valid()
+
+    class InnerArrayMapperWithMin(Mapper):
+        field = fields.ArrayField(field_cls=fields.IntField, min_length=1)
+
+    assert InnerArrayMapperWithMin({"field": [1, 2]}).is_valid()
+    assert InnerArrayMapperWithMin({"field": [1]}).is_valid()
+    assert not InnerArrayMapperWithMin({"field": []}).is_valid()
+
+    class InnerArrayMapperFull(Mapper):
+        field = fields\
+            .ArrayField(field_cls=fields.IntField, min_length=1, max_length=2)
+
+    assert InnerArrayMapperFull({"field": [1, 2]}).is_valid()
+    assert InnerArrayMapperFull({"field": [1]}).is_valid()
+    assert not InnerArrayMapperFull({"field": []}).is_valid()
+    assert not InnerArrayMapperFull({"field": [1, 2, 3]}).is_valid()

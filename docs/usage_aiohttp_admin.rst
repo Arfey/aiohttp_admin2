@@ -282,6 +282,8 @@ to have the same type. To specify this type you have to provide `field_cls`
 - *validators* - list of validators
 - *field_cls* - field type which will represent data type of items inside array
 - *primary_key* - `True` if current field is a primary key
+- *min_length, max_length* - add validation related with min/max length of
+  array
 
 **JsonField** - field for represented data in json type format.
 

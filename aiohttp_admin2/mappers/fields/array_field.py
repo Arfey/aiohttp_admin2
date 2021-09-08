@@ -3,6 +3,7 @@ import typing as t
 
 from aiohttp_admin2.mappers.exceptions import ValidationError
 from aiohttp_admin2.mappers.fields.abc import AbstractField
+from aiohttp_admin2.mappers import validators
 
 __all__ = ["ArrayField", ]
 
@@ -20,12 +21,23 @@ class ArrayField(AbstractField):
     array.
     """
     type_name: str = 'array'
-    # todo: min, max
 
-    def __init__(self, *, field_cls: AbstractField, **kwargs: t.Any):
+    def __init__(
+        self,
+        *,
+        field_cls: AbstractField,
+        max_length: int = None,
+        min_length: int = None,
+        **kwargs: t.Any,
+    ):
         super().__init__(**kwargs)
         self.field_cls = field_cls
         self.field = field_cls(value=None)
+
+        if max_length or min_length:
+            self.validators.append(
+                validators.length(max_value=max_length, min_value=min_length)
+            )
 
     def to_python(self) -> t.Optional[t.List[t.Any]]:
         if self._value:
