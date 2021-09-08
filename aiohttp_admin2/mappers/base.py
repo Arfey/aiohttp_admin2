@@ -38,8 +38,6 @@ class MapperMeta(type):
 
 class Mapper(metaclass=MapperMeta):
 
-    # todo: add itter
-
     _data: t.Dict[str, t.Any] = None
     _fields: t.Dict[str, AbstractField] = None
 

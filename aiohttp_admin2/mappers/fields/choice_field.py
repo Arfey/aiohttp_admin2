@@ -69,7 +69,6 @@ class ChoicesField(AbstractField):
         return self.field.to_storage()
 
     def is_valid(self) -> bool:
-        # todo: move to validator
         is_valid = self.field.is_valid()
 
         if not self.required and self.value is None:
