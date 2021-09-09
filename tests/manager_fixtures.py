@@ -9,7 +9,8 @@ from sqlalchemy.schema import (
 import aiopg.sa
 import aiomysql.sa
 from motor.motor_asyncio import AsyncIOMotorClient
-from umongo import Instance as MInstance, Document, fields
+from umongo.frameworks import MotorAsyncIOInstance
+from umongo import Document, fields
 
 from aiohttp_admin2.resources import (
     PostgresResource,
@@ -36,7 +37,6 @@ table = sa.Table('table', sa.MetaData(),
 def event_loop():
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
-    loop.close()
 
 
 @pytest.fixture(scope='session')
@@ -53,7 +53,8 @@ async def postgres_resource(postgres):
 @pytest.fixture(scope="session")
 async def mongo_resource(mongo):
     db = AsyncIOMotorClient(**mongo).test
-    instance = MInstance(db)
+    instance = MotorAsyncIOInstance()
+    instance.set_db(db)
 
     @instance.register
     class Table(Document):
