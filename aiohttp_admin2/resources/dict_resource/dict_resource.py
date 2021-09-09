@@ -160,7 +160,7 @@ class DictResource(AbstractResource):
 
         return self._row_to_instance({
             "id": pk,
-            **instance.data
+            **instance.data.__dict__
         })
 
     def _get_pk(self) -> PK:

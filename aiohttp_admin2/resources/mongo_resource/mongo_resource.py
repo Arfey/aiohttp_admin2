@@ -124,15 +124,14 @@ class MongoResource(AbstractResource):
         return await self.get_one(res.inserted_id)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
-        if hasattr(instance.data, 'id'):
-            del instance.data.id
+        data = instance.data.to_dict()
+
+        if data.get('id'):
+            del data['id']
 
         await self.table\
             .collection\
-            .update_one(
-                {"_id": ObjectId(pk)},
-                {"$set": instance.data.to_dict()}
-            )
+            .update_one({"_id": ObjectId(pk)}, {"$set": data})
 
         return await self.get_one(pk)
 

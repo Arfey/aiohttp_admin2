@@ -19,6 +19,8 @@ async def test_get_one(resource):
     first_id = instances[0].get_pk()
     second_id = instances[1].get_pk()
 
+    assert first_id and second_id
+
     first_instance = await resource.get_one(first_id)
     second_instance = await resource.get_one(second_id)
 
