@@ -148,7 +148,7 @@ class DictResource(AbstractResource):
     async def create(self, instance: Instance) -> Instance:
         pk = self._get_pk()
         instance.data.id = pk
-        self.engine[pk] = {"id": pk, **instance.data}
+        self.engine[pk] = {"id": pk, **instance.data.__dict__}
 
         return instance
 

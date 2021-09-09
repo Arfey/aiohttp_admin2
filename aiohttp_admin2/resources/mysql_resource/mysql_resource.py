@@ -10,7 +10,7 @@ __all__ = ['MySqlResource', ]
 class MySqlResource(PostgresResource):
 
     async def create(self, instance: Instance) -> Instance:
-        data = instance.data
+        data = instance.data.to_dict()
         async with self.engine.acquire() as conn:
             query = self.table\
                 .insert()\
@@ -30,7 +30,7 @@ class MySqlResource(PostgresResource):
             return self._row_to_instance(data)
 
     async def update(self, pk: PK, instance: Instance) -> Instance:
-        data = instance.data
+        data = instance.data.to_dict()
         async with self.engine.acquire() as conn:
             query = self.table\
                 .update()\
