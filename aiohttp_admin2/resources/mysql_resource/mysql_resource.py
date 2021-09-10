@@ -1,3 +1,5 @@
+from sqlalchemy.dialects import mysql
+
 from aiohttp_admin2.resources.postgres_resource.postgres_resource import \
     PostgresResource
 from aiohttp_admin2.resources.abc import Instance
@@ -8,6 +10,8 @@ __all__ = ['MySqlResource', ]
 
 
 class MySqlResource(PostgresResource):
+
+    _dialect = mysql.dialect()
 
     async def create(self, instance: Instance) -> Instance:
         data = instance.data.to_dict()

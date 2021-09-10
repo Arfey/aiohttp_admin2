@@ -46,9 +46,14 @@ class MongoResource(AbstractResource):
             .find({"_id": {"$in": [ObjectId(pk) for pk in pks]}})\
             .to_list(length=len(pks))
 
-        return {
+        relations = {
             str(r["id"]): self._row_to_instance(r)
             for r in data
+        }
+
+        return {
+            _id: relations.get(_id, None)
+            for _id in pks
         }
 
     async def get_list(

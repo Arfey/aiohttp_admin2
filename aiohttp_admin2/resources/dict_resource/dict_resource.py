@@ -56,10 +56,15 @@ class DictResource(AbstractResource):
         return self._row_to_instance(instance)
 
     async def get_many(self, pks: t.List[PK]) -> InstanceMapper:
-        return {
+        relations = {
             pk: self._row_to_instance(self.engine.get(pk))
             for pk in pks
             if pk in self.engine
+        }
+
+        return {
+            _id: relations.get(_id, None)
+            for _id in pks
         }
 
     async def get_list(

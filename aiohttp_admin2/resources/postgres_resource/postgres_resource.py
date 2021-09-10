@@ -1,9 +1,11 @@
 import typing as t
+import logging
 
 import sqlalchemy as sa
 from sqlalchemy import func
 from sqlalchemy.engine.row import RowProxy
 from sqlalchemy.sql.elements import UnaryExpression
+from sqlalchemy.dialects import postgresql
 from aiopg.sa import Engine
 
 from aiohttp_admin2.resources.abc import AbstractResource
@@ -26,6 +28,7 @@ __all__ = ['PostgresResource', 'SortType', ]
 
 
 SortType = t.Union[sa.Column, UnaryExpression]
+logger = logging.getLogger('aiohttp_admin.resource')
 
 
 class PostgresResource(AbstractResource):
@@ -35,6 +38,7 @@ class PostgresResource(AbstractResource):
     name: str
     custom_sort_list: t.Dict[str, t.Callable] = {}
     filter_map = default_filter_mapper
+    _dialect = postgresql.dialect()
 
     # todo: *
     def __init__(
@@ -73,12 +77,19 @@ class PostgresResource(AbstractResource):
         async with self.engine.acquire() as conn:
             query = self.table.select().where(column.in_(pks))
 
-            cursor = await conn.execute(query)
+            # fixed problem with post compile in aio-mysql
+            string_query = str(
+                query.compile(
+                    compile_kwargs={"literal_binds": True},
+                    dialect=self._dialect,
+                )
+            )
 
-            # todo: validation for return many instance for single id
+            cursor = await conn.execute(string_query)
 
             relations = {}
             relations_list = []
+            multiple_instances_per_key = False
 
             for r in await cursor.fetchall():
                 instance = self._row_to_instance(r, relations_list)
@@ -89,7 +100,17 @@ class PostgresResource(AbstractResource):
                     pk = instance.get_pk()
 
                 relations_list.append(instance)
+
+                if relations.get(pk):
+                    multiple_instances_per_key = True
+
                 relations[pk] = instance
+
+            if multiple_instances_per_key:
+                logger.warning(
+                    "`get_many` function return multiple instances for "
+                    "single pk"
+                )
 
             return {_id: relations.get(_id, None) for _id in pks}
 
