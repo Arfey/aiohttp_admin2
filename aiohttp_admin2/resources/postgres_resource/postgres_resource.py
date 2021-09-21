@@ -5,7 +5,6 @@ import sqlalchemy as sa
 from sqlalchemy import func
 from sqlalchemy.engine.row import RowProxy
 from sqlalchemy.sql.elements import UnaryExpression
-from sqlalchemy.dialects import postgresql
 from aiopg.sa import Engine
 
 from aiohttp_admin2.resources.abc import AbstractResource
@@ -38,7 +37,6 @@ class PostgresResource(AbstractResource):
     name: str
     custom_sort_list: t.Dict[str, t.Callable] = {}
     filter_map = default_filter_mapper
-    _dialect = postgresql.dialect()
 
     # todo: *
     def __init__(
@@ -52,6 +50,14 @@ class PostgresResource(AbstractResource):
         self.name = table.name.lower()
         self.custom_sort_list = custom_sort_list or {}
 
+
+    async def _execute(self, conn, query):
+        return await conn.execute(query)
+    
+    async def _execute_scalar(self, conn, query):
+        res = await self._execute(conn, query)
+        return await res.scalar()
+
     def get_one_select(self) -> sa.sql.Select:
         """
         In this place you can redefine query.
@@ -63,7 +69,7 @@ class PostgresResource(AbstractResource):
             query = self.get_one_select()\
                 .where(self._primary_key == pk)
 
-            cursor = await conn.execute(query)
+            cursor = await self._execute(conn, query)
 
             res = await cursor.fetchone()
 
@@ -76,16 +82,7 @@ class PostgresResource(AbstractResource):
         column = sa.column(field) if field else self._primary_key
         async with self.engine.acquire() as conn:
             query = self.table.select().where(column.in_(pks))
-
-            # fixed problem with post compile in aio-mysql
-            string_query = str(
-                query.compile(
-                    compile_kwargs={"literal_binds": True},
-                    dialect=self._dialect,
-                )
-            )
-
-            cursor = await conn.execute(string_query)
+            cursor = await self._execute(conn, query)
 
             relations = {}
             relations_list = []
@@ -144,17 +141,17 @@ class PostgresResource(AbstractResource):
 
             if cursor is not None:
                 if order_by == id_orders[0]:
-                    query = query.where(self._primary_key >= cursor)
+                    query = query.where(self._primary_key > cursor)
                 else:
-                    query = query.where(self._primary_key <= cursor)
+                    query = query.where(self._primary_key < cursor)
             else:
                 query = query.offset(offset)
 
             if filters:
                 query = self.apply_filters(query=query, filters=filters)
 
-            cursor_query = await conn\
-                .execute(query.order_by(self.get_order(order_by)))
+            cursor_query = await self\
+                ._execute(conn, query.order_by(self.get_order(order_by)))
 
             res = []
 
@@ -163,14 +160,16 @@ class PostgresResource(AbstractResource):
 
             if cursor is None:
                 if filters:
-                    count: int = await conn.scalar(
+                    count: int = await self._execute_scalar(
+                        conn,
                         self.apply_filters(
                             query=sa.select([func.count(self._primary_key)]),
                             filters=filters,
                         )
                     )
                 else:
-                    count: int = await conn.scalar(
+                    count: int = await self._execute_scalar(
+                        conn,
                         sa.select([func.count(self._primary_key)])
                     )
                 return self.create_paginator(
@@ -192,8 +191,8 @@ class PostgresResource(AbstractResource):
                 .delete()\
                 .where(self._primary_key == pk)
 
-            cursor = await conn.execute(query)
-            await conn.execute('commit;')
+            cursor = await self._execute(conn, query)
+            await self._execute(conn, 'commit;')
 
             if not cursor.rowcount:
                 raise InstanceDoesNotExist
@@ -206,7 +205,7 @@ class PostgresResource(AbstractResource):
                 .values([data])\
                 .returning(*self.table.c)
 
-            cursor = await conn.execute(query)
+            cursor = await self._execute(conn, query)
             data = await cursor.fetchone()
 
             return self._row_to_instance(data)
@@ -221,7 +220,7 @@ class PostgresResource(AbstractResource):
                 .values(**data)\
                 .returning(*self.table.c)
 
-            cursor = await conn.execute(query)
+            cursor = await self._execute(conn, query)
             data = await cursor.fetchone()
 
             return self._row_to_instance(data)

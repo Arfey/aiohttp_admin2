@@ -13,6 +13,18 @@ class MySqlResource(PostgresResource):
 
     _dialect = mysql.dialect()
 
+    async def _execute(self, conn, query):
+        if not isinstance(query, str):
+            # fixed problem with post compile in aio-mysql
+            query = str(
+                query.compile(
+                    compile_kwargs={"literal_binds": True},
+                    dialect=self._dialect,
+                )
+            )
+
+        return await conn.execute(query)
+
     async def create(self, instance: Instance) -> Instance:
         data = instance.data.to_dict()
         async with self.engine.acquire() as conn:

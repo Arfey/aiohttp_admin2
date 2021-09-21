@@ -2,7 +2,7 @@ import pytest
 
 from aiohttp_admin2.resources import DictResource
 
-from tests.resources.common_resource.utils import generate_fake_instance
+from .utils import generate_fake_instance
 
 
 @pytest.mark.asyncio

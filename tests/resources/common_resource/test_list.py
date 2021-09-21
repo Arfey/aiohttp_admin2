@@ -34,7 +34,7 @@ async def test_list_order(resource):
     )
 
     for a, b in compare_list:
-        assert a.id == b.id
+        assert a.get_pk() == b.get_pk()
 
     # 3. Error of ordering for cursor pagination
     with pytest.raises(ClientException):
@@ -61,13 +61,13 @@ async def test_list_page_pagination(resource, ordering):
     # 1. Check of correct work page pagination
     full_list_objects = \
         await resource.get_list(limit=instance_count, order_by=ordering)
-    full_list_objects_ids = [i.id for i in full_list_objects.instances]
+    full_list_objects_ids = [i.get_pk() for i in full_list_objects.instances]
 
     assert len(full_list_objects_ids) == instance_count
 
     # page 1
     list_objects = await resource.get_list(limit=3, order_by=ordering)
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 3
     assert set(full_list_objects_ids[:3]) == set(list_objects_ids)
@@ -79,7 +79,7 @@ async def test_list_page_pagination(resource, ordering):
 
     # page 2
     list_objects = await resource.get_list(limit=3, page=2, order_by=ordering)
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 3
     assert set(full_list_objects_ids[3:6]) == set(list_objects_ids)
@@ -91,7 +91,7 @@ async def test_list_page_pagination(resource, ordering):
 
     # page 3
     list_objects = await resource.get_list(limit=3, page=3, order_by=ordering)
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 3
     assert set(full_list_objects_ids[6:9]) == set(list_objects_ids)
@@ -106,7 +106,7 @@ async def test_list_page_pagination(resource, ordering):
 
     # page 4
     list_objects = await resource.get_list(limit=3, page=4, order_by=ordering)
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 1
 
@@ -133,7 +133,7 @@ async def test_list_page_pagination_parameters_error(resource):
     instances = await generate_fake_instance(resource, 1)
 
     with pytest.raises(BadParameters):
-        await resource.get_list(page=2, cursor=instances[0].id)
+        await resource.get_list(page=2, cursor=instances[0].get_pk())
 
     # 3. page must be greater than zero
     with pytest.raises(BadParameters):
@@ -159,7 +159,7 @@ async def test_list_cursor_pagination(resource, ordering):
     # 1. Check of correct work cursor pagination
     full_list_objects = \
         await resource.get_list(limit=instance_count, order_by=ordering)
-    full_list_objects_ids = [i.id for i in full_list_objects.instances]
+    full_list_objects_ids = [i.get_pk() for i in full_list_objects.instances]
 
     assert len(full_list_objects_ids) == instance_count
 
@@ -169,7 +169,7 @@ async def test_list_cursor_pagination(resource, ordering):
         limit=3,
         order_by=ordering,
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 3
     assert set(full_list_objects_ids[1:4]) == set(list_objects_ids)
@@ -184,7 +184,7 @@ async def test_list_cursor_pagination(resource, ordering):
         limit=3,
         order_by=ordering,
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 1
     assert set(full_list_objects_ids[4:7]) == set(list_objects_ids)
@@ -206,7 +206,7 @@ async def test_filter_api_for_get_list(resource):
     """
     # 1. Check corrected work of one filter + ordering
     instances = await generate_fake_instance(resource, 10)
-    full_list_objects_ids = [i.id for i in instances]
+    full_list_objects_ids = [i.get_pk() for i in instances]
 
     # desc
     list_objects = await resource.get_list(
@@ -215,7 +215,7 @@ async def test_filter_api_for_get_list(resource):
         ],
         limit=len(full_list_objects_ids),
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert set(list_objects_ids) == set(full_list_objects_ids[1:])
 
@@ -227,7 +227,7 @@ async def test_filter_api_for_get_list(resource):
         limit=len(full_list_objects_ids),
         order_by='id'
     )
-    asc_list_objects_ids = [i.id for i in list_objects.instances]
+    asc_list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     for x, y in zip(list_objects_ids[1:], reversed(asc_list_objects_ids[1:])):
         assert x == y
@@ -240,7 +240,7 @@ async def test_filter_api_for_get_list(resource):
         ],
         limit=len(full_list_objects_ids),
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 1
     assert list_objects_ids[0] == full_list_objects_ids[1]
@@ -256,7 +256,7 @@ async def test_common_filters_for_get_list(resource):
         eq, ne, lt, lte, gt, gte, in, nin, like
     """
     instances = await generate_fake_instance(resource, 10)
-    full_list_objects_ids = [i.id for i in instances]
+    full_list_objects_ids = [i.get_pk() for i in instances]
 
     # eq
     list_objects = await resource.get_list(
@@ -265,7 +265,7 @@ async def test_common_filters_for_get_list(resource):
         ],
         limit=len(full_list_objects_ids),
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 1
     assert list_objects_ids[0] == full_list_objects_ids[0]
@@ -277,7 +277,7 @@ async def test_common_filters_for_get_list(resource):
         ],
         limit=len(full_list_objects_ids),
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == len(full_list_objects_ids) - 1
     assert full_list_objects_ids[0] not in list_objects_ids
@@ -289,7 +289,7 @@ async def test_common_filters_for_get_list(resource):
         ],
         limit=len(full_list_objects_ids),
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 1
     assert list_objects_ids[0] == full_list_objects_ids[-1]
@@ -301,7 +301,7 @@ async def test_common_filters_for_get_list(resource):
         ],
         limit=len(full_list_objects_ids),
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 2
     assert set(list_objects_ids) == set(full_list_objects_ids[-2:])
@@ -313,7 +313,7 @@ async def test_common_filters_for_get_list(resource):
         ],
         limit=len(full_list_objects_ids),
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 1
     assert list_objects_ids[0] == full_list_objects_ids[0]
@@ -325,7 +325,7 @@ async def test_common_filters_for_get_list(resource):
         ],
         limit=len(full_list_objects_ids),
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 2
     assert set(list_objects_ids) == set(full_list_objects_ids[:2])
@@ -338,7 +338,7 @@ async def test_common_filters_for_get_list(resource):
         ],
         limit=len(full_list_objects_ids),
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 2
     assert set(list_objects_ids) == set(ids)
@@ -350,7 +350,7 @@ async def test_common_filters_for_get_list(resource):
         ],
         limit=len(full_list_objects_ids),
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == len(full_list_objects_ids) - 2
     assert not (set(list_objects_ids) & set(ids))
@@ -358,11 +358,11 @@ async def test_common_filters_for_get_list(resource):
     # like
     list_objects = await resource.get_list(
         filters=[
-            FilterTuple('val', instances[0].val, "like"),
+            FilterTuple('val', instances[0].data.val, "like"),
         ],
         limit=len(full_list_objects_ids),
     )
-    list_objects_ids = [i.id for i in list_objects.instances]
+    list_objects_ids = [i.get_pk() for i in list_objects.instances]
 
     assert len(list_objects_ids) == 1
-    assert list_objects_ids[0] == instances[0].id
+    assert list_objects_ids[0] == instances[0].get_pk()
