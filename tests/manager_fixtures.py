@@ -30,12 +30,14 @@ resource_params = [
 table = sa.Table('table', sa.MetaData(),
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('val', sa.String(255), nullable=False),
+    sa.Column('val2', sa.String(255), nullable=True),
  )
 
 
 @pytest.yield_fixture(scope='session')
 def event_loop():
     loop = asyncio.get_event_loop_policy().new_event_loop()
+    loop.set_debug(True)
     yield loop
 
 
@@ -59,6 +61,7 @@ async def mongo_resource(mongo):
     @instance.register
     class Table(Document):
         val = fields.StrField(required=True)
+        val2 = fields.StrField(required=False)
 
         class Meta:
             collection_name = "table"

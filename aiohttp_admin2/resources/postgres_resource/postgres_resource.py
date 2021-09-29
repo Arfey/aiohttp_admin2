@@ -53,7 +53,7 @@ class PostgresResource(AbstractResource):
 
     async def _execute(self, conn, query):
         return await conn.execute(query)
-    
+
     async def _execute_scalar(self, conn, query):
         res = await self._execute(conn, query)
         return await res.scalar()
