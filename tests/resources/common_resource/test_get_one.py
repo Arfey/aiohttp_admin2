@@ -41,9 +41,12 @@ async def test_get_one_correct_value_of_field(resource):
     """
     instances = await generate_fake_instance(resource, 1)
 
-    value = instances[0].data.val
+    value1 = instances[0].data.val
+    value2 = instances[0].data.val2
 
-    assert value
+    assert value1
+    assert value2
 
     instance_from_db = await resource.get_one(instances[0].get_pk())
-    assert instance_from_db.data.val == value
+    assert instance_from_db.data.val == value1
+    assert instance_from_db.data.val2 == value2
