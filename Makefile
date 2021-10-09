@@ -85,7 +85,13 @@ demo_quick:
 	DATABASE_URL=postgres://postgres:postgres@0.0.0.0:5432/postgres adev runserver demo/quick_start/app.py
 
 deploy_demo:
-	git push heroku master:master
+	git checkout -b heroku-deploy
+	cp requirements/develop.txt requirements.txt
+	git add requirements.txt
+	git commit -m "add deploy"
+	git push heroku heroku-deploy:master --force
+	git checkout master
+	git branch -D heroku-deploy
 
 bandit:
 	bandit -r ./aiohttp_admin2
