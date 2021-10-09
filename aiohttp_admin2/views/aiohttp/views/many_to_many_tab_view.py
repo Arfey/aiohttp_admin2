@@ -83,11 +83,11 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
         else:
             raise web.HTTPFound(
                 req.app.router[self.get_index_url_name()]
-                    .url_for(pk=self.get_pk(req))
-                    .with_query(
-                        f'message=The {self.get_name()}#{obj.get_pk()} '
-                        f'has been created'
-                    )
+                .url_for(pk=self.get_pk(req))
+                .with_query(
+                    f'message=The {self.get_name()}#{obj.get_pk()} '
+                    f'has been created'
+                )
             )
 
     @route(r'/update/{nested_pk:\w+}/', method='POST')
@@ -104,11 +104,11 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
         else:
             raise web.HTTPFound(
                 req.app.router[self.get_url(self.get_detail).name]
-                    .url_for(pk=pk, nested_pk=nested_pk)
-                    .with_query(
-                        f'message=The {self.get_name()}#{nested_pk} '
-                        f'has been updated'
-                    )
+                .url_for(pk=pk, nested_pk=nested_pk)
+                .with_query(
+                    f'message=The {self.get_name()}#{nested_pk} '
+                    f'has been updated'
+                )
             )
 
     @route(r'/')
@@ -147,7 +147,7 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
                 if url_name_maps.get(url_name):
                     return str(
                         req.app.router[url_name_maps.get(url_name)]
-                            .url_for(pk=str(obj.get_pk()))
+                        .url_for(pk=str(obj.get_pk()))
                     )
 
             return ''
@@ -171,11 +171,11 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
                 "tabs": parent.tabs_list(),
                 "detail_url": (
                     req.app.router[parent.get_url(parent.get_detail).name]
-                        .url_for(pk=req.match_info['pk'])
+                    .url_for(pk=req.match_info['pk'])
                 ),
                 "create_url": (
                     req.app.router[self.get_url(self.get_create).name]
-                        .url_for(pk=req.match_info['pk'])
+                    .url_for(pk=req.match_info['pk'])
                 ),
                 "view_filters": self.get_filters(req.rel_url.query),
             },
@@ -211,15 +211,15 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
                 "nested_pk": req.match_info['nested_pk'],
                 "delete_url": (
                     req.app.router[self.get_url(self.get_delete).name]
-                        .url_for(pk=pk, nested_pk=nested_pk)
+                    .url_for(pk=pk, nested_pk=nested_pk)
                 ),
                 "detail_url": (
                     req.app.router[self.get_url(self.get_detail).name]
-                        .url_for(pk=pk, nested_pk=nested_pk)
+                    .url_for(pk=pk, nested_pk=nested_pk)
                 ),
                 "save_url": (
                     req.app.router[self.get_url(self.post_update).name]
-                        .url_for(pk=pk, nested_pk=nested_pk)
+                    .url_for(pk=pk, nested_pk=nested_pk)
                 ),
                 "mapper": mapper or controller.mapper(instance.data.to_dict()),
                 "fields": controller.fields,
@@ -233,8 +233,8 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
 
         await controller.delete(int(pk))
 
-        location = req.app.router[self.get_index_url_name()] \
-            .url_for(pk=self.get_pk(req)) \
+        location = req.app.router[self.get_index_url_name()]\
+            .url_for(pk=self.get_pk(req))\
             .with_query(f'message=The {self.get_name()}#{pk} has been deleted')
 
         raise web.HTTPFound(location=location)
@@ -256,7 +256,7 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
                 "controller": controller,
                 "delete_url": (
                     req.app.router[self.get_url(self.post_delete).name]
-                        .url_for(nested_pk=nested_pk, pk=pk)
+                    .url_for(nested_pk=nested_pk, pk=pk)
                 ),
                 "pk": nested_pk,
             }

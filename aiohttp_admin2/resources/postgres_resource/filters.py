@@ -1,5 +1,3 @@
-from abc import ABC
-
 import sqlalchemy as sa
 import typing as t
 
@@ -36,7 +34,14 @@ comparator_map = {
 class SQLAlchemyBaseFilter(ABCFilter):
     filter_type: str
 
-    def __init__(self, table: sa.Table, column: sa.Column, *, value: t.Any, query: sa.sql.Select) -> None:
+    def __init__(
+        self,
+        table: sa.Table,
+        column: sa.Column,
+        *,
+        value: t.Any,
+        query: sa.sql.Select,
+    ) -> None:
         self.table = table
         self.value = value
         self.column = column
@@ -88,7 +93,6 @@ class SQLAlchemyMultiBaseFilter(SQLAlchemyBaseFilter):
             raise FilterException(
                 f"filter_type is not defined in {self.__class__}"
             )
-
 
 
 class GT(SQLAlchemyBaseFilter):

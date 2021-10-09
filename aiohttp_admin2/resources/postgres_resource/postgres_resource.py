@@ -50,7 +50,6 @@ class PostgresResource(AbstractResource):
         self.name = table.name.lower()
         self.custom_sort_list = custom_sort_list or {}
 
-
     async def _execute(self, conn, query):
         return await conn.execute(query)
 
@@ -78,7 +77,11 @@ class PostgresResource(AbstractResource):
 
             return self._row_to_instance(res)
 
-    async def get_many(self, pks: t.List[PK], field: str = None) -> InstanceMapper:
+    async def get_many(
+        self,
+        pks: t.List[PK],
+        field: str = None,
+    ) -> InstanceMapper:
         column = sa.column(field) if field else self._primary_key
         async with self.engine.acquire() as conn:
             query = self.table.select().where(column.in_(pks))

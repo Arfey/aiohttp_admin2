@@ -2,7 +2,7 @@ import typing as t
 from dataclasses import dataclass
 
 if t.TYPE_CHECKING:
-    from aiohttp_admin2.views import ControllerView
+    from aiohttp_admin2.views import ControllerView  # noqa
 
 
 __all__ = ['ToManyRelation', 'ToOneRelation', ]

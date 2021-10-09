@@ -16,5 +16,5 @@ def required(value: t.Any):
         >>>     # or just
         >>>     second_field_name = StringField(required=True)
     """
-    if value is None or value is '':
+    if value is None or value == '':
         raise ValidationError("field is required")

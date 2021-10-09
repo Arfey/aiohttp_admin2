@@ -101,13 +101,13 @@ class DateTimeFilter(FilerBase):
 
     js_extra = [
         "https://code.jquery.com/jquery-3.5.1.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"
+        "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js",  # noqa
+        "https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"  # noqa
 
     ]
     css_extra = [
-        "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css",
-        "https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css",
+        "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css",  # noqa
+        "https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css",  # noqa
     ]
 
     def __init__(self, field: AbstractField, query: dict) -> None:
@@ -118,7 +118,10 @@ class DateTimeFilter(FilerBase):
         self.param_key_to = f'date_to__{self.name}'
 
     def get_params(self):
-        return self.query.get(self.param_key_from), self.query.get(self.param_key_to)
+        return (
+            self.query.get(self.param_key_from),
+            self.query.get(self.param_key_to)
+        )
 
     def get_filter_list(self):
         params = self.get_params()

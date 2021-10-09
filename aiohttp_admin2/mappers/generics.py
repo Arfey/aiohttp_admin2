@@ -60,8 +60,10 @@ class PostgresMapperGeneric(Mapper):
                 )
             elif field_cls is fields.ArrayField:
                 field = field_cls(
-                    field_cls=cls.FIELDS_MAPPER
-                        .get(type(column.type.item_type), cls.DEFAULT_FIELD),
+                    field_cls=(
+                        cls.FIELDS_MAPPER
+                        .get(type(column.type.item_type), cls.DEFAULT_FIELD)
+                    ),
                     **field_kwargs
                 )
             else:

@@ -41,7 +41,7 @@ def get_list_filters(
     if controller.search_fields:
         filters.extend(
             SearchFilter(controller.search_fields, req.rel_url.query)
-                .get_filter_list()
+            .get_filter_list()
         )
 
     return filters

@@ -31,7 +31,10 @@ class TabBaseView(BaseAdminView):
 
     @classmethod
     def get_index_url(cls) -> str:
-        return f'{cls.get_parent().get_index_url()}' + r'{pk:\w+}' + f'/{cls.get_name()}'
+        return (
+            f'{cls.get_parent().get_index_url()}'
+            + r'{pk:\w+}' + f'/{cls.get_name()}'
+        )
 
     @classmethod
     def get_index_url_name(cls):

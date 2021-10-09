@@ -26,6 +26,7 @@ __all__ = [
 
 PK = t.Union[str, int]
 
+
 # todo: docs
 class ABCFilter(ABC):
     field_name: str
@@ -137,8 +138,9 @@ InstanceMapper = t.Dict[PK, t.Optional[Instance]]
 
 class AbstractResource(ABC):
     """
-    All resources must be implement all method from current abstract class. These
-    methods provide all action which need to do with store for work with data.
+    All resources must be implement all method from current abstract class.
+    These methods provide all action which need to do with store for work with
+    data.
     """
     engine: t.Any = None
     name: str
@@ -154,7 +156,11 @@ class AbstractResource(ABC):
         """
 
     @abstractmethod
-    async def get_many(self, pks: t.List[PK], field: str = None) -> InstanceMapper:
+    async def get_many(
+        self,
+        pks: t.List[PK],
+        field: str = None,
+    ) -> InstanceMapper:
         """
         Get many instances by ids from a storage. This method will use as a
         dataloader. This method mainly will use on list page in cases when

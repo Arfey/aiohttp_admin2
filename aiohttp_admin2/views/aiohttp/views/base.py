@@ -23,7 +23,7 @@ from aiohttp_admin2.controllers.controller import controllers_map
 from aiohttp_admin2.controllers.exceptions import PermissionDenied
 
 if t.TYPE_CHECKING:
-    from aiohttp_admin2.views.aiohttp.views.tab_base_view import TabBaseView
+    from aiohttp_admin2.views.aiohttp.views.tab_base_view import TabBaseView # noqa
 
 __all__ = [
     'BaseAdminView',
@@ -114,7 +114,9 @@ class BaseAdminView:
 
     @classmethod
     def get_index_url(cls):
-        """This method return the url of the index page of the current views."""
+        """
+        This method return the url of the index page of the current views.
+        """
         return str(cls.index_url or f'/{cls.__name__.lower()}/')
 
     @classmethod
@@ -310,7 +312,13 @@ class BaseControllerView(BaseAdminView):
     controller: t.Type[Controller]
     _controller: Controller
 
-    def __init__(self, request=None, params: t.Dict[str, t.Any] = None, *args, **kwargs) -> None:
+    def __init__(
+        self,
+        request=None,
+        params: t.Dict[str, t.Any] = None,
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(request, *args, **kwargs)
         self._controller = self.controller.builder()
         self.params = params or {}

@@ -16,8 +16,8 @@ from aiohttp_admin2.controllers.types import Cell
 from aiohttp_admin2.controllers.types import ListObject
 
 if t.TYPE_CHECKING:
-    from aiohttp_admin2.controllers.relations import ToManyRelation
-    from aiohttp_admin2.controllers.relations import ToOneRelation
+    from aiohttp_admin2.controllers.relations import ToManyRelation  # noqa
+    from aiohttp_admin2.controllers.relations import ToOneRelation  # noqa
 
 
 logger = logging.getLogger(__name__)

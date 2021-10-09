@@ -74,7 +74,7 @@ class ControllerView(BaseControllerView):
                 if url_name_maps.get(url_name):
                     return str(
                         req.app.router[url_name_maps.get(url_name)]
-                            .url_for(pk=str(obj.get_pk()))
+                        .url_for(pk=str(obj.get_pk()))
                     )
 
             return ''
@@ -100,7 +100,10 @@ class ControllerView(BaseControllerView):
                 **await self.get_context(req),
                 "list": data,
                 "controller": controller,
-                "create_url": str(req.app.router[self.get_url(self.get_create).name].url_for()),
+                "create_url": str(
+                    req.app.router[self.get_url(self.get_create).name]
+                    .url_for()
+                ),
                 "media": self.get_extra_media_list(),
                 "view_filters": self.get_filters(req.rel_url.query),
             }
@@ -131,12 +134,18 @@ class ControllerView(BaseControllerView):
                 "object": instance,
                 "controller": controller,
                 "title": f"{self.get_name()}#{pk}",
-                "delete_url": req.app.router[self.get_url(self.get_delete).name]
-                    .url_for(pk=pk),
-                "detail_url": req.app.router[self.get_url(self.get_detail).name]
-                    .url_for(pk=pk),
-                "save_url": req.app.router[self.get_url(self.post_update).name]
-                    .url_for(pk=pk),
+                "delete_url": (
+                    req.app.router[self.get_url(self.get_delete).name]
+                    .url_for(pk=pk)
+                ),
+                "detail_url": (
+                    req.app.router[self.get_url(self.get_detail).name]
+                    .url_for(pk=pk)
+                ),
+                "save_url": (
+                    req.app.router[self.get_url(self.post_update).name]
+                    .url_for(pk=pk)
+                ),
                 "mapper": mapper or controller.mapper(instance.data.to_dict()),
                 "fields": controller.fields,
                 "exclude_fields": self.controller.exclude_update_fields,
@@ -165,7 +174,10 @@ class ControllerView(BaseControllerView):
                 "mapper": mapper or controller.mapper({}),
                 "fields": controller.fields,
                 "exclude_fields": self.controller.exclude_create_fields,
-                "create_post_url": str(req.app.router[self.get_url(self.post_create).name].url_for()),
+                "create_post_url": str(
+                    req.app.router[self.get_url(self.post_create).name]
+                    .url_for()
+                ),
             }
         )
 
@@ -181,11 +193,11 @@ class ControllerView(BaseControllerView):
         else:
             raise web.HTTPFound(
                 req.app.router[self.get_url(self.get_detail).name]
-                    .url_for(pk=str(obj.get_pk()))
-                    .with_query(
-                        f'message=The {self.get_name()}#{obj.get_pk()} '
-                        f'has been created'
-                    )
+                .url_for(pk=str(obj.get_pk()))
+                .with_query(
+                    f'message=The {self.get_name()}#{obj.get_pk()} '
+                    f'has been created'
+                )
             )
 
     # todo: concat post and get update
@@ -203,8 +215,8 @@ class ControllerView(BaseControllerView):
         else:
             raise web.HTTPFound(
                 req.app.router[self.get_url(self.get_detail).name]
-                    .url_for(pk=pk)
-                    .with_query(
+                .url_for(pk=pk)
+                .with_query(
                     f'message=The {self.get_name()}#{pk} has been updated'
                 )
             )
@@ -221,8 +233,10 @@ class ControllerView(BaseControllerView):
                 **await self.get_context(req),
                 "title": f"Confirm delete {self.get_name()}#{pk}",
                 "controller": controller,
-                "delete_url": req.app.router[self.get_url(self.post_delete).name]
-                    .url_for(pk=pk),
+                "delete_url": (
+                    req.app.router[self.get_url(self.post_delete).name]
+                    .url_for(pk=pk)
+                ),
                 "pk": pk,
             }
         )

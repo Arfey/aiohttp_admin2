@@ -1,3 +1,4 @@
+# flake8: noqa
 from aiohttp_admin2.mappers.fields.string_field import StringField
 from aiohttp_admin2.mappers.fields.string_field import LongStringField
 from aiohttp_admin2.mappers.fields.bolean_field import BooleanField

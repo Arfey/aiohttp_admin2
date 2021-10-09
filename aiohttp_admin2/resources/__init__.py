@@ -1,3 +1,4 @@
+# flake8: noqa
 from aiohttp_admin2.resources.postgres_resource.postgres_resource import \
     PostgresResource
 from aiohttp_admin2.resources.mongo_resource.mongo_resource import MongoResource
