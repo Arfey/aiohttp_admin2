@@ -157,6 +157,7 @@ async def app():
     await admin(application)
 
     asyncio.create_task(load_data_cron(application['db_url']))
-    asyncio.create_task(ping_website())
+    # now we have a problem with heroku's limit 😔 and can't to use it
+    # asyncio.create_task(ping_website())
 
     return application
