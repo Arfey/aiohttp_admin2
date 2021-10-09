@@ -36,7 +36,7 @@ async def test_create_success_with_partial_data(resource):
 
     assert instance.get_pk()
     assert instance.data.val == 'test'
-    assert instance.data.val2 is None
+    assert getattr(instance.data, 'val2', None) is None
 
 
 @pytest.mark.asyncio
