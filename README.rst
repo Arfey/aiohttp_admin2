@@ -5,7 +5,7 @@
         :target: https://github.com/Arfey/aiohttp_admin2/actions/workflows/tests.yaml
 
 .. image:: https://readthedocs.org/projects/aiohttp-admin2/badge/?version=latest
-        :target: https://aiohttp-admin2.readthedocs.io/en/latest/?badge=latest
+        :target: https://aiohttp-admin2.readthedocs.io
         :alt: Documentation Status
 
 .. image:: https://pyup.io/repos/github/arfey/aiohttp_admin2/shield.svg
