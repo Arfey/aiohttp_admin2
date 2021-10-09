@@ -68,7 +68,8 @@ Ready to contribute? Here's how to set up `aiohttp_admin2` for local development
 
     $ mkvirtualenv aiohttp_admin2
     $ cd aiohttp_admin2/
-    $ python setup.py develop
+    $ pip install requirements/develop.txt
+    $ pip install -e .
 
 4. Create a branch for local development::
 
@@ -76,14 +77,11 @@ Ready to contribute? Here's how to set up `aiohttp_admin2` for local development
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8 and the
-   tests, including testing other Python versions with tox::
+5. When you're done making changes, check that your changes pass linters and
+   tests::
 
-    $ flake8 aiohttp_admin2 tests
-    $ python setup.py test or pytest
-    $ tox
-
-   To get flake8 and tox, just pip install them into your virtualenv.
+    $ make lint
+    $ make test
 
 6. Commit your changes and push your branch to GitHub::
 
@@ -93,36 +91,19 @@ Ready to contribute? Here's how to set up `aiohttp_admin2` for local development
 
 7. Submit a pull request through the GitHub website.
 
-Pull Request Guidelines
------------------------
-
-Before you submit a pull request, check that it meets these guidelines:
-
-1. The pull request should include tests.
-2. If the pull request adds functionality, the docs should be updated. Put
-   your new functionality into a function with a docstring, and add the
-   feature to the list in README.rst.
-3. The pull request should work for Python 3.5, 3.6, 3.7 and 3.8, and for PyPy. Check
-   https://travis-ci.com/arfey/aiohttp_admin2/pull_requests
-   and make sure that the tests pass for all supported Python versions.
-
 Tips
 ----
 
 To run a subset of tests::
 
 
-    $ python -m unittest tests.test_aiohttp_admin2
+    $ pytest --slow -v -s -p no:warnings  tests/resources/common_resource
 
-Deploying
----------
 
-A reminder for the maintainers on how to deploy.
-Make sure all your changes are committed (including an entry in HISTORY.rst).
-Then run::
+Run some particular test::
 
-$ bump2version patch # possible: major / minor / patch
-$ git push
-$ git push --tags
 
-Travis will then deploy to PyPI if tests pass.
+    $ pytest --slow -v -s -p no:warnings  tests/resources/common_resource/test_create.py::test_create_with_error
+
+
+All features you can to test in demo application.

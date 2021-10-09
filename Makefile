@@ -103,9 +103,6 @@ build_lint:
 	rm README_BUILD.rst
 	rm -rf dist
 
-twine_check: build
-	python -m twine check --strict dist/*
-
-lint: bandit twine_check  ## check style
+lint: bandit  ## check style
 	flake8 aiohttp_admin2 --exclude views/aiohttp/templates
 
