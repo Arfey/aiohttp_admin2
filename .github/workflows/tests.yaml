@@ -30,6 +30,7 @@ jobs:
 
           # install poetry
           curl -sSL https://install.python-poetry.org | python3 -
+          poetry config settings.virtualenvs.create false
 
           # install deps
           pip install flake8 bandit twine
