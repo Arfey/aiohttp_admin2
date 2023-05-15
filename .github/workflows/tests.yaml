@@ -29,7 +29,7 @@ jobs:
           python -m pip install --upgrade pip
 
           # install poetry
-          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+          curl -sSL https://install.python-poetry.org | python3 -
 
           # install deps
           pip install flake8 bandit twine
@@ -65,8 +65,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
 
+          # install poetry
+          curl -sSL https://install.python-poetry.org | python3 -
+
           # install deps
           pip install -r requirements/develop.txt
+
+          poetry install
 
       - name: Pytest
         run: make test
