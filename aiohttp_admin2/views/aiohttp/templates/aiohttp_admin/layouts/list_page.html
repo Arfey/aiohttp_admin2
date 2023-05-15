@@ -9,7 +9,7 @@
         {% include 'aiohttp_admin/blocks/tabs_bar.html' %}
 
         {% block list_content %}
-            <div class="container">
+            <div>
                 <div>
                     {% if controller.search_fields %}
                         {{ search_filter(controller_view.search_filter(controller.search_fields, url_query)) }}
