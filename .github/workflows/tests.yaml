@@ -74,4 +74,5 @@ jobs:
           poetry install
 
       - name: Pytest
-        run: make test
+        run: |
+          poetry run pytest --slow -v -s -p no:warnings
