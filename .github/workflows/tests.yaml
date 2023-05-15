@@ -32,18 +32,16 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
 
           # install deps
-          pip install flake8 bandit twine
+          poetry add flake8 bandit twine
 
       - name: bandit
         run: make bandit
 
       - name: Lint build
         run: |
-          source $HOME/.poetry/env
-
           cat README.rst > README_BUILD.rst && echo >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst
           poetry build
-          python -m twine check --strict dist/*
+          poetry run python -m twine check --strict dist/*
 
       - name: flake8
         run: flake8 aiohttp_admin2 --exclude views/aiohttp/templates
@@ -69,9 +67,9 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
 
           # install deps
-          pip install -r requirements/develop.txt
-
           poetry install
 
+          poetry add $(sed 's/#.*//' requirements/develop.txt)
+
       - name: Pytest
-        run: make test
+        run: poetry run pytest --slow -v -s -p no:warnings
