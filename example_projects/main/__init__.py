@@ -14,7 +14,7 @@ from aiohttp_session.cookie_storage import EncryptedCookieStorage
 import aiopg.sa
 import aiohttp_jinja2
 import jinja2
-from motor.motor_asyncio import AsyncIOMotorClient
+# from motor.motor_asyncio import AsyncIOMotorClient
 
 from .admin.actors.controllers import ActorPage
 from .admin.genres.pages import GenresPage
@@ -22,13 +22,13 @@ from .admin.movies.pages import MoviesPage
 from .admin.template_view import TemplatePage
 from .admin.shows.controllers import ShowsPage
 from .admin.users.controllers import UsersPage
-from .admin.mongo_admin import MongoPage
+# from .admin.mongo_admin import MongoPage
 from .routes import routes
 from .auth.views import login_page
 from .auth.authorization import AuthorizationPolicy
 from .auth.middlewares import admin_access_middleware
 from .admin.injectors import postgres_injector
-from .admin.injectors import instance
+# from .admin.injectors import instance
 from .load_data import load_data
 from .load_data import get_config_from_db_url
 
@@ -102,23 +102,23 @@ async def database(application: web.Application) -> None:
     await application['db'].wait_closed()
 
 
-async def mongo(application: web.Application) -> None:
-    """
-    A function that, when the server is started, connects to mongo,
-    and after stopping it breaks the connection (after yield)
-    """
+# async def mongo(application: web.Application) -> None:
+#     """
+#     A function that, when the server is started, connects to mongo,
+#     and after stopping it breaks the connection (after yield)
+#     """
 
-    conn = AsyncIOMotorClient(
-        'mongodb://0.0.0.0:27017/db',
-        io_loop=asyncio.get_event_loop(),
-    )
+#     conn = AsyncIOMotorClient(
+#         'mongodb://0.0.0.0:27017/db',
+#         io_loop=asyncio.get_event_loop(),
+#     )
 
-    application['mongo'] = conn.get_database()
-    instance.set_db(application['mongo'])
+#     application['mongo'] = conn.get_database()
+#     instance.set_db(application['mongo'])
 
-    yield
+#     yield
 
-    application['mongo'].client.close()
+#     application['mongo'].client.close()
 
 
 async def admin(application: web.Application) -> None:

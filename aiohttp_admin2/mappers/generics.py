@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 import umongo
 
 from marshmallow import EXCLUDE
@@ -28,6 +29,7 @@ class PostgresMapperGeneric(Mapper):
         sa.String: fields.StringField,
         sa.Text: fields.LongStringField,
         sa.Enum: fields.ChoicesField,
+        postgresql.ENUM: fields.ChoicesField,
         sa.Boolean: fields.BooleanField,
         sa.ARRAY: fields.ArrayField,
         sa.DateTime: fields.DateTimeField,

@@ -136,6 +136,17 @@ class Admin:
             .add_static('/static/', path=str(static_dir), name='admin_static')
 
         self._set_views(admin)
+        # global_list_view_item = global_list_view.get()
+
+        # async def init_views(app):
+        #     global_list_view.set(global_list_view_item)
+
+        #     yield
+
+        # self.app.cleanup_ctx.extend([
+        #     init_views,
+        # ])
+
         self.app.add_subapp(self.admin_url, admin)
         self.app['aiohttp_admin'] = admin
 

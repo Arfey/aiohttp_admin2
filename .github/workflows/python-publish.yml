@@ -24,8 +24,8 @@ jobs:
     - name: Install Python dependencies
       run: |
         # install poetry
-        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-        source $HOME/.poetry/env
+        curl -sSL https://install.python-poetry.org | python3 -
+        poetry config settings.virtualenvs.create false
 
         # install deps
         pip install poetry-dynamic-versioning bandit twine
@@ -34,9 +34,8 @@ jobs:
         cat README.rst > README_BUILD.rst && echo >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst
     - name: Publish
       run: |
-        source $HOME/.poetry/env
         poetry build
-        python -m twine check --strict dist/*
+        poetry run python -m twine check --strict dist/*
         poetry publish --username ${PYPI_USERNAME} --password ${PYPI_PASSWORD}
       env:
           PYPI_USERNAME: __token__

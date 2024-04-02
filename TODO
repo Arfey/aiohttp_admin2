@@ -7,7 +7,7 @@
 - think about move instance to dict
 - get name of user in nav bar
 - controller name with whitespace
-- datetime field mongodb
+- date time field mongodb
 - remove hidden field for update???
 - add required to generic fields
 - add min,max length input
@@ -36,3 +36,10 @@
 - permission for tabs
 - todo: pagination in tabs
 - TabTemplateView
+
+
+-----
+
+- example video
+- optional packages
+- change docs related to example projects

@@ -14,7 +14,7 @@ class PostStatusEnum(Enum):
     not_published = 'not published'
 
 
-users = sa.Table('users', metadata,
+users = sa.Table('demo_quick_users', metadata,
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('first_name', sa.String(255)),
     sa.Column('last_name', sa.String(255)),
@@ -22,16 +22,25 @@ users = sa.Table('users', metadata,
     sa.Column('joined_at', sa.DateTime()),
 )
 
-post = sa.Table('post', metadata,
+post = sa.Table('demo_quick_post', metadata,
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('title', sa.String(255)),
     sa.Column('body', sa.Text),
     sa.Column('status', sa.Enum(PostStatusEnum)),
     sa.Column('published_at', sa.DateTime()),
-    sa.Column('author_id', sa.ForeignKey('users.id', ondelete='CASCADE')),
+    sa.Column('author_id', sa.ForeignKey('demo_quick_users.id', ondelete='CASCADE')),
 )
 
-DB_URL = 'postgres://postgres:postgres@0.0.0.0:5432/postgres'
+DB_URL = 'postgresql://postgres:postgres@0.0.0.0:5432/postgres'
+
+
+def create_tables(db_url):
+    engine = create_engine(
+        db_url,
+        isolation_level='AUTOCOMMIT',
+    )
+
+    metadata.create_all(engine)
 
 
 def recreate_tables(db_url):

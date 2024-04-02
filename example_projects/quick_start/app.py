@@ -1,3 +1,4 @@
+import typing as t
 from aiohttp import web
 from aiohttp_admin2 import setup_admin
 from aiohttp_admin2.views import Admin
@@ -22,6 +23,7 @@ from .auth import login_page
 from .auth import login_post
 from .auth import logout_page
 from .auth import AuthorizationPolicy
+from .tables import create_tables, DB_URL
 
 
 template_directory = Path(__file__).parent / 'templates'
@@ -47,7 +49,7 @@ async def init_db(app):
     await app['db'].wait_closed()
 
 
-async def security(application: web.Application) -> None:
+async def security(application: web.Application) -> t.AsyncGenerator[None, None]:
     fernet_key = fernet.Fernet.generate_key()
     secret_key = base64.urlsafe_b64decode(fernet_key)
 
@@ -63,8 +65,13 @@ async def security(application: web.Application) -> None:
 
 
 def app() -> web.Application:
-    application = web.Application()
+    try:
+        # try to create tables if no exists
+        create_tables(DB_URL)
+    except Exception:
+        pass
 
+    application = web.Application()
     application.cleanup_ctx.extend([
         init_db,
         security,
@@ -88,7 +95,9 @@ def app() -> web.Application:
     application.add_routes([
         web.get('/login', login_page, name='login'),
         web.post('/login', login_post, name='login_post'),
-        web.get('/logout', logout_page, name='logout')
+        web.get('/logout', logout_page, name='logout'),
+        # redirect to login page if page not found
+        web.get('/{tail:.*}', login_page, name='redirect_to_login'),
     ])
 
     return application

@@ -38,7 +38,7 @@ API_KEY = '702889df5a654ac187d0de04d5b85f97'
 
 def get_config_from_db_url(text_url):
     result = re.match(
-        r'postgres:\/\/(\w*):(\w*)@([-\w.]*):(\d*)\/([\w]*)',
+        r'postgresql:\/\/(\w*):(\w*)@([-\w.]*):(\d*)\/([\w]*)',
         text_url,
     )
 
@@ -291,7 +291,7 @@ async def load_data(db_url_text):
                 'budget': movie.get('budget'),
                 'revenue': movie.get('revenue'),
                 'release_date': movie.get('release_date') or None,
-                'vote_average': movie.get('vote_average'),
+                'vote_average': movie.get('vote_average', 0),
                 'vote_count': movie.get('vote_count'),
                 'poster_path': movie.get('poster_path'),
                 'status': movies_status_mapper.get(
@@ -379,7 +379,7 @@ async def load_data(db_url_text):
             'overview': show.get('overview'),
             'homepage': show.get('homepage'),
             'title': show.get('name'),
-            'vote_average': show.get('vote_average'),
+            'vote_average': show.get('vote_average', 0),
             'vote_count': show.get('vote_count'),
             'poster_path': show.get('poster_path'),
             'status': shows_status_mapper.get(
@@ -399,6 +399,8 @@ async def load_data(db_url_text):
 
     for show_id, seasons in shows_seasons_dict.items():
         for season in seasons:
+            season.pop('vote_average', None)
+            season.pop('vote_count', None)
             seasons_values.append({"show_id": show_id, **season})
 
     query = shows_seasons\

@@ -19,7 +19,7 @@
 
 <!-- pagination block -->
 {% macro pagination(page, count, has_next, has_prev, per_page, query_args={}, size=5) -%}
-    <nav class="container pagination-wrapper">
+    <nav class="pagination-wrapper">
         <ul class="pagination">
             <!-- prev -->
             <li class="page-item {% if not has_prev %}disabled{% endif %}">
