@@ -45,7 +45,7 @@ jobs:
           poetry run python -m twine check --strict dist/*
 
       - name: flake8
-        run: flake8 aiohttp_admin2 --exclude views/aiohttp/templates
+        run: poetry run flake8 aiohttp_admin2 --exclude views/aiohttp/templates
 
   run-tests:
     name: Run pytest
