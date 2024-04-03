@@ -4,7 +4,6 @@ from aiohttp_admin2.resources import Instance
 from aiohttp_admin2.resources import DictResource
 
 
-@pytest.mark.asyncio
 async def test_create_with_success(resource):
     """
     In this test check corrected work of create method in resource.
@@ -23,7 +22,6 @@ async def test_create_with_success(resource):
     assert instance.get_pk()
 
 
-@pytest.mark.asyncio
 async def test_create_success_with_partial_data(resource):
     """
     In this test we check that instance have been created success without full
@@ -39,7 +37,6 @@ async def test_create_success_with_partial_data(resource):
     assert getattr(instance.data, 'val2', None) is None
 
 
-@pytest.mark.asyncio
 async def test_create_with_error_if_data_no_precent_required_field(resource):
     """
     In this test we check that instance will not be create if data don't have
@@ -53,7 +50,6 @@ async def test_create_with_error_if_data_no_precent_required_field(resource):
             await resource.create(obj)
 
 
-@pytest.mark.asyncio
 async def test_create_with_error(resource):
     """
     In this test check corrected work of create method in resource.

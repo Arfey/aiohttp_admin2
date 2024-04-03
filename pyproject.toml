@@ -17,15 +17,16 @@ packages = [
 exclude = ["tests/**/*"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.8.1"
 aiohttp = "^3.6.3"
 aiohttp-jinja2 = "^1.4.2"
-aiomysql = {version = "^0.0.21", optional = true}
-motor = {version = "^2.4.0", optional = true}
+
+umongo = {version = "^3.1.0", extras = ["motor"], optional = true}
 python-dateutil = "^2.8.1"
 sqlalchemy = "^2.0.29"
 sqlalchemy-stubs = "^0.4"
 aiopg = {version = "^1.4.0", extras = ["sa"]}
+aiomysql = {version = "^0.2.0", optional = true}
 
 [tool.poetry.group.dev.dependencies]
 aiohttp-devtools = "^1.1.2"
@@ -33,16 +34,28 @@ aiohttp-security = "^0.5.0"
 aiohttp-session = "^2.12.0"
 aiohttp-jinja2 = "^1.6"
 cryptography = "^42.0.5"
-umongo = {version = "^3.1.0", extras = ["motor"]}
 aiofiles = "^23.2.1"
 
+[tool.poetry.group.test.dependencies]
+pytest = "^8.1.1"
+pytest-docker = "^3.1.1"
+pytest-aiohttp = "^1.0.5"
+pytest-asyncio = "0.21.1"
+bandit = "^1.7.8"
+flake8 = "^7.0.0"
+twine = "^5.0.0"
+
 [tool.poetry.extras]
-motor = ["motor"]
+motor = ["umongo"]
 mysql = ["aiomysql"]
 
 
 [tool.poetry-dynamic-versioning]
 enable = true
+
+[tool.pytest.ini_options]
+asyncio_mode="auto"
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]

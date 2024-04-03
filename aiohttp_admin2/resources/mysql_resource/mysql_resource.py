@@ -5,6 +5,13 @@ from aiohttp_admin2.resources.postgres_resource.postgres_resource import \
 from aiohttp_admin2.resources.abc import Instance
 from aiohttp_admin2.resources.types import PK
 
+try:
+    from sqlalchemy.dialects.mysql.pymysql import MySQLDialect_pymysql
+    # waiting for fix https://github.com/aio-libs/aiomysql/discussions/908
+    MySQLDialect_pymysql.case_sensitive = True
+except ImportError:
+    raise ImportError('aiomysql.sa requires sqlalchemy')
+
 
 __all__ = ['MySqlResource', ]
 

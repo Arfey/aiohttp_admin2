@@ -5,7 +5,6 @@ from aiohttp_admin2.resources import DictResource
 from .utils import generate_fake_instance
 
 
-@pytest.mark.asyncio
 async def test_update(resource):
     """
     In this test check corrected work of update method in resource.

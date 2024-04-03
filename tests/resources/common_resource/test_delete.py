@@ -5,7 +5,6 @@ from aiohttp_admin2.resources.exceptions import InstanceDoesNotExist
 from .utils import generate_fake_instance
 
 
-@pytest.mark.asyncio
 async def test_delete(resource):
     """
     In this test check corrected work of delete method in resource.

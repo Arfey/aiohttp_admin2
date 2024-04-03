@@ -64,12 +64,11 @@ Ready to contribute? Here's how to set up `aiohttp_admin2` for local development
 
     $ git clone git@github.com:your_name_here/aiohttp_admin2.git
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+3. You need to have preinstalled poetry and docker.
 
-    $ mkvirtualenv aiohttp_admin2
+    $ poetry config virtualenvs.create true --local # create virtualenv in project directory
     $ cd aiohttp_admin2/
-    $ pip install requirements/develop.txt
-    $ pip install -e .
+    $ poetry install --with "dev, test" --all-extras
 
 4. Create a branch for local development::
 

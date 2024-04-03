@@ -69,10 +69,7 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
 
           # install deps
-          poetry install
-
-          pip install -r requirements/develop.txt
-
+          poetry install --with "dev, test" --all-extras
       - name: Pytest
         run: |
           poetry run pytest --slow -v -s -p no:warnings

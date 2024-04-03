@@ -5,7 +5,6 @@ from aiohttp_admin2.resources.exceptions import InstanceDoesNotExist
 from .utils import generate_fake_instance
 
 
-@pytest.mark.asyncio
 async def test_get_one(resource):
     """
     In this test check corrected work of get method in resource.
@@ -34,7 +33,6 @@ async def test_get_one(resource):
         await resource.get_one(second_id)
 
 
-@pytest.mark.asyncio
 async def test_get_one_correct_value_of_field(resource):
     """
     In this test we check that get method return instance with right value.

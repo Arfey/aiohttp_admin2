@@ -3,7 +3,6 @@ import pytest
 from .utils import generate_fake_instance
 
 
-@pytest.mark.asyncio
 async def test_get_many(resource):
     """
     In this test check corrected work of get_many method in resource.

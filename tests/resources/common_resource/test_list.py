@@ -9,7 +9,6 @@ from aiohttp_admin2.resources.types import FilterTuple
 from .utils import generate_fake_instance
 
 
-@pytest.mark.asyncio
 async def test_list_order(resource):
     """
     In this test check corrected work sort in get_list method of resource.
@@ -41,7 +40,6 @@ async def test_list_order(resource):
         await resource.get_list(order_by='val', cursor=1)
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("ordering", ("id", "-id"))
 async def test_list_page_pagination(resource, ordering):
     """
@@ -115,7 +113,6 @@ async def test_list_page_pagination(resource, ordering):
     assert list_objects.has_prev
 
 
-@pytest.mark.asyncio
 async def test_list_page_pagination_parameters_error(resource):
     """
     In this test check errors which can been raised if pass bad arguments.
@@ -140,7 +137,6 @@ async def test_list_page_pagination_parameters_error(resource):
         await resource.get_list(page=0)
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("ordering", ("id", "-id"))
 async def test_list_cursor_pagination(resource, ordering):
     """
@@ -194,7 +190,6 @@ async def test_list_cursor_pagination(resource, ordering):
     assert list_objects.count is None
 
 
-@pytest.mark.asyncio
 async def test_filter_api_for_get_list(resource):
     """
     In this test check corrected work filter api in get_list method of resource.
@@ -246,7 +241,6 @@ async def test_filter_api_for_get_list(resource):
     assert list_objects_ids[0] == full_list_objects_ids[1]
 
 
-@pytest.mark.asyncio
 async def test_common_filters_for_get_list(resource):
     """
     In this test we check corrected work of common filters in get_list method

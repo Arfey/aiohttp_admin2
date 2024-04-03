@@ -166,7 +166,10 @@ class PostgresResource(AbstractResource):
                     count: int = await self._execute_scalar(
                         conn,
                         self.apply_filters(
-                            query=sa.select(func.count(self._primary_key)).select_from(self.table),
+                            query=(
+                                sa.select(func.count(self._primary_key))
+                                .select_from(self.table)
+                            ),
                             filters=filters,
                         )
                     )
