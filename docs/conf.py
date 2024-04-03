@@ -97,4 +97,4 @@ latex_elements = {
 
 
 def setup(app):
-    app.add_stylesheet('style.css?r=1')
+    app.add_css_file('style.css')
