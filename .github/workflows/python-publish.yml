@@ -29,6 +29,7 @@ jobs:
 
           # install deps
           poetry install --with "dev, test" --all-extras
+          poetry self add "poetry-dynamic-versioning[plugin]"
       - name: Create README.rst
         run: |
           cat README.rst > README_BUILD.rst && echo >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst
