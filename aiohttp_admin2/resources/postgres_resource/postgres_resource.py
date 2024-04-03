@@ -166,14 +166,14 @@ class PostgresResource(AbstractResource):
                     count: int = await self._execute_scalar(
                         conn,
                         self.apply_filters(
-                            query=sa.select([func.count(self._primary_key)]),
+                            query=sa.select(func.count(self._primary_key)).select_from(self.table),
                             filters=filters,
                         )
                     )
                 else:
                     count: int = await self._execute_scalar(
                         conn,
-                        sa.select([func.count(self._primary_key)])
+                        sa.select(func.count()).select_from(self.table)
                     )
                 return self.create_paginator(
                     instances=res,

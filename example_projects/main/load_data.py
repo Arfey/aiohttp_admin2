@@ -156,20 +156,20 @@ def recreate_tables(db_url):
 async def create_users(config):
     query = users.insert().values([
         {
-            "name": "admin",
+            "name": "Jake Gyllenhaal",
             "is_superuser": True,
             "create_at": datetime.datetime.now(),
             "create_at_date": datetime.datetime.today(),
             "payload": {},
-            "avatar": "https://bit.ly/2MZJnqt",
+            "avatar": "https://image.tmdb.org/t/p/w200//rJdYHYNhlcOBwbPvDZVvt1xw7bi.jpg",
         },
         {
-            "name": "user",
+            "name": "Dionne Wudu",
             "is_superuser": False,
             "create_at": datetime.datetime.now(),
             "create_at_date": datetime.datetime.today(),
             "payload": {},
-            "avatar": "https://bit.ly/2MZJnqt",
+            "avatar": "https://image.tmdb.org/t/p/w200//gSvoRh6lRnLM0FduX3sIciTIj17.jpg",
         },
     ])
 

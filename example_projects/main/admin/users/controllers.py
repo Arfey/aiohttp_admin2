@@ -22,11 +22,11 @@ class UserPostgresResource(PostgresResource):
         """
         In this place you can redefine query.
         """
-        return sa.select([
+        return sa.select(
             *self.table.c,
             sa.type_coerce(sa.text("payload -> 'data'"), sa.Text)
                 .label('data')
-        ])
+        )
 
 
 @postgres_injector.inject
@@ -35,7 +35,7 @@ class UsersController(PostgresController, table=users):
     resource = UserPostgresResource
     name = 'users'
     per_page = 10
-    upload_to = './demo/main/static'
+    upload_to = './example_projects/main/static'
     inline_fields = ['id', 'create_at', 'is_superuser', 'array_c', 'data', ]
     list_filter = ['create_at', 'is_superuser', 'id']
 
