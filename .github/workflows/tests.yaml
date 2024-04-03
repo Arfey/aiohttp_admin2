@@ -33,7 +33,7 @@ jobs:
           poetry config virtualenvs.create false
 
           # install deps
-          pip install flake8 bandit twine
+          poetry install --with "dev, test" --all-extras
 
       - name: bandit
         run: make bandit
