@@ -28,7 +28,7 @@ jobs:
           poetry config virtualenvs.create false
 
           # install deps
-          pip install poetry-dynamic-versioning bandit twine
+          poetry install --with "dev, test" --all-extras
       - name: Create README.rst
         run: |
           cat README.rst > README_BUILD.rst && echo >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst

@@ -604,6 +604,20 @@ files = [
 ]
 
 [[package]]
+name = "dunamai"
+version = "1.19.2"
+description = "Dynamic version generation"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "dunamai-1.19.2-py3-none-any.whl", hash = "sha256:bc126b17571a44d68ed826cec596e0f61dc01edca8b21486f70014936a5d44f2"},
+    {file = "dunamai-1.19.2.tar.gz", hash = "sha256:3be4049890763e19b8df1d52960dbea60b3e263eb0c96144a677ae0633734d2e"},
+]
+
+[package.dependencies]
+packaging = ">=20.9"
+
+[[package]]
 name = "exceptiongroup"
 version = "1.2.0"
 description = "Backport of PEP 654 (exception groups)"
@@ -1368,6 +1382,25 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "poetry-dynamic-versioning"
+version = "1.2.0"
+description = "Plugin for Poetry to enable dynamic versioning based on VCS tags"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "poetry_dynamic_versioning-1.2.0-py3-none-any.whl", hash = "sha256:8dbef9728d866eb3d1a4edbb29c7ac8abdf96e3ca659473e950e2c016f3785ec"},
+    {file = "poetry_dynamic_versioning-1.2.0.tar.gz", hash = "sha256:1a7bbdba2530499e73dfc6ac0af19de29020ab4aaa3e507573877114e6b71ed6"},
+]
+
+[package.dependencies]
+dunamai = ">=1.18.0,<2.0.0"
+jinja2 = ">=2.11.1,<4"
+tomlkit = ">=0.4"
+
+[package.extras]
+plugin = ["poetry (>=1.2.0,<2.0.0)"]
+
+[[package]]
 name = "psycopg2-binary"
 version = "2.9.9"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
@@ -2051,6 +2084,17 @@ files = [
 ]
 
 [[package]]
+name = "tomlkit"
+version = "0.12.4"
+description = "Style preserving TOML library"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tomlkit-0.12.4-py3-none-any.whl", hash = "sha256:5cd82d48a3dd89dee1f9d64420aa20ae65cfbd00668d6f094d7578a78efbb77b"},
+    {file = "tomlkit-0.12.4.tar.gz", hash = "sha256:7ca1cfc12232806517a8515047ba66a19369e71edf2439d0f5824f91032b6cc3"},
+]
+
+[[package]]
 name = "twine"
 version = "5.0.0"
 description = "Collection of utilities for publishing packages on PyPI"
@@ -2333,4 +2377,4 @@ mysql = ["aiomysql"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "c2f5854707969a2abe70d56cf7c06a9bef61c7072eed6d00901252fa5a04435a"
+content-hash = "7ecd934f4053db4cd280830f5e32b2096bd5d3b4e0851aa7967291cb5cd82870"
