@@ -6,6 +6,9 @@ sphinx:
 formats:
    - pdf
 
+build:
+  image: latest
+
 python:
    version: 3.8
    install:
