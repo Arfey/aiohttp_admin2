@@ -17,10 +17,10 @@ import aiomysql.sa
 
 from aiohttp_admin2.resources import (
     PostgresResource,
-    MySqlResource,
-    # MongoResource,
     DictResource,
 )
+from aiohttp_admin2.resources.mysql_resource.mysql_resource import MySqlResource
+# from aiohttp_admin2.resources.mongo_resource.mongo_resource import MongoResource
 
 
 resource_params = [
