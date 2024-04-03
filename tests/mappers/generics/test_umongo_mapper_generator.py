@@ -1,5 +1,5 @@
 from aiohttp_admin2.mappers import fields
-from aiohttp_admin2.mappers.generics import MongoMapperGeneric
+from aiohttp_admin2.mappers.generics.mongo import MongoMapperGeneric
 from umongo import Document
 from umongo import fields as mongo_fields
 

@@ -1,6 +1,6 @@
 from umongo.document import MetaDocumentImplementation
 from aiohttp_admin2.controllers.controller import Controller
-from aiohttp_admin2.mappers.generics import MongoMapperGeneric
+from aiohttp_admin2.mappers.generics.mongo import MongoMapperGeneric
 from aiohttp_admin2.resources.mongo_resource.mongo_resource import MongoResource  # noqa
 
 
