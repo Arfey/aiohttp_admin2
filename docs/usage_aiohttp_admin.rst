@@ -982,6 +982,29 @@ have to inherit from `BaseWidget`. Custom filter have to inherit from
 `FilerBase`.
 
 
+Custom Routes
+...............
+
+You can use `@route` decorator to add custom endpoint to your view
+
+.. code-block:: python
+
+    from aiohttp_admin2.view import ControllerView
+    from aiohttp_admin2.views.aiohttp.views.utils import route
+
+    class UserView(ControllerView):
+        controller = UserController
+
+        @route(r'/{pk:\d+}/ban/', method='POST')
+        def ban_user(self, req):
+            # ban_user(req.match_info['pk'])
+            return await self.get_detail(req)
+
+
+`@route` takes 2 parameters: url and method. Valid methods are: `POST`, `GET`, `PUT`, `DELETE`, `HEAD`.
+The URL must always start and end with `/`.
+
+
 Templates
 ---------
 
