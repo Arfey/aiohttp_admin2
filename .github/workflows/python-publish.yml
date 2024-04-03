@@ -22,21 +22,21 @@ jobs:
         with:
           python-version: '3.x'
       - name: Install Python dependencies
-      run: |
-        # install poetry
-        curl -sSL https://install.python-poetry.org | python3 -
-        poetry config settings.virtualenvs.create false
+        run: |
+          # install poetry
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry config settings.virtualenvs.create false
 
-        # install deps
-        pip install poetry-dynamic-versioning bandit twine
-    - name: Create README.rst
-      run: |
-        cat README.rst > README_BUILD.rst && echo >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst
-    - name: Publish
-      run: |
-        poetry build
-        poetry run python -m twine check --strict dist/*
-        poetry publish --username ${PYPI_USERNAME} --password ${PYPI_PASSWORD}
-      env:
-          PYPI_USERNAME: __token__
-          PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+          # install deps
+          pip install poetry-dynamic-versioning bandit twine
+      - name: Create README.rst
+        run: |
+          cat README.rst > README_BUILD.rst && echo >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst
+      - name: Publish
+        run: |
+          poetry build
+          poetry run python -m twine check --strict dist/*
+          poetry publish --username ${PYPI_USERNAME} --password ${PYPI_PASSWORD}
+        env:
+            PYPI_USERNAME: __token__
+            PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
