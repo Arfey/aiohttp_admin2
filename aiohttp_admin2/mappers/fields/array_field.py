@@ -89,4 +89,4 @@ class ArrayField(AbstractField):
             f"{self.__class__.__name__}(name={self.type_name}," \
             f" value={self._value}), required={self.required}" \
             f" primary_key={self.primary_key}"\
-            f" type={self.field_cls.__name__ })"
+            f" type={self.field_cls.__name__})"
