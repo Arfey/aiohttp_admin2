@@ -176,7 +176,9 @@ class PostgresResource(AbstractResource):
                 else:
                     count: int = await self._execute_scalar(
                         conn,
-                        sa.select(func.count()).select_from(self.get_list_select())
+                        sa.select(func.count()).select_from(
+                            self.get_list_select()
+                        )
                     )
                 return self.create_paginator(
                     instances=res,
