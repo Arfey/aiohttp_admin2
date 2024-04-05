@@ -162,22 +162,10 @@ class PostgresResource(AbstractResource):
                 res.append(self._row_to_instance(r, res))
 
             if cursor is None:
-                if filters:
-                    count: int = await self._execute_scalar(
-                        conn,
-                        self.apply_filters(
-                            query=(
-                                sa.select(func.count(self._primary_key))
-                                .select_from(self.table)
-                            ),
-                            filters=filters,
-                        )
-                    )
-                else:
-                    count: int = await self._execute_scalar(
-                        conn,
-                        sa.select(func.count()).select_from(self.table)
-                    )
+                count: int = await self._execute_scalar(
+                    conn,
+                    sa.select(func.count()).select_from(query)
+                )
                 return self.create_paginator(
                     instances=res,
                     limit=limit,
