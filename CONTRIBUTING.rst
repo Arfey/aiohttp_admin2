@@ -76,19 +76,24 @@ Ready to contribute? Here's how to set up `aiohttp_admin2` for local development
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass linters and
+5. Install dependencies
+
+    $ pip install pre-commit
+    $ poetry install --with "dev, test" --all-extras
+
+6. When you're done making changes, check that your changes pass linters and
    tests::
 
     $ make lint
     $ make test
 
-6. Commit your changes and push your branch to GitHub::
+7. Commit your changes and push your branch to GitHub::
 
     $ git add .
     $ git commit -m "Your detailed description of your changes."
     $ git push origin name-of-your-bugfix-or-feature
 
-7. Submit a pull request through the GitHub website.
+8. Submit a pull request through the GitHub website.
 
 Tips
 ----

@@ -50,4 +50,3 @@ def test_validation_from_string():
     mapper = BooleanMapper({"field": True})
     assert mapper.is_valid()
     assert mapper.data['field'] is True
-

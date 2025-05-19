@@ -16,15 +16,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v1
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.12"
+      - name: Install pre-commit
+        run: pip install pre-commit
+      - name: Lint using pre-commit
+        run: pre-commit run --all-files
 
-      - name: Install Python dependencies
+      - name: Install Poetry
         run: |
           python -m pip install --upgrade pip
 
@@ -35,17 +37,11 @@ jobs:
           # install deps
           poetry install --with "dev, test" --all-extras
 
-      - name: bandit
-        run: make bandit
-
       - name: Lint build
         run: |
           cat README.rst > README_BUILD.rst && echo >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst
           poetry build
           poetry run python -m twine check --strict dist/*
-
-      - name: flake8
-        run: poetry run flake8 aiohttp_admin2 --exclude views/aiohttp/templates
 
   run-tests:
     name: Run pytest

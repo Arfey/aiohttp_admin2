@@ -13,14 +13,8 @@ test: ## run tests
 	@docker stop $(docker ps | grep pytest | awk '{ print $1 }') | true
 	poetry run pytest --slow -v -s -p no:warnings
 
-bandit:
-	poetry run bandit -r ./aiohttp_admin2
-
-mypy: ## run mypy
-	@mypy aiohttp_admin2
-
-lint: bandit  ## check style
-	poetry run flake8 aiohttp_admin2 --exclude views/aiohttp/templates
+lint:  ## check style
+	@pre-commit run --all-files
 
 build_lint:
 	cat README.rst > README_BUILD.rst && echo >> README_BUILD.rst && cat HISTORY.rst >> README_BUILD.rst

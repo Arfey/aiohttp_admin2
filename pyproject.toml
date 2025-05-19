@@ -60,3 +60,42 @@ asyncio_mode="auto"
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 79
+
+[tool.isort]
+line_length = 80
+multi_line_output = 3
+include_trailing_comma = true
+use_parentheses = true
+ensure_newline_before_comments = true
+force_grid_wrap = 2
+extend_skip_glob = [".git", "env/*", ".venv/*", ".mypy_cache/*", "example_projects/*", "tests/*"]
+
+[tool.flake8]
+max-line-length = 80
+max-complexity = 12
+exclude = [".git", "env/*", ".venv/*", ".mypy_cache/*", "example_projects/*", "tests/*"]
+extend-ignore = ["P101"]
+
+[tool.bandit]
+exclude_dirs = ["env", ".venv", ".cache", "tests/", ".mypy_cache", "example_projects"]
+
+[tool.mypy]
+ignore_missing_imports = true
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_untyped_defs = true
+follow_imports = "silent"
+strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = "tests/*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "example_projects/*"
+ignore_errors = true

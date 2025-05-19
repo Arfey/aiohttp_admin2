@@ -480,4 +480,3 @@ async def load_data(db_url_text):
     """))
 
     print('Done...')
-
