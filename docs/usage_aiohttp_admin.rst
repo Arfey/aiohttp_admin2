@@ -3,7 +3,7 @@
    :keywords: admin, aiohttp, admin-dashboard, admin-panel, aiohttp-admin, umongo, python, sqlalchemy, asyncio
 
 Usage aiohttp admin
-=====
+===================
 
 .. image:: /images/overview_header.png
 
@@ -105,7 +105,7 @@ related with this view only for users who have correct rights for that.
 
 .. code-block:: python
 
-    from aiohttp_admin2.view import ControllerView
+    from aiohttp_admin2.views import ControllerView
 
 
     class ActorView(ControllerView):
@@ -127,7 +127,7 @@ create but without edit rights.
 
 .. code-block:: python
 
-    from aiohttp_admin2.view import ControllerView
+    from aiohttp_admin2.views import ControllerView
 
 
     class ActorView(ControllerView):
@@ -528,9 +528,8 @@ to db exist in table instance.
                 per_page = 10
 
 
-
-Common settings
-...............
+Common controller settings
+..........................
 
 **access settings**
 
@@ -835,7 +834,7 @@ TemplateView
 
 .. code-block:: python
 
-    from aiohttp_admin2.view import TemplateView
+    from aiohttp_admin2.views import TemplateView
 
 
     class NewPage(TemplateView):
@@ -847,7 +846,7 @@ specify `content` variable in jinja's context.
 
 .. code-block:: python
 
-    from aiohttp_admin2.view import TemplateView
+    from aiohttp_admin2.views import TemplateView
 
 
     class NewPage(TemplateView):
@@ -865,8 +864,8 @@ specify `content` variable in jinja's context.
 *Dashboards* view is just subclass of `TemplateView` which you can to customize
 in the same way.
 
-Common settings
-...............
+Common view settings
+....................
 
 All view has properties which describe below:
 
@@ -932,7 +931,7 @@ models.
 
 .. code-block:: python
 
-    from aiohttp_admin2.view import ControllerView
+    from aiohttp_admin2.views import ControllerView
 
 
     class UserView(ControllerView):
@@ -989,7 +988,7 @@ You can use `@route` decorator to add custom endpoint to your view
 
 .. code-block:: python
 
-    from aiohttp_admin2.view import ControllerView
+    from aiohttp_admin2.views import ControllerView
     from aiohttp_admin2.views.aiohttp.views.utils import route
 
     class UserView(ControllerView):

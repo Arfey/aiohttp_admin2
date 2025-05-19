@@ -6,14 +6,12 @@ sys.path.insert(0, os.path.abspath('..'))
 
 
 extensions = [
-    # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
-    'sphinx.ext.autodoc',
     # https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html#module-sphinx.ext.napoleon
     'sphinx.ext.napoleon',
     # https://www.sphinx-doc.org/en/master/usage/extensions/viewcode.html
-    'sphinx.ext.viewcode',
-
-    'sphinx.ext.autosectionlabel'
+    "sphinx.ext.viewcode",
+    "sphinx.ext.autosectionlabel",
+    "sphinx_toggleprompt",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -46,7 +44,7 @@ release = ""
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -62,7 +60,7 @@ pygments_style = 'abap'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = "furo"
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the

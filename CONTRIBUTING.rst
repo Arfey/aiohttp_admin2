@@ -42,6 +42,12 @@ aiohttp admin 2 could always use more documentation, whether as part of the
 official aiohttp admin 2 docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
+.. code-block:: bash
+
+    $ pip install -r requirements/documentation.txt
+    $ sphinx-build -b html docs docs/build
+    $ open docs/build/index.html
+
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
@@ -76,7 +82,7 @@ Ready to contribute? Here's how to set up `aiohttp_admin2` for local development
 
    Now you can make your changes locally.
 
-5. Install dependencies
+5. Install dependencies::
 
     $ pip install pre-commit
     $ poetry install --with "dev, test" --all-extras

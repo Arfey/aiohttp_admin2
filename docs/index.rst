@@ -34,8 +34,8 @@ representation and access to these.
 
 .. image:: /images/index.png
 
-Installation
-------------
+Installation aiohttp_admin2
+---------------------------
 
 The first step which you need to do it’s installing library
 
@@ -753,7 +753,6 @@ The source code of current examples you might to find `here
 
    installation
    usage_aiohttp_admin
-   modules
    contributing
    authors
    history
