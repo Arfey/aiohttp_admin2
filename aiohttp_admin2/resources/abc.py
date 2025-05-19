@@ -181,6 +181,7 @@ class AbstractResource(ABC):
         cursor: t.Optional[int] = None,
         order_by: t.Optional[str] = None,
         filters: t.Optional[FiltersType] = None,
+        with_count: bool = True,
     ) -> Paginator:
         """
         Get list of instances. This method will use for show list of instances

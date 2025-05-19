@@ -326,6 +326,7 @@ class Controller:
             order_by=self.order_by,
             filters=filters_list,
             page=page,
+            with_count=True,
         )
 
         await self.prepare_instances(list_data.instances)
@@ -364,6 +365,7 @@ class Controller:
         cursor: t.Optional[int] = None,
         order_by: t.Optional[str] = None,
         filters: t.Optional[FiltersType] = None,
+        with_count: bool = True,
     ):
         await self.access_hook()
 
@@ -376,6 +378,7 @@ class Controller:
             limit=self.per_page,
             order_by=order_by or self.order_by,
             filters=filters,
+            with_count=with_count,
         )
 
         await self.prepare_instances(list_data.instances)

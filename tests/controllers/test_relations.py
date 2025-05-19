@@ -1,28 +1,6 @@
-from aiohttp import web
-
 from aiohttp_admin2.controllers.controller import Controller
 from aiohttp_admin2.controllers.relations import ToManyRelation
 from aiohttp_admin2.views import ControllerView
-
-# from aiohttp_admin2.views import Admin
-
-
-# @dataclass
-# class ToManyRelation:
-#     """
-#     The current class need to describe one to many or many to many relation
-#     between two tables.
-#     """
-#     name: str
-#     left_table_pk: str
-#     relation_controller: "Callable[..., ControllerView] | ControllerView"
-#     view_settings: dict[str, t.Any] | None = None
-
-#     def accept(self, obj: t.Type['ControllerView']) -> None:
-#         if callable(self.relation_controller):
-#             self.relation_controller = self.relation_controller()
-
-#         obj.visit_to_many_relations(self)
 
 
 class MockController(Controller):

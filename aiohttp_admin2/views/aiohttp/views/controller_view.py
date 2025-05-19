@@ -83,6 +83,7 @@ class ControllerView(BaseControllerView):
             **params._asdict(),
             filters=filters,
             url_builder=url_builder,
+            with_count=not self.infinite_scroll,
         )
 
         with_infinity_scroll = bool(req.rel_url.query.get('cursor'))

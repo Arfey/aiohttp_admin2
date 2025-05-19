@@ -64,6 +64,7 @@ class MongoResource(AbstractResource):
         cursor=None,
         order_by: t.Optional[str] = None,
         filters: t.Optional[FiltersType] = None,
+        with_count: bool = True,
     ) -> Paginator:
         self._validate_list_params(page=page, cursor=cursor, limit=limit)
         sort = self.get_order(order_by)

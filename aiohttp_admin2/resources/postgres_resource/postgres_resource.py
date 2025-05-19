@@ -128,6 +128,7 @@ class PostgresResource(AbstractResource):
         cursor: t.Optional[int] = None,
         order_by: t.Optional[str] = None,
         filters: t.Optional[FiltersType] = None,
+        with_count: bool = True,
     ) -> Paginator:
         self._validate_list_params(page=page, cursor=cursor, limit=limit)
 
@@ -135,7 +136,7 @@ class PostgresResource(AbstractResource):
 
         id_orders = f"{self._primary_key.name}", f"-{self._primary_key.name}"
 
-        if order_by not in id_orders and cursor:
+        if order_by not in id_orders and cursor is not None:
             raise ClientException(CURSOR_PAGINATION_ERROR_MESSAGE)
 
         async with self.engine.acquire() as conn:
@@ -161,7 +162,7 @@ class PostgresResource(AbstractResource):
             for r in await cursor_query.fetchall():
                 res.append(self._row_to_instance(r, res))
 
-            if cursor is None:
+            if cursor is None and with_count:
                 if filters:
                     count: int = await self._execute_scalar(
                         conn,

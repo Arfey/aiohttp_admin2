@@ -156,6 +156,7 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
             **params._asdict(),
             filters=filters_list,
             url_builder=url_builder,
+            with_count=not self.infinite_scroll,
         )
 
         parent = self.get_parent()()

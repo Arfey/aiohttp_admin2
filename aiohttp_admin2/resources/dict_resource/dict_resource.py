@@ -74,6 +74,7 @@ class DictResource(AbstractResource):
         cursor: t.Optional[int] = None,
         order_by: t.Optional[str] = None,
         filters: t.Optional[FiltersType] = None,
+        with_count: bool = True,
     ) -> Paginator:
         self._validate_list_params(page=page, cursor=cursor, limit=limit)
 
@@ -141,7 +142,7 @@ class DictResource(AbstractResource):
             instances=instances[offset:offset + limit + 1],
             limit=limit,
             offset=offset,
-            count=len(instances),
+            count=len(instances) if with_count else None,
         )
 
     async def delete(self, pk: PK) -> None:

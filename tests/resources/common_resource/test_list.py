@@ -360,3 +360,13 @@ async def test_common_filters_for_get_list(resource):
 
     assert len(list_objects_ids) == 1
     assert list_objects_ids[0] == instances[0].get_pk()
+
+
+async def test_without_count(resource):
+    await generate_fake_instance(resource, 10)
+
+    list_objects = await resource.get_list(with_count=True)
+    assert list_objects.count == 10
+
+    list_objects = await resource.get_list(with_count=False)
+    assert list_objects.count is None
