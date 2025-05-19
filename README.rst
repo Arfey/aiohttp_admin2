@@ -22,7 +22,7 @@ Aiohttp admin
 
 `Demo site
 <https://shrouded-stream-28595.herokuapp.com/>`_ | `Demo source code
-<https://github.com/Arfey/aiohttp_admin2/tree/master/demo/main>`_.
+<https://github.com/Arfey/aiohttp_admin2/tree/master/example_projects/main>`_.
 
 The aiohttp admin is a library for build admin interface for applications based
 on the aiohttp. With this library you can ease to generate CRUD views for your
