@@ -691,7 +691,7 @@ object you need to add to `relations_to_one` list in apropriate controller.
 
 To declare many-to-many relation in aiohttp admin you need to create the
 `ToManyRelation` from the `aiohttp_admin2.controllers.relations` module.
-Created object you need to add to `relations_to_many` list in apropriate
+Created object you need to add to `relations_to_many` list in appropriate
 controller.
 
 *snippet from the demo*
@@ -716,6 +716,21 @@ controller.
 - *left_table_pk* - name of the field which responsible for the current
   relation
 - *relation_controller* - controller of related models (can be callable object)
+- *view_settings* - override a controller view settings
+
+.. note::
+    `ToManyRelation` create a controller view for the current controller with default
+    settings. If you need to specify any view's settings (like `template_delete_name`,
+    `infinite_scroll` etc) use `view_settings` for it.
+
+    .. code-block:: python
+
+        ToManyRelation(
+            name='products',
+            left_table_pk='id',
+            view_settings={"infinite_scroll": True},
+            relation_controller=lambda: ProductController,
+        )
 
 
 Custom fields

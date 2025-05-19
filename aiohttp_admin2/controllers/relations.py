@@ -1,7 +1,9 @@
 import typing as t
+from collections.abc import Callable
 from dataclasses import dataclass
 
 if t.TYPE_CHECKING:
+    from aiohttp_admin2.controllers.controller import Controller  # noqa
     from aiohttp_admin2.views import ControllerView  # noqa
 
 
@@ -16,7 +18,8 @@ class ToManyRelation:
     """
     name: str
     left_table_pk: str
-    relation_controller: t.Any
+    relation_controller: "Callable[..., Controller] | Controller"
+    view_settings: dict[str, t.Any] | None = None
 
     def accept(self, obj: t.Type['ControllerView']) -> None:
         if callable(self.relation_controller):

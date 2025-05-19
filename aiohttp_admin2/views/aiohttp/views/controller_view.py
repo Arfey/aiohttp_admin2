@@ -260,4 +260,7 @@ class ControllerView(BaseControllerView):
         }
         tab_name = f'{cls.__name__}AutogenerateManyToManyTab'
 
+        if obj.view_settings:
+            kwargs.update(obj.view_settings)
+
         cls.add_tab(type(tab_name, (ManyToManyTabView,), kwargs))
