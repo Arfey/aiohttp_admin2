@@ -55,10 +55,9 @@ class ArrayWidget(BaseWidget):
 
 class CKEditorWidget(BaseWidget):
     """This widget represent a field as a smart html editor."""
-    template_name = 'aiohttp_admin/blocks/form/fields/ck_editor_field.html'
-    js_extra = [
-        "https://cdn.ckeditor.com/4.15.0/standard/ckeditor.js"
-    ]
+
+    template_name = "aiohttp_admin/blocks/form/fields/ck_editor_field.html"
+    js_extra = ["https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"]
 
 
 class DateTimeWidget(BaseWidget):
