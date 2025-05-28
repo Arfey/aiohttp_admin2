@@ -67,6 +67,7 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
                 "mapper": mapper,
                 "fields": controller.fields,
                 "exclude_fields": self.controller.exclude_create_fields,
+                "read_only_fields": self.controller.read_only_fields,
                 "create_post_url": create_post_url,
             }
         )
@@ -206,6 +207,7 @@ class ManyToManyTabView(TabBaseView, BaseControllerView):
                 "object": instance,
                 "media": self.get_extra_media(),
                 "exclude_fields": self.controller.exclude_update_fields,
+                "read_only_fields": self.controller.read_only_fields,
                 "controller": controller,
                 "title": f"{self.get_name()}#{pk}",
                 "pk": pk,

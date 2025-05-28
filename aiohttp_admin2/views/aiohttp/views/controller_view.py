@@ -150,6 +150,7 @@ class ControllerView(BaseControllerView):
                 "mapper": mapper or controller.mapper(instance.data.to_dict()),
                 "fields": controller.fields,
                 "exclude_fields": self.controller.exclude_update_fields,
+                "read_only_fields": self.controller.read_only_fields,
                 "is_common": True,
                 "tabs": self.tabs_list(),
                 "pk": pk,
@@ -175,6 +176,7 @@ class ControllerView(BaseControllerView):
                 "mapper": mapper or controller.mapper({}),
                 "fields": controller.fields,
                 "exclude_fields": self.controller.exclude_create_fields,
+                "read_only_fields": self.controller.read_only_fields,
                 "create_post_url": str(
                     req.app.router[self.get_url(self.post_create).name]
                     .url_for()
